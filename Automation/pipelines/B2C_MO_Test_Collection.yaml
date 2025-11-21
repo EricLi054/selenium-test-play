@@ -1,0 +1,60 @@
+name: $(Rev:r)
+
+trigger:
+  batch: true
+  branches:
+    include:
+    - main
+    - release/*
+  paths:
+    exclude:
+      - readme.md
+      - .gitignore
+      - .gitattribute
+      - .editorconfig
+
+pr:
+- main
+- release/*
+
+jobs:
+- job: Build
+  displayName: Build
+
+  workspace:
+    clean: all
+
+  pool:
+    vmImage: windows-latest
+
+  steps:
+    - checkout: self
+      clean: true
+
+    - task: NuGetCommand@2
+      inputs:
+        command: 'restore'
+        includeNuGetOrg: true
+        restoreSolution: '**/TestCollection_B2C.sln'
+    
+    - task: VSBuild@1
+      displayName: Build
+      inputs:
+        solution: '**\TestCollection_B2C.sln'
+        vsVersion: latest
+        platform: 'Any CPU'
+        configuration: 'Release'
+
+    - task: ArchiveFiles@2
+      inputs:
+        rootFolderOrFile: 'Automation'
+        includeRootFolder: false
+        archiveType: 'zip'
+        archiveFile: 'Test.zip'
+        replaceExistingArchive: true
+
+    - task: PublishBuildArtifacts@1
+      inputs:
+        PathtoPublish: 'Test.zip'
+        ArtifactName: 'Test'
+        publishLocation: 'Container'

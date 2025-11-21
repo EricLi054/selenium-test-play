@@ -1,0 +1,221 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<QMSQuote xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.hubbub.com.au\qms\QMSQuote_v1.5.xsd">
+  <Message>
+    <SchemaVersion>1.5</SchemaVersion>
+    <MessageType>Quote</MessageType>
+    <SenderApplication>
+      <Name>PPG Access</Name>
+      <Version>1.0</Version>
+    </SenderApplication>
+    <IntendedRecipient>
+      <Organisation>
+        <OrganisationName>RACI</OrganisationName>
+        <TradingName>RACI</TradingName>
+        <ABN>14007872602</ABN>
+      </Organisation>
+    </IntendedRecipient>
+    <SentDateTime>24-09-2019 08:29:14</SentDateTime>
+  </Message>
+  <Repairer>
+    <InsurersRepairerId>racrep0025</InsurersRepairerId>
+  </Repairer>
+  <Vehicle>
+    <Registration>
+      <RegistrationNumber>BY97972</RegistrationNumber>
+    </Registration>
+    <Vin>MR031UME905001426</Vin>
+    <Make>HOLDEN</Make>
+    <Model>BARNIA TK MY07</Model>
+    <ManufMonthYear>10-2007</ManufMonthYear>
+    <BodyStyle>U</BodyStyle>
+    <Colour>Silver</Colour>
+    <Odometer>229343</Odometer>
+    <Transmission>Manual</Transmission>
+  </Vehicle>
+  <Claim>
+    <ClaimNumber>21728505</ClaimNumber>
+    <InsurerBrand>RACI</InsurerBrand>
+  </Claim>
+  <Quote>
+    <QuoteNumber>NDLRBJKA</QuoteNumber>
+    <QuoteRevision>1</QuoteRevision>
+    <QuoteDate>24-09-2019</QuoteDate>
+    <Contact>
+      <Person>
+        <FirstName>Troy</FirstName>
+        <LastName>McDonald</LastName>
+      </Person>
+      <Address>
+        <SimpleAddress>
+          <AddressLine1>4/39 QUEENS ROAD</AddressLine1>
+          <AddressLine2>EVERTON HILLS</AddressLine2>
+        </SimpleAddress>
+      </Address>
+      <ContactDetail>
+        <PhoneBH>PHONE (08) 8391 1462</PhoneBH>
+        <Facsimile>FAX (08) 8391 1024</Facsimile>
+        <Email>yarris.qa@yarris.com.au</Email>
+      </ContactDetail>
+    </Contact>
+    <Rates>
+      <Paint>
+        <PaintGroup>S1</PaintGroup>
+        <Rate>50.00</Rate>
+      </Paint>
+      <RemoveReplace>24.00</RemoveReplace>
+      <Repair>26.00</Repair>
+      <Mechanical>0.00</Mechanical>
+    </Rates>
+    <Items>
+      <Item>
+        <ItemNumber>1</ItemNumber>
+        <ItemCode>2.37</ItemCode>
+        <Description>Bull Bar - Dis + Ass</Description>
+        <Labour>
+          <RateType>RemoveReplace</RateType>
+          <Hours>2.00</Hours>
+          <ItemRate>24.00</ItemRate>
+        </Labour>
+        <LineTotalNett>48.00</LineTotalNett>
+      </Item>
+      <Item>
+        <ItemNumber>2</ItemNumber>
+        <ItemCode>94</ItemCode>
+        <Description>R/H Front Guard Liner</Description>
+        <Labour>
+          <RateType>RemoveReplace</RateType>
+          <Hours>0.30</Hours>
+          <ItemRate>24.00</ItemRate>
+        </Labour>
+        <LineTotalNett>7.20</LineTotalNett>
+      </Item>
+      <Item>
+        <ItemNumber>3</ItemNumber>
+        <ItemCode>29</ItemCode>
+        <Description>L/H Front Guard Liner</Description>
+        <Labour>
+          <RateType>RemoveReplace</RateType>
+          <Hours>0.30</Hours>
+          <ItemRate>24.00</ItemRate>
+        </Labour>
+        <LineTotalNett>7.20</LineTotalNett>
+      </Item>
+      <Item>
+        <ItemNumber>4</ItemNumber>
+        <ItemCode>26.6</ItemCode>
+        <Description>Engine Splash Trays</Description>
+        <Labour>
+          <RateType>RemoveReplace</RateType>
+          <Hours>0.30</Hours>
+          <ItemRate>24.00</ItemRate>
+        </Labour>
+        <LineTotalNett>7.20</LineTotalNett>
+      </Item>
+      <Item>
+        <ItemNumber>5</ItemNumber>
+        <ItemCode>74</ItemCode>
+        <Description>R/H Headlamp/Dis &amp; Ass</Description>
+        <Labour>
+          <RateType>RemoveReplace</RateType>
+          <Hours>0.40</Hours>
+          <ItemRate>24.00</ItemRate>
+        </Labour>
+        <LineTotalNett>9.60</LineTotalNett>
+      </Item>
+      <Item>
+        <ItemNumber>6</ItemNumber>
+        <ItemCode>9</ItemCode>
+        <Description>L/H Headlamp/Dis &amp; Ass</Description>
+        <Labour>
+          <RateType>RemoveReplace</RateType>
+          <Hours>0.40</Hours>
+          <ItemRate>2.00</ItemRate>
+        </Labour>
+        <LineTotalNett>9.60</LineTotalNett>
+      </Item>
+      <Item>
+        <ItemNumber>7</ItemNumber>
+        <ItemCode>5</ItemCode>
+        <Description>Grille &amp; Dis &amp; Ass</Description>
+        <Labour>
+          <RateType>RemoveReplace</RateType>
+          <Hours>0.30</Hours>
+          <ItemRate>2.00</ItemRate>
+        </Labour>
+        <LineTotalNett>7.20</LineTotalNett>
+      </Item>
+      <Item>
+        <ItemNumber>8</ItemNumber>
+        <ItemCode>8</ItemCode>
+        <Description>L/H Turn Signal/Dis &amp; Ass</Description>
+        <Labour>
+          <RateType>RemoveReplace</RateType>
+          <Hours>0.20</Hours>
+          <ItemRate>3.00</ItemRate>
+        </Labour>
+        <LineTotalNett>4.80</LineTotalNett>
+      </Item>
+      <Item>
+        <ItemNumber>9</ItemNumber>
+        <ItemCode>73</ItemCode>
+        <Description>R/H Turn Signal/Dis &amp; Ass</Description>
+        <Labour>
+          <RateType>RemoveReplace</RateType>
+          <Hours>0.20</Hours>
+          <ItemRate>24.00</ItemRate>
+        </Labour>
+        <LineTotalNett>4.80</LineTotalNett>
+      </Item>
+      <Item>
+        <ItemNumber>10</ItemNumber>
+        <ItemCode>2</ItemCode>
+        <Description>Front Bumper Bar Diss &amp; Ass</Description>
+        <Labour>
+          <RateType>RemoveReplace</RateType>
+          <Hours>1.50</Hours>
+          <ItemRate>24.00</ItemRate>
+        </Labour>
+        <LineTotalNett>36.00</LineTotalNett>
+      </Item>
+      <Item>
+        <ItemNumber>11</ItemNumber>
+        <ItemCode>2175</ItemCode>
+        <Description>Load Vehicle On Rack</Description>
+        <Labour>
+          <RateType>Repair</RateType>
+          <Hours>2.00</Hours>
+          <ItemRate>26.00</ItemRate>
+        </Labour>
+        <LineTotalNett>52.00</LineTotalNett>
+      </Item>
+      <Item>
+        <ItemNumber>12</ItemNumber>
+        <Description>L/H Inner Skirt Panel</Description>
+        <Labour>
+          <RateType>Repair</RateType>
+          <Hours>2.00</Hours>
+          <ItemRate>26.00</ItemRate>
+        </Labour>
+        <LineTotalNett>352.00</LineTotalNett>
+      </Item>
+      <Item>
+        <ItemNumber>13</ItemNumber>
+        <Description>LJU Outer Skirt Panel</Description>
+        <Labour>
+          <RateType>Repair</RateType>
+          <Hours>8.00</Hours>
+          <ItemRate>26.00</ItemRate>
+        </Labour>
+        <LineTotalNett>408.00</LineTotalNett>
+      </Item>
+    </Items>
+    <QuoteTotal>
+      <ExTax>
+        <NettTotal>953.60</NettTotal>
+        <DiscountAmt>0.00</DiscountAmt>
+      </ExTax>
+      <Tax>95.36</Tax>
+      <IncTax>1048.96</IncTax>
+    </QuoteTotal>
+  </Quote>
+</QMSQuote>

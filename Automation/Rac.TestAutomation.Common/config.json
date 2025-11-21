@@ -1,0 +1,190 @@
+﻿{
+  "Browser": "msedge",
+  "WindowsAD": {
+    "User": "",
+    "Pwd": ""
+  },
+  "B2C": {
+    "Url": "https://racwa-dcc-web-b2c-int1.azureapp.ractest.com.au/",
+    "FeatureToggles": [
+      {
+        "Key": "UseMemberCentralMock",
+        "Value": true
+      },
+      {
+        "Key": "RoadsideBundle",
+        "Value": true
+      },
+      {
+        "Key": "UseAddressManagementApi",
+        "Value": true
+      },
+      {
+        "Key": "MotorRiskAddress",
+        "Value": true
+      },
+      {
+        "Key": "RefundToOrigin",
+        "Value": true
+      },
+      {
+        "Key": "CycloneReInsurance",
+        "Value": true
+      },
+      {
+        "Key": "PcmCycloneReInsurance",
+        "Value": true
+      },
+      {
+        "Key": "UseCxOneAgentForClaimsWebChat",
+        "Value": true
+      },
+      {
+        "Key": "UseCxOneAgentForPolicyWebChat",
+        "Value": true
+      }
+    ]
+  },
+  "Spark": {
+    "BannerVisibleToggle": true,
+    "Applications": {
+      "Boat": "https://new-business-boat-sit.racinsurance.ractest.com.au/quote/boat/",
+      "CancelPolicy": "https://pco-sit.racinsurance.ractest.com.au/Policy/Cancel",
+      "Caravan": "https://ico-sit.racinsurance.ractest.com.au/Caravan/Quote",
+      "ClaimsHomeGeneral": "https://claimshomegeneraldamage-sit.racinsurance.ractest.com.au/claims/home/general/",
+      "ClaimsMotorCollision": "https://claimsmotorcollision-sit.racinsurance.ractest.com.au/claims/motor/car-accident",
+      "ClaimsMotorGlass": "https://claimsmotorglass-sit.racinsurance.ractest.com.au/claims/motor/glass/before-you-start",
+      "ClaimsServicing": "https://claimsservicing-sit.racinsurance.ractest.com.au",
+      "EFT": "https://claimseft-sit.racinsurance.ractest.com.au/Claims/EFTLink",
+      "LaunchPage": "https://ins-sit.ractest.com.au/testlaunchpage",
+      "Motorcycle": "https://motorcycleonline-sit.racinsurance.ractest.com.au/Quote/Motorcycle",
+      "MotorEndorsement": "https://motorendorsement-sit.racinsurance.ractest.com.au/policy/motor/manage/",
+      "TriageHome": "https://ctr-sit.racinsurance.ractest.com.au/claims/home/building-and-contents",
+      "TriageMotor": "https://ctr-sit.racinsurance.ractest.com.au/claims/motor/what-are-you-claiming-for",
+      "UpdateHowYouPay": "https://cmp-sit.racinsurance.ractest.com.au/policy/payment/how-you-pay",
+      "MemberRefund": "https://memberrefund-sit.racinsurance.ractest.com.au",
+      "MakeAPayment": "https://makeapayment-sit.racinsurance.ractest.com.au/member/pay",
+      "CaravanEndorsement": "https://caravanendorsement-sit.racinsurance.ractest.com.au/policy/caravan/manage"
+    },
+    "FeatureToggles": [
+      {
+        "Key": "Use MC Mock",
+        "Value": true
+      },
+      {
+        "Key": "Use OTP Bypass",
+        "Value": true
+      },
+      {
+        "Key": "Use myRAC Login",
+        "Value": true
+      },
+      {
+        "Key": "Expect MFA for Spark Endorsements Bank Details",
+        "Value": false
+      },
+      {
+        "Key": "CHG More about your damage screen INSU-818",
+        "Value": false
+      },
+      {
+        "Key": "Use Person V3",
+        "Value": false
+      }
+    ]
+  },
+  "Shield": {
+    "Environment": "shieldint1",
+    "Web": {
+      "Url": "https://shieldint1.ractest.com.au",
+      "User": "",
+      "Pwd": ""
+    },
+    "Database": {
+      "User": "",
+      "Pwd": ""
+    }
+  },
+  "MyRAC": {
+    "Pwd": ""
+  },
+  "Azure": {
+    "TenantId": "",
+    "MemberCentral": {
+      "APIKey": "",
+      "APIEnv": "sit",
+      "HasLiveSync": false
+    },
+    "MCMock": {
+      "APIKey": "",
+      "APIEnv": "sit",
+      "APIClientId": "",
+      "APISecret": "",
+      "APIScope": ""
+    },
+    "RoadsideBundling": {
+      "APIKey": "not applicable",
+      "APIEnv": "not applicable",
+      "HasLiveSync": false
+    },
+    "Sendgrid": {
+      "APIKey": "",
+      "APIEnv": "sit"
+    },
+    "ContactService": {
+      "APIKey": "",
+      "APIEnv": "sit"
+    },
+    "MemberNotificationService": {
+      "APIKey": "",
+      "APIEnv": "sit"
+    },
+    "Shield": {
+      "APIKey": ""
+    },
+    "StorageMotorClaims": {
+      "URI": "https://racwadccstanpetestautm.table.core.windows.net",
+      "AccountName": "racwadccstanpetestautm",
+      "AccountKey": ""
+    },
+    "StorageMemberRefund": {
+      "URI": "https://racwadcdstasitmrorefunds.table.core.windows.net",
+      "AccountName": "racwadcdstasitmrorefunds",
+      "AccountKey": ""
+    }
+  },
+  "Email": {
+    "APIKey": "",
+    "ServerID": "u8pbw776",
+    "Domain": "u8pbw776.mailosaur.net"
+  },
+  "Telephone": {
+    "OverrideOTPNumber": "+15405024901",
+    "FeatureToggles": [
+      {
+        "Key": "expect MNS SMS to be retrievable from Mailosaur Inbox",
+        "Value": false
+      }
+    ]
+  },
+  "BrowserStack": {
+    "Percy": {
+      "Token": null
+    },
+    "Automate": {
+      "URL": "https://hub-cloud.browserstack.com/wd/hub/",
+      "UserName": "",
+      "Key": ""
+    }
+  },
+  "CCI": {
+    "ClaimMailbox": "sit1.claims@ractest.com.au",
+    "InsurerMailbox": "sit1.claims.insurer@ractest.com.au",
+    "SupplierMailbox": "sit1.claims.supplier@ractest.com.au",
+    "ProofOfLossMailbox": "sit.proof.of.loss@ractest.com.au",
+    "TCUMailbox": "sit.tcu@rac.com.au",
+    "TenantId": "",
+    "ClientID": "",
+    "ClientSecret": ""
+  }
+}

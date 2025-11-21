@@ -1,0 +1,32 @@
+[
+  {
+    "Name": "Oracle Financial Export v2",
+    "Time": "07:30",
+    "ExcludedWeekDays": "Sun,Sat"
+  },
+  {
+    "Name": "Cancellation for Unpaid DD policies",
+    "Time": "07:45",
+    "ExcludedWeekDays": "Sun,Sat"
+  },
+  {
+    "Name": "Non-Payment Process",
+    "Time": "19:00",
+    "ExcludedWeekDays": "Sun,Mon,Sat"
+  },
+  {
+    "Name": "Create Online Reconciliation Transactions",
+    "Time": "07:45",
+    "ExcludedWeekDays": "Sun,Sat"
+  },
+  {
+    "Name": "ComputerShare Daily Job",
+    "Time": "18:30",
+    "ExcludedWeekDays": "Sun,Sat"
+  },
+  {
+    "Name": "EAS Batch Starter",
+    "Time": "18:30",
+    "ExcludedWeekDays": "Sun,Sat"
+  }
+]

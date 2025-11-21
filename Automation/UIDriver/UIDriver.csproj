@@ -1,0 +1,379 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\NUnit.4.0.1\build\NUnit.props" Condition="Exists('..\packages\NUnit.4.0.1\build\NUnit.props')" />
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{9B426136-10DB-4393-81CA-0FD5B5FD1A4F}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>UIDriver</RootNamespace>
+    <AssemblyName>UIDriver</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <LangVersion>preview</LangVersion>
+    <FileAlignment>512</FileAlignment>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=8.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Bcl.AsyncInterfaces.8.0.0\lib\net462\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.13.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="nunit.framework, Version=4.0.1.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
+      <HintPath>..\packages\NUnit.4.0.1\lib\net462\nunit.framework.dll</HintPath>
+    </Reference>
+    <Reference Include="nunit.framework.legacy, Version=4.0.1.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
+      <HintPath>..\packages\NUnit.4.0.1\lib\net462\nunit.framework.legacy.dll</HintPath>
+    </Reference>
+    <Reference Include="Percy, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\PercyIO.Selenium.1.1.0\lib\netstandard2.0\Percy.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Drawing.Common, Version=7.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Drawing.Common.7.0.0\lib\net462\System.Drawing.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="System.IO, Version=4.1.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.IO.4.3.0\lib\net462\System.IO.dll</HintPath>
+      <Private>True</Private>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Json, Version=2.0.8.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Json.4.7.1\lib\net461\System.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Memory, Version=4.0.1.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Memory.4.5.5\lib\net461\System.Memory.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net.Http, Version=4.1.1.3, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Net.Http.4.3.4\lib\net46\System.Net.Http.dll</HintPath>
+      <Private>True</Private>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Numerics.Vectors, Version=4.1.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Numerics.Vectors.4.5.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime, Version=4.1.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Runtime.4.3.0\lib\net462\System.Runtime.dll</HintPath>
+      <Private>True</Private>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.6.0.0\lib\net461\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Security.Cryptography.Algorithms, Version=4.2.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Security.Cryptography.Algorithms.4.3.0\lib\net463\System.Security.Cryptography.Algorithms.dll</HintPath>
+      <Private>True</Private>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Security.Cryptography.Encoding, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Security.Cryptography.Encoding.4.3.0\lib\net46\System.Security.Cryptography.Encoding.dll</HintPath>
+      <Private>True</Private>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Security.Cryptography.Primitives, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Security.Cryptography.Primitives.4.3.0\lib\net46\System.Security.Cryptography.Primitives.dll</HintPath>
+      <Private>True</Private>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Security.Cryptography.X509Certificates, Version=4.1.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Security.Cryptography.X509Certificates.4.3.0\lib\net461\System.Security.Cryptography.X509Certificates.dll</HintPath>
+      <Private>True</Private>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Text.Encodings.Web, Version=8.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Text.Encodings.Web.8.0.0\lib\net462\System.Text.Encodings.Web.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Text.Json, Version=8.0.0.5, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Text.Json.8.0.5\lib\net462\System.Text.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Threading.Tasks.Extensions.4.5.4\lib\net461\System.Threading.Tasks.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ValueTuple.4.5.0\lib\net47\System.ValueTuple.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="WebDriver, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Selenium.WebDriver.4.35.0\lib\netstandard2.0\WebDriver.dll</HintPath>
+    </Reference>
+    <Reference Include="WebDriver.Support, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Selenium.Support.4.35.0\lib\netstandard2.0\WebDriver.Support.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Helpers\HelpersCreditCardPayment.cs" />
+    <Compile Include="Helpers\HelpersQuoteHome.cs" />
+    <Compile Include="Helpers\HelpersQuoteMotorCar.cs" />
+    <Compile Include="Helpers\HelpersQuoteMotorcycle.cs" />
+    <Compile Include="Helpers\HelpersQuotePet.cs" />
+    <Compile Include="Helpers\HelpersShield.cs" />
+    <Compile Include="Pages\B2C\BaseQuotePage2.cs" />
+    <Compile Include="Pages\B2C\CallbackConfirmation.cs" />
+    <Compile Include="Pages\B2C\ErrorB2C.cs" />
+    <Compile Include="Pages\B2C\FeatureTogglePage.cs" />
+    <Compile Include="Pages\B2C\HomeQuote\HomeQuote1Details.cs" />
+    <Compile Include="Pages\B2C\HomeQuote\HomeQuote2Quote.cs" />
+    <Compile Include="Pages\B2C\HomeQuote\HomeQuote3Policy.cs" />
+    <Compile Include="Pages\B2C\HomeQuote\HomeQuote3Summary.cs" />
+    <Compile Include="Pages\B2C\KnockoutDialog.cs" />
+    <Compile Include="Pages\B2C\QuotePayments.cs" />
+    <Compile Include="Pages\B2C\HomeQuote\HomeQuoteConfirmation.cs" />
+    <Compile Include="Pages\B2C\PetQuote\PetQuote1Details.cs" />
+    <Compile Include="Pages\B2C\PetQuote\PetQuote2Quote.cs" />
+    <Compile Include="Pages\B2C\PetQuote\PetQuote3Policy.cs" />
+    <Compile Include="Pages\B2C\PetQuote\PetQuote3Summary.cs" />
+    <Compile Include="Pages\B2C\PetQuote\PetQuoteConfirmation.cs" />
+    <Compile Include="Pages\B2C\RetrieveQuote.cs" />
+    <Compile Include="Pages\Claims\BaseClaimsConfirmation.cs" />
+    <Compile Include="Pages\Claims\ClaimHomePage2DamageEventDetails.cs" />
+    <Compile Include="Pages\Claims\ClaimHomePage3OnlineSettlement.cs" />
+    <Compile Include="Pages\Claims\ClaimHomePage3OtherParties.cs" />
+    <Compile Include="Pages\Claims\ClaimHomePageConfirmation.cs" />
+    <Compile Include="Pages\Claims\ClaimMotorPage2DamageEventDetails.cs" />
+    <Compile Include="Pages\Claims\ClaimMotorPage3DriverDetails.cs" />
+    <Compile Include="Pages\Claims\ClaimMotorPage4OtherParties.cs" />
+    <Compile Include="Pages\Claims\ClaimPreamble.cs" />
+    <Compile Include="Pages\Claims\BaseClaimsPrelimDetails.cs" />
+    <Compile Include="Pages\Claims\ClaimPrelimHome.cs" />
+    <Compile Include="Pages\Claims\ClaimPrelimMotor.cs" />
+    <Compile Include="Pages\LaunchPage.cs" />
+    <Compile Include="Pages\B2C\MotorCarQuote\MotorQuote3Summary.cs" />
+    <Compile Include="Pages\B2C\MotorCarQuote\MotorQuote1Details.cs" />
+    <Compile Include="Pages\B2C\QuoteCallback.cs" />
+    <Compile Include="Pages\B2C\MotorCarQuote\MotorQuote3Policy.cs" />
+    <Compile Include="Pages\B2C\MotorCarQuote\MotorQuote2Quote.cs" />
+    <Compile Include="Pages\B2C\MotorCarQuote\MotorQuoteConfirmation.cs" />
+    <Compile Include="Pages\MicrosoftAD\MyApplications.cs" />
+    <Compile Include="Pages\MyRAC\MyRACLogin.cs" />
+    <Compile Include="Pages\MyRAC\MyRACRegisterAnAccount.cs" />
+    <Compile Include="Pages\MyRAC\MyRACUpdateContactInformation.cs" />
+    <Compile Include="Pages\PCM\CertificateOfCurrency\RetrieveCertificateOfCurrency.cs" />
+    <Compile Include="Pages\PCM\Home\ChangeMyHomeDetails.cs" />
+    <Compile Include="Pages\PCM\ContactDetails\UpdateMailingPreferences.cs" />
+    <Compile Include="Pages\PCM\BaseEndorsementPage.cs" />
+    <Compile Include="Pages\PCM\Home\RenewHomePolicy.cs" />
+    <Compile Include="Pages\Shield\AdministrationPages\FindEmployeeRoles.cs" />
+    <Compile Include="Pages\Shield\AdministrationPages\NewEmployee.cs" />
+    <Compile Include="Pages\Shield\AdministrationPages\SchedulerManagerView.cs" />
+    <Compile Include="Pages\Shield\AdministrationPages\SchedulerManagerAddJob.cs" />
+    <Compile Include="Pages\Shield\AdministrationPages\SecurityManager.cs" />
+    <Compile Include="Pages\Shield\AdministrationPages\SecurityManagerPromotion.cs" />
+    <Compile Include="Pages\Shield\BaseShieldPage.cs" />
+    <Compile Include="Pages\Shield\ClaimPages\ChildPages\TreeItemDriverDetails.cs" />
+    <Compile Include="Pages\Shield\ClaimPages\ShieldClaimCreatePayment.cs" />
+    <Compile Include="Pages\Shield\ClaimPages\ShieldClaimDetailsPage.cs" />
+    <Compile Include="Pages\Shield\ClaimPages\ShieldClaimManualAction.cs" />
+    <Compile Include="Pages\Shield\ClaimPages\Tabs\RelatedPolicy.cs" />
+    <Compile Include="Pages\Shield\ClaimPages\Tabs\DependenciesTree.cs" />
+    <Compile Include="Pages\Shield\ClaimPages\Tabs\Dashboard.cs" />
+    <Compile Include="Pages\Shield\ClaimPages\ChildPages\AddLiabilityReserve.cs" />
+    <Compile Include="Pages\Shield\ClaimPages\ChildPages\DamageDetails.cs" />
+    <Compile Include="Pages\Shield\ClaimPages\ChildPages\MaintainEvent.cs" />
+    <Compile Include="Pages\Shield\ClaimPages\ChildPages\TreeItemDamagesQuestionnairesAgenda.cs" />
+    <Compile Include="Pages\Shield\ContactPages\ContactSearchResults.cs" />
+    <Compile Include="Pages\Shield\ContactPages\MaintainContactEmail.cs" />
+    <Compile Include="Pages\Shield\ShieldLogin.cs" />
+    <Compile Include="Pages\Shield\ShieldSearchPage.cs" />
+    <Compile Include="Pages\Spark\BoatQuote\BaseBoatPage.cs" />
+    <Compile Include="Pages\Spark\Claim\Home\StormBuilding\DamagedBuilding.cs" />
+    <Compile Include="Pages\Spark\Claim\Home\StormBuilding\DamagedBuildingDetails.cs" />
+    <Compile Include="Pages\Spark\Claim\Home\StormBuilding\MoreAboutYourBuildingDamage.cs" />
+    <Compile Include="Pages\Spark\Claim\Home\StormBuilding\StormSafetyChecks.cs" />
+    <Compile Include="Pages\Spark\Claim\Home\StormBuilding\StormWaterDamageToBuilding.cs" />
+    <Compile Include="Pages\Spark\Claim\Home\StormBuilding\StormFixturesAndFittingsDamageToInvestmentProperty.cs" />
+    <Compile Include="Pages\Spark\Claim\Home\StormContents\DamagedContentsList.cs" />
+    <Compile Include="Pages\Spark\Claim\Home\StormContents\DamagedContents.cs" />
+    <Compile Include="Pages\Spark\Claim\Home\StormFence\ExcessAndExistingRepairs.cs" />
+    <Compile Include="Pages\Spark\Claim\Home\StormFence\NowLetsLookAtYourFence.cs" />
+    <Compile Include="Pages\Spark\Claim\Home\StormFence\YourPolicyPicker.cs" />
+    <Compile Include="Pages\Spark\Claim\Home\StormFence\ReviewYourClaim.cs" />
+    <Compile Include="Pages\Spark\Claim\Home\StormFence\UploadDocuments.cs" />
+    <Compile Include="Pages\Spark\Claim\Motor\Collision\AboutTheAccident.cs" />
+    <Compile Include="Pages\Spark\Claim\Motor\Collision\Confirmation.cs" />
+    <Compile Include="Pages\Spark\Claim\Motor\Collision\MoreThirdPartyDetails.cs" />
+    <Compile Include="Pages\Spark\Claim\Motor\Collision\ThirdPartyDetails.cs" />
+    <Compile Include="Pages\Spark\Claim\Motor\Collision\ReviewYourClaim.cs" />
+    <Compile Include="Pages\Spark\Claim\Motor\Collision\RepairerOptions.cs" />
+    <Compile Include="Pages\Spark\Claim\Motor\Collision\WheresYourCar.cs" />
+    <Compile Include="Pages\Spark\Claim\Motor\Collision\BeforeYouStart.cs" />
+    <Compile Include="Pages\Spark\Claim\Motor\Collision\AboutYourCar.cs" />
+    <Compile Include="Pages\Spark\Claim\Motor\Collision\DriverOfYourCar.cs" />
+    <Compile Include="Pages\Spark\Claim\Motor\Collision\DriverHistory.cs" />
+    <Compile Include="Pages\Spark\Claim\Motor\Collision\StartYourClaim.cs" />
+    <Compile Include="Pages\Spark\Claim\Motor\Collision\MoreAboutTheAccident.cs" />
+    <Compile Include="Pages\Spark\Claim\Motor\Collision\WhereAndHowItHappened.cs" />
+    <Compile Include="Pages\Spark\Claim\Motor\Collision\Witnesses.cs" />
+    <Compile Include="Pages\Spark\Claim\Motor\Glass\BeforeYouStart.cs" />
+    <Compile Include="Pages\Spark\Claim\Motor\Glass\StartYourClaim.cs" />
+    <Compile Include="Pages\Spark\Claim\Motor\BaseMotorClaimPage.cs" />
+    <Compile Include="Pages\Spark\Claim\SparkBeforeYouStart.cs" />
+    <Compile Include="Pages\Spark\BoatQuote\PremiumChangePopup.cs" />
+    <Compile Include="Pages\Spark\BoatQuote\SparkBoatAboutYou.cs" />
+    <Compile Include="Pages\Spark\BoatQuote\SparkBoatConfirmation.cs" />
+    <Compile Include="Pages\Spark\BoatQuote\SparkBoatLetsStart.cs" />
+    <Compile Include="Pages\Spark\BoatQuote\SparkBoatMoreBoat.cs" />
+    <Compile Include="Pages\Spark\BoatQuote\SparkBoatRetrieveQuote.cs" />
+    <Compile Include="Pages\Spark\BoatQuote\SparkBoatTypeOfBoat.cs" />
+    <Compile Include="Pages\Spark\BoatQuote\SparkBoatYourBoat.cs" />
+    <Compile Include="Pages\Spark\BoatQuote\SparkBoatYourRegistration.cs" />
+    <Compile Include="Pages\Spark\BoatQuote\SparkBoatPayment.cs" />
+    <Compile Include="Pages\Spark\BoatQuote\SparkBoatStartDate.cs" />
+    <Compile Include="Pages\Spark\BoatQuote\SparkBoatYourDetails.cs" />
+    <Compile Include="Pages\Spark\BoatQuote\SparkQuoteImportantInformation.cs" />
+    <Compile Include="Pages\Spark\BoatQuote\SparkBoatYourQuote.cs" />
+    <Compile Include="Pages\Spark\CaravanQuote\BeforeWeGetStarted.cs" />
+    <Compile Include="Pages\Spark\CaravanQuote\ConfirmationPage.cs" />
+    <Compile Include="Pages\Spark\Claim\Home\StormFence\BeforeYouStart.cs" />
+    <Compile Include="Pages\Spark\Claim\Home\StormFence\ContactDetails.cs" />
+    <Compile Include="Pages\Spark\Claim\Home\StormFence\Confirmation.cs" />
+    <Compile Include="Pages\Spark\Claim\Home\StormFence\SafetyAndSecurity.cs" />
+    <Compile Include="Pages\Spark\Claim\Home\StormFence\YourBankDetails.cs" />
+    <Compile Include="Pages\Spark\Claim\Home\StormFence\YourClaimSettlementOptions.cs" />
+    <Compile Include="Pages\Spark\Claim\Home\StormFence\YourDamagedFence.cs" />
+    <Compile Include="Pages\Spark\Claim\Home\StormFence\StartClaimEventDateTime.cs" />
+    <Compile Include="Pages\Spark\Claim\Motor\Glass\Confirmation.cs" />
+    <Compile Include="Pages\Spark\Claim\Motor\Glass\ReviewAndSubmitClaim.cs" />
+    <Compile Include="Pages\Spark\Claim\Motor\SparkYourPolicy.cs" />
+    <Compile Include="Pages\Spark\Claim\Motor\Glass\YourGlassRepairs.cs" />
+    <Compile Include="Pages\Spark\Claim\Motor\SparkStartYourClaim.cs" />
+    <Compile Include="Pages\Spark\Claim\Triage\Home\OtherSideOfDamageFence.cs" />
+    <Compile Include="Pages\Spark\Claim\Triage\Home\StormDamageClaim.cs" />
+    <Compile Include="Pages\Spark\Claim\Triage\Home\BuildingAndContents.cs" />
+    <Compile Include="Pages\Spark\Claim\Triage\Motor\OtherVehicle.cs" />
+    <Compile Include="Pages\Spark\Claim\Triage\Motor\CarInsuranceClaim.cs" />
+    <Compile Include="Pages\Spark\Claim\UploadInvoice\Confirmation.cs" />
+    <Compile Include="Pages\Spark\Claim\UploadInvoice\ErrorPage.cs" />
+    <Compile Include="Pages\Spark\Claim\UploadInvoice\UploadAndSubmit.cs" />
+    <Compile Include="Pages\Spark\ConfigurationPanel.cs" />
+    <Compile Include="Pages\Spark\Endorsements\CaravanEndorsement\CaravanBaseYourPremium.cs" />
+    <Compile Include="Pages\Spark\Endorsements\CaravanEndorsement\HeresYourMidTermPremium.cs" />
+    <Compile Include="Pages\Spark\Endorsements\CaravanEndorsement\ReviewYourCaravanPolicy.cs" />
+    <Compile Include="Pages\Spark\Endorsements\CaravanEndorsement\SetPolicyStartDate.cs" />
+    <Compile Include="Pages\Spark\Endorsements\CaravanEndorsement\RenewalConfirmation.cs" />
+    <Compile Include="Pages\Spark\Endorsements\CaravanEndorsement\PayYourRenewalPremium.cs" />
+    <Compile Include="Pages\Spark\Endorsements\CaravanEndorsement\StorageAndUse.cs" />
+    <Compile Include="Pages\Spark\Endorsements\CaravanEndorsement\HeresYourRenewalPremium.cs" />
+    <Compile Include="Pages\Spark\Endorsements\CaravanEndorsement\LetsUpdateYourCaravanOrTrailer.cs" />
+    <Compile Include="Pages\Spark\Endorsements\CaravanEndorsement\YourCaravanOrTrailer.cs" />
+    <Compile Include="Pages\Spark\Endorsements\MakePayment\ConfirmationPage.cs" />
+    <Compile Include="Pages\Spark\Endorsements\MakePayment\PaymentPage.cs" />
+    <Compile Include="Pages\Spark\Endorsements\MotorEndorsement\HeresYourPremium.cs" />
+    <Compile Include="Pages\Spark\Endorsements\MotorEndorsement\BaseYourPremium.cs" />
+    <Compile Include="Pages\Spark\Endorsements\MotorEndorsement\ReviewYourPolicy.cs" />
+    <Compile Include="Pages\Spark\Endorsements\MotorEndorsement\ChangePolicyStartDate.cs" />
+    <Compile Include="Pages\Spark\Endorsements\UpdateHowYouPay\UhohErrorPage.cs" />
+    <Compile Include="Pages\Spark\Endorsements\UpdateHowYouPay\ItsRenewalTime.cs" />
+    <Compile Include="Pages\Spark\MemberRefund\BankAccountDetails.cs" />
+    <Compile Include="Pages\Spark\MemberRefund\BaseMemberRefund.cs" />
+    <Compile Include="Pages\Spark\MemberRefund\Confirmation.cs" />
+    <Compile Include="Pages\Spark\MemberRefund\LetsGetSomeInformation.cs" />
+    <Compile Include="Pages\Spark\MemberRefund\LetsVerifyItsYou.cs" />
+    <Compile Include="Pages\Spark\MFA\EnterVerificationCode.cs" />
+    <Compile Include="Pages\Spark\MFA\LetsVerifyItsYou.cs" />
+    <Compile Include="Pages\Spark\SparkContactDetails.cs" />
+    <Compile Include="Pages\Spark\EFT\OneTimePasscodeScreen.cs" />
+    <Compile Include="Pages\Spark\Endorsements\Cancellation\CancellationConfirmationPage.cs" />
+    <Compile Include="Pages\Spark\Endorsements\Cancellation\CancellationDetailsPage.cs" />
+    <Compile Include="Pages\Spark\Endorsements\MotorEndorsement\ConfirmYourCarUsage.cs" />
+    <Compile Include="Pages\Spark\Endorsements\MotorEndorsement\Confirmation.cs" />
+    <Compile Include="Pages\Spark\Endorsements\MotorEndorsement\PayYourRenewal.cs" />
+    <Compile Include="Pages\Spark\Endorsements\MotorEndorsement\HeresYourRenewal.cs" />
+    <Compile Include="Pages\Spark\Endorsements\MotorEndorsement\ConfirmYourCarDetails.cs" />
+    <Compile Include="Pages\Spark\Endorsements\MotorEndorsement\LetsUpdateYourCar.cs" />
+    <Compile Include="Pages\Spark\Endorsements\MotorEndorsement\YourCar.cs" />
+    <Compile Include="Pages\Spark\Endorsements\PolicyInformationComponent.cs" />
+    <Compile Include="Pages\Spark\Endorsements\UpdateHowYouPay\UpdateHowYouPayConfirmationPage.cs" />
+    <Compile Include="Pages\Spark\Endorsements\UpdateHowYouPay\UpdateHowYouPayDetailsPage.cs" />
+    <Compile Include="Pages\Spark\MotorcycleQuote\BeforeWeGetStarted.cs" />
+    <Compile Include="Pages\Spark\SparkBeforeWeGetStarted.cs" />
+    <Compile Include="Pages\MicrosoftAD\Authentication.cs" />
+    <Compile Include="Pages\Spark\CaravanQuote\PaymentDetails.cs" />
+    <Compile Include="Pages\Spark\CaravanQuote\PremiumChangePopup.cs" />
+    <Compile Include="Pages\Spark\CaravanQuote\MembershipLevel.cs" />
+    <Compile Include="Pages\Spark\CaravanQuote\TellUsMoreAboutYourJointPH.cs" />
+    <Compile Include="Pages\Spark\CaravanQuote\TellUsMoreAboutYou.cs" />
+    <Compile Include="Pages\Spark\CaravanQuote\GreatLetsSetAStartDate.cs" />
+    <Compile Include="Pages\Spark\CaravanQuote\HeresYourQuote.cs" />
+    <Compile Include="Pages\Spark\CaravanQuote\NowABitAboutThePolicyholders.cs" />
+    <Compile Include="Pages\Spark\CaravanQuote\TellUsMoreAboutYourCaravan.cs" />
+    <Compile Include="Pages\Spark\CaravanQuote\LetsStartWithYourCaravan.cs" />
+    <Compile Include="Pages\Spark\EFT\ChooseSettlement.cs" />
+    <Compile Include="Pages\Spark\EFT\Confirmation.cs" />
+    <Compile Include="Pages\Spark\EFT\EnterYourBankDetails.cs" />
+    <Compile Include="Pages\Spark\EFT\LinkExpired.cs" />
+    <Compile Include="Pages\Spark\MotorcycleQuote\ConfirmationPage.cs" />
+    <Compile Include="Pages\Spark\MotorcycleQuote\PaymentDetails.cs" />
+    <Compile Include="Pages\Spark\MotorcycleQuote\PremiumChangePopup.cs" />
+    <Compile Include="Pages\Spark\MotorcycleQuote\TellUsMoreAboutYou.cs" />
+    <Compile Include="Pages\Spark\MotorcycleQuote\HeresYourQuote.cs" />
+    <Compile Include="Pages\Spark\MotorcycleQuote\LetsClarifyFewMoreDetails.cs" />
+    <Compile Include="Pages\Spark\MotorcycleQuote\LetsStartWithYourBike.cs" />
+    <Compile Include="Pages\Spark\MotorcycleQuote\MotorcycleProgressBar.cs" />
+    <Compile Include="Pages\Spark\MotorcycleQuote\TellUsMoreAboutYourBike.cs" />
+    <Compile Include="Pages\Spark\MotorcycleQuote\NowABitAboutYou.cs" />
+    <Compile Include="Pages\B2C\PCMLogon.cs" />
+    <Compile Include="Pages\B2C\RACSpinner.cs" />
+    <Compile Include="Pages\Spark\SparkEmailContactDetailMissing.cs" />
+    <Compile Include="Pages\Spark\SparkPaymentPage.cs" />
+    <Compile Include="Pages\Spark\SparkPersonalInformationPage.cs" />
+    <Compile Include="Pages\Spark\SparkRetrieveQuote.cs" />
+    <Compile Include="Pages\Spark\SparkSpinner.cs" />
+    <Compile Include="Pages\PCM\PortfolioSummary.cs" />
+    <Compile Include="Pages\Spark\SparkTestLaunchPage.cs" />
+    <Compile Include="Pages\Westpac\WestpacQuickStream.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Rac.TestAutomation.Common\Rac.TestAutomation.Common.csproj">
+      <Project>{1db2701a-a024-4db3-96c3-ce2b08f53d41}</Project>
+      <Name>Rac.TestAutomation.Common</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\NUnit.4.0.1\build\NUnit.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\NUnit.4.0.1\build\NUnit.props'))" />
+    <Error Condition="!Exists('..\packages\Selenium.WebDriver.4.35.0\build\netstandard2.0\Selenium.WebDriver.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Selenium.WebDriver.4.35.0\build\netstandard2.0\Selenium.WebDriver.targets'))" />
+  </Target>
+  <Import Project="..\packages\Selenium.WebDriver.4.35.0\build\netstandard2.0\Selenium.WebDriver.targets" Condition="Exists('..\packages\Selenium.WebDriver.4.35.0\build\netstandard2.0\Selenium.WebDriver.targets')" />
+</Project>
