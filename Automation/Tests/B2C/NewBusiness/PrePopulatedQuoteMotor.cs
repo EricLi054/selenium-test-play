@@ -112,7 +112,8 @@ namespace B2C.NewBusiness
             ActionsQuoteMotor.CompletePage3DetailsForPPQ(_browser, duplicateQuoteData);
 
             // Verify duplicate alert is displayed - this is the main focus of the test
-            VerifyQuoteMotor.VerifyDuplicatePolicyAlert(_browser);
+            // VerifyQuoteSummaryPage will automatically detect and verify the alert if present
+            VerifyQuoteMotor.VerifyQuoteSummaryPage(browser: _browser, vehicleQuote: duplicateQuoteData, insuredVehicle: duplicateInsuredVehicle, isPPQ: true);
 
             // Close alert, change rego, and continue
             ActionsQuoteMotor.HandleDuplicateAlertAndContinueWithNewRego(_browser, duplicateQuoteData);
