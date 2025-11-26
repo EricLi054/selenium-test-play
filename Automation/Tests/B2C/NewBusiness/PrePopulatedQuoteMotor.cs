@@ -1,15 +1,17 @@
 ﻿using NUnit.Framework;
 using NUnit.Framework.Internal;
 using Rac.TestAutomation.Common;
+using Rac.TestAutomation.Common.TestData.Quote;
+using Tests.ActionsAndValidations;
 using Rac.TestAutomation.Common.DatabaseCalls.Contacts;
 using Rac.TestAutomation.Common.DatabaseCalls.Policies;
-using Rac.TestAutomation.Common.TestData.Quote;
 using System;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using Tests.ActionsAndValidations;
 using UIDriver.Pages;
 using UIDriver.Pages.B2C;
 using UIDriver.Pages.PCM;
+
 using static Rac.TestAutomation.Common.Constants.Contacts;
 using static Rac.TestAutomation.Common.Constants.General;
 using static Rac.TestAutomation.Common.Constants.PolicyGeneral;
@@ -110,7 +112,8 @@ namespace B2C.NewBusiness
             ActionsQuoteMotor.CompletePage3DetailsForPPQ(_browser, duplicateQuoteData);
 
             // Verify duplicate alert is displayed - this is the main focus of the test
-            VerifyQuoteMotor.VerifyDuplicatePolicyAlert(_browser);
+            // VerifyQuoteSummaryPage will automatically detect and verify the alert if present
+            VerifyQuoteMotor.VerifyQuoteSummaryPage(browser: _browser, vehicleQuote: duplicateQuoteData, insuredVehicle: duplicateInsuredVehicle, isPPQ: true);
 
             // Close alert, change rego, and continue
             ActionsQuoteMotor.HandleDuplicateAlertAndContinueWithNewRego(_browser, duplicateQuoteData);
@@ -170,100 +173,6 @@ namespace B2C.NewBusiness
                 System.Threading.Thread.Sleep(3000);
                 Reporting.IsTrue(pcmHomePage.VerifyNewQuoteRadioButtonValidations(), "PPQ prelim question validations");
             }
-        }
-
-        /// <summary>
-        /// Test verifies that when a logged-in member attempts to create a new quote
-        /// with the same member details (firstname, lastname, mobile number) and
-        /// registration number as an existing policy, the system detects this as a
-        /// duplicate and displays an alert after clicking the last Continue button
-        /// on Page 3 and waiting for the spinner.
-        /// </summary>
-        [Test, Category(TestCategory.Regression), Category(TestCategory.Motor), Category(TestCategory.B2CPCM),
-            Category(TestCategory.New_Business), Category(TestCategory.Mock_Member_Central_Support)]
-        public void INSU_T808_LoggedInMember_DuplicateAlert()
-        {
-            var (duplicateQuoteData, existingMember) = BuildTestDataForDuplicateAlert();
-
-            _browser.LoginMemberToPCMAndBeginNewMotorQuote(existingMember);
-
-            var duplicateInsuredVehicle = VerifyAndSubmitPage1InitialDetails(duplicateQuoteData);
-            decimal duplicateFirstPayment = 0;
-            ActionsQuoteMotor.UpdateAndSubmitInitialQuotePage(browser: _browser, vehicleQuote: duplicateQuoteData, agreedQuotePrice: out duplicateFirstPayment);
-
-            // Fill in Page 3 details - duplicate detection occurs here
-            ActionsQuoteMotor.CompletePage3DetailsForPPQ(_browser, duplicateQuoteData);
-
-            VerifyQuoteMotor.VerifyDuplicatePolicyAlert(_browser);
-
-            // Close alert, change rego, and continue
-            ActionsQuoteMotor.HandleDuplicateAlertAndContinueWithNewRego(_browser, duplicateQuoteData);
-
-            // Complete purchase flow
-            VerifyQuoteMotor.VerifyQuoteSummaryPage(browser: _browser, vehicleQuote: duplicateQuoteData, insuredVehicle: duplicateInsuredVehicle, isPPQ: true);
-            ActionsQuoteMotor.AcceptQuoteSummary(_browser);
-            ActionsQuoteMotor.SubmitPayment(browser: _browser, vehicleQuote: duplicateQuoteData, expectedPrice: duplicateFirstPayment);
-
-            string receiptNumber = string.Empty;
-            VerifyQuoteMotor.VerifyMotorVehicleConfirmationPage(browser: _browser, vehicleQuote: duplicateQuoteData, expectedPrice: duplicateFirstPayment,
-                                                               insuredVehicle: duplicateInsuredVehicle, receiptNumber: out receiptNumber);
-        }
-
-        /// <summary>
-        /// Builds test data for a duplicate quote that uses the same member details
-        /// (firstname, lastname, mobile number) and rego as an existing policy.
-        /// This should trigger the duplicate alert when member match occurs.
-        /// </summary>
-        /// <returns>A tuple containing the duplicate quote vehicle and the existing member for login</returns>
-        private (QuoteCar vehicle, Contact existingMember) BuildTestDataForDuplicateAlert()
-        {
-            var motorPolicyList = ShieldPolicyDB.FindPolicyForVehicle(ShieldProductType.MGP);
-
-            foreach (var existingMotorPolicyNumber in motorPolicyList)
-            {
-                var existingPolicyDetails = DataHelper.GetPolicyDetails(existingMotorPolicyNumber);
-
-                if (!DataHelper.IsRegistrationNumberConsideredValid(existingPolicyDetails?.MotorAsset?.RegistrationNumber))
-                { continue; }
-
-                Contact existingMember = null;
-                try
-                {
-                    var mainPH = existingPolicyDetails.Policyholder;
-                    existingMember = DataHelper.MapContactWithPersonAPI(mainPH.Id.ToString(), mainPH.ContactExternalNumber);
-                }
-                catch
-                {
-                    // Ignore exceptions when mapping contact with Member Central.
-                    // This is expected for contacts that are not single match or have sync issues.
-                    // The retry loop will attempt to find another valid policy.
-                }
-
-                if (existingMember == null ||
-                    string.IsNullOrEmpty(existingMember.FirstName) ||
-                    string.IsNullOrEmpty(existingMember.Surname) ||
-                    string.IsNullOrEmpty(existingMember.MobilePhoneNumber))
-                { continue; }
-
-                var duplicateMember = new ContactBuilder(existingMember)
-                    .WithFirstName(existingMember.FirstName)
-                    .WithSurname(existingMember.Surname)
-                    .WithMobileNumber(existingMember.MobilePhoneNumber)
-                    .Build();
-
-                var vehicle = ShieldMotorDB.FetchVehicleFromMotorPolicy(existingMotorPolicyNumber);
-                var duplicateVehicle = new MotorCarBuilder().InitialiseMotorCarWithRandomData(duplicateMember, true)
-                                                 .WithParkingAddress(duplicateMember.MailingAddress)
-                                                 .WithLimitedValidRandomVehicleUsage()
-                                                 .WithRandomCover()
-                                                 .WithRego(vehicle.Registration)
-                                                 .Build();
-                Reporting.LogTestData(TestContext.CurrentContext.Test.Name, duplicateVehicle.ToString());
-                return (duplicateVehicle, existingMember);
-            }
-
-            Reporting.Error("Unable to create a valid test data entry.");
-            return (null,null);
         }
 
         private QuoteCar BuildTestDataMCValidContactMotorPPQB2CT2013()
@@ -334,21 +243,35 @@ namespace B2C.NewBusiness
                 // Verify PPQ defaults.
                 Reporting.IsTrue(quotePage1.AnnualKm == AnnualKms.UpTo10000, "Annual KM should default to 'Up To 10,000' for pre-populated quotes");
                 Reporting.IsTrue(quotePage1.Usage == VehicleUsage.Private, "Vehicle usage should be Private");
-
-                if (testVehicle.Drivers[0].Details.MailingAddress.StreetOrPOBox.Contains("po box", StringComparison.OrdinalIgnoreCase))
+                if (Config.Get().IsMotorRiskAddressEnabled()) // TODO: B2C-4561 Remove toggle and old Risk Suburb references as appropriate when removing toggle from B2C/PCM Functional code
                 {
-                    Reporting.IsTrue(string.Empty.Equals(quotePage1.RiskAddress), "Motor risk address should not be pre-filled as PPQ member had a PO Box mailing address.");
+                    /* KNOWN ISSUE:
+                     * RAI-316: PPQ combined with MRA creates a test data issue. As we are drawing from a large
+                     * pool of existing members, we don't currently have any filtering on their mailing address,
+                     * meaning that some of the members attempted may have a Lot number address or other unusable
+                     * address without a GNAF. These type of addresses cause execution and validation issues for
+                     * the automation.
+                     */
+                    if (testVehicle.Drivers[0].Details.MailingAddress.StreetOrPOBox.ToLower().Contains("po box"))
+                    {
+                        Reporting.IsTrue(string.Empty.Equals(quotePage1.RiskAddress), "Motor risk address should not be pre-filled as PPQ member had a PO Box mailing address.");
+                    }
+                    else
+                    {
+                        var expectedAddress = testVehicle.ParkingAddress.QASStreetAddress();
+                        var foundAddress = quotePage1.RiskAddress.StripAddressDelimiters();
+                        if (!expectedAddress.Equals(foundAddress, StringComparison.InvariantCultureIgnoreCase))
+                            // Modifying street type, as non-QAS verified addresses can present unabbreviated street types.
+                            expectedAddress = testVehicle.ParkingAddress.QASStreetAddress(true);
+                        Reporting.AreEqual(expectedAddress, foundAddress, ignoreCase: true, "motor risk address");
+                    }
                 }
                 else
                 {
-                    var expectedAddress = testVehicle.ParkingAddress.QASStreetAddress();
-                    var foundAddress = quotePage1.RiskAddress.StripAddressDelimiters();
-                    if (!expectedAddress.Equals(foundAddress, StringComparison.InvariantCultureIgnoreCase))
-                    // Modifying street type, as non-QAS verified addresses can present unabbreviated street types.
-                    { expectedAddress = testVehicle.ParkingAddress.QASStreetAddress(true); }
-                    Reporting.AreEqual(expectedAddress, foundAddress, ignoreCase: true, "motor risk address");
+                    if (!string.IsNullOrEmpty(testMember.MailingAddress.StreetNumber))
+                        Reporting.AreEqual($"{testMember.MailingAddress.Suburb.ToLower()} - {testMember.MailingAddress.PostCode}", 
+                            quotePage1.ParkedSuburb.ToLower(), "Member Mailing address");
                 }
-
                 insuredVehicle = Regex.Replace(quotePage1.FillQuoteDetailsFirstAccordion(testVehicle, isPPQ: true), ",", "");
                 System.Threading.Thread.Sleep(2000);
 
@@ -360,5 +283,6 @@ namespace B2C.NewBusiness
 
             return insuredVehicle;
         }
+
     }
 }

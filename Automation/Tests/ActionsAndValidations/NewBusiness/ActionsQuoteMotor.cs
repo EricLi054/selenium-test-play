@@ -1,4 +1,6 @@
 ﻿using Rac.TestAutomation.Common;
+using Rac.TestAutomation.Common.TestData.Quote;
+using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using UIDriver.Helpers;
@@ -187,7 +189,8 @@ namespace Tests.ActionsAndValidations
 
         /// <summary>
         /// Completes Page 3 details for PPQ (PrePopulated Quote) scenario with Reporting and spinner wait.
-        /// Main driver details are pre-populated.
+        /// Main driver details are pre-populated, only additional drivers need to be filled.
+        /// Handles both normal flow and duplicate alert flow.
         /// </summary>
         /// <param name="browser">The browser instance</param>
         /// <param name="vehicleQuote">The quote data</param>
@@ -214,15 +217,16 @@ namespace Tests.ActionsAndValidations
                     quotePage3.FillInDriverDetails(i, workingDriversList, vehicleQuote.ParkingAddress, browser);
                     quotePage3.ClickDriverContinueButton(i);
                 }
-                spinner.WaitForSpinnerToFinish();
 
+                // Wait for spinner to finish (spinner will disappear whether navigating to summary or showing alert)
+                spinner.WaitForSpinnerToFinish();
             }
         }
 
         /// <summary>
         /// Handles the duplicate policy alert by closing it, changing the registration number,
         /// and continuing the flow to complete Page 3.
-        /// In PPQ scenario, only rego changes; driver details remain pre-populated.
+        /// In PPQ scenario, only rego changes; driver details remain pre-populated and don't need re-entry.
         /// </summary>
         /// <param name="browser">The browser instance</param>
         /// <param name="vehicleQuote">The quote data to update with new rego</param>
@@ -246,8 +250,9 @@ namespace Tests.ActionsAndValidations
                 System.Threading.Thread.Sleep(1000);
 
                 quotePage3.ClickCarDetailsContinueButton();
-
+                
                 // Driver details remain pre-populated after rego change, so we only need to verify and continue
+                // Process all drivers by clicking through their continue buttons
                 for (int i = 0; i < vehicleQuote.Drivers.Count; i++)
                 {
                     if (i == 0)
