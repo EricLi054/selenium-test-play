@@ -326,7 +326,7 @@ namespace UIDriver.Pages.B2C
             ClickControl($"{XP_PANEL_BODY_X}[1]{XPR_CONTINUE_BTN}");
 
             // Animation from Car Details panel to Membership/Driver Details is hard to detect. Using fixed sleep.
-            Thread.Sleep(2000);
+            Thread.Sleep(SleepTimes.T2SEC);
         }
 
         public void ClickRACMembershipContinueButton()
@@ -334,7 +334,7 @@ namespace UIDriver.Pages.B2C
             ClickControl($"{XP_PANEL_BODY_X}[2]{XPR_CONTINUE_BTN}");
 
             // Animation from Membership Details panel to Driver Details is hard to detect. Using fixed sleep.
-            Thread.Sleep(2000);
+            Thread.Sleep(SleepTimes.T2SEC);
         }
 
         public void ClickDriverContinueButton(int index)
@@ -346,7 +346,7 @@ namespace UIDriver.Pages.B2C
             ClickControl($"{XP_PANEL_BODY_X}{offset}{XPR_CONTINUE_BTN}");
 
             // Animation from Car Details panel to Driver Details is hard to detect. Using fixed sleep.
-            Thread.Sleep(2000);
+            Thread.Sleep(SleepTimes.T2SEC);
         }
 
         public void WaitForDriverDetails(int index)

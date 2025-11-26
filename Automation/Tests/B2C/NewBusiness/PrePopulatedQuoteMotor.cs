@@ -83,6 +83,49 @@ namespace B2C.NewBusiness
             VerifyQuoteMotor.VerifyMotorVehiclePolicyInShield(testVehicle, policyNumber);
         }
 
+         /// <summary>
+        /// Automated version of mandatory regression test:
+        /// "B2C- Logged in - member takes out pre-populated quote"
+        /// 
+        /// Test verifies that when a logged-in member attempts to create a new quote
+        /// with the same member details (firstname, lastname, mobile number) and 
+        /// registration number as an existing policy, the system detects this as a 
+        /// duplicate and displays an alert after clicking the last Continue button 
+        /// on Page 3 and waiting for the spinner.
+        /// </summary>
+        [Test, Category(TestCategory.Regression), Category(TestCategory.Motor), Category(TestCategory.B2CPCM),
+            Category(TestCategory.New_Business), Category(TestCategory.Mock_Member_Central_Support)]
+        public void INSU_T254_LoggedInMember_DuplicateAlert()
+        {
+            var (duplicateQuoteData, existingMember) = BuildTestDataForDuplicateAlert();
+
+            _browser.LoginMemberToPCMAndBeginNewMotorQuote(existingMember);
+
+            var duplicateInsuredVehicle = VerifyAndSubmitPage1InitialDetails(duplicateQuoteData);
+            decimal duplicateFirstPayment = 0;
+            ActionsQuoteMotor.UpdateAndSubmitInitialQuotePage(browser: _browser, vehicleQuote: duplicateQuoteData, agreedQuotePrice: out duplicateFirstPayment);
+
+            // Fill in Page 3 details - duplicate detection occurs here
+            // Wait for spinner to allow Shield to process and search for duplicates
+            ActionsQuoteMotor.CompletePage3DetailsForPPQ(_browser, duplicateQuoteData);
+
+            // Verify duplicate alert is displayed - this is the main focus of the test
+            // VerifyQuoteSummaryPage will automatically detect and verify the alert if present
+            VerifyQuoteMotor.VerifyQuoteSummaryPage(browser: _browser, vehicleQuote: duplicateQuoteData, insuredVehicle: duplicateInsuredVehicle, isPPQ: true);
+
+            // Close alert, change rego, and continue
+            ActionsQuoteMotor.HandleDuplicateAlertAndContinueWithNewRego(_browser, duplicateQuoteData);
+
+            // Complete purchase flow
+            VerifyQuoteMotor.VerifyQuoteSummaryPage(browser: _browser, vehicleQuote: duplicateQuoteData, insuredVehicle: duplicateInsuredVehicle, isPPQ: true);
+            ActionsQuoteMotor.AcceptQuoteSummary(_browser);
+            ActionsQuoteMotor.SubmitPayment(browser: _browser, vehicleQuote: duplicateQuoteData, expectedPrice: duplicateFirstPayment);
+            
+            string receiptNumber = string.Empty;
+            VerifyQuoteMotor.VerifyMotorVehicleConfirmationPage(browser: _browser, vehicleQuote: duplicateQuoteData, expectedPrice: duplicateFirstPayment, 
+                                                               insuredVehicle: duplicateInsuredVehicle, receiptNumber: out receiptNumber);
+        }
+
         /// <summary>
         /// Automated version of mandatory regression test:
         /// "B2C- Logged in - member takes out pre-populated quote"
@@ -243,6 +286,36 @@ namespace B2C.NewBusiness
             Reporting.LogTestData(TestContext.CurrentContext.Test.Name, vehicle.ToString());
 
             return vehicle;
+        }
+
+        /// <summary>
+        /// Builds test data for a duplicate quote that uses the same member details 
+        /// (firstname, lastname, mobile number) and rego as an existing policy. 
+        /// This should trigger the duplicate alert when member match occurs.
+        /// </summary>
+        /// <returns>A tuple containing the duplicate quote vehicle and the existing member for login</returns>
+        private (QuoteCar vehicle, Contact existingMember) BuildTestDataForDuplicateAlert()
+        {
+            var existingPolicy = ShieldMotorDB.FindMotorPolicyNotInRenewal(policyCreatedinLast28days: false);
+            var vehicle = ShieldMotorDB.FetchVehicleFromMotorPolicy(existingPolicy.PolicyNumber);
+            var existingMember = DataHelper.MapContactWithPersonAPI(existingPolicy.ActivePolicyHolder.Id, existingPolicy.ActivePolicyHolder.ExternalContactNumber);
+
+            var duplicateMember = new ContactBuilder(existingMember)
+                .WithFirstName(existingMember.FirstName)
+                .WithSurname(existingMember.Surname)
+                .WithMobileNumber(existingMember.MobilePhoneNumber)
+                .Build();
+
+            var duplicateVehicle = new MotorCarBuilder().InitialiseMotorCarWithRandomData(duplicateMember, true)
+                                             .WithParkingAddress(duplicateMember.MailingAddress)
+                                             .WithLimitedValidRandomVehicleUsage()
+                                             .WithRandomCover()
+                                             .WithRego(vehicle.Registration)
+                                             .Build();
+
+            Reporting.LogTestData(TestContext.CurrentContext.Test.Name, duplicateVehicle.ToString());
+
+            return (duplicateVehicle, existingMember);
         }
 
         /// <summary>

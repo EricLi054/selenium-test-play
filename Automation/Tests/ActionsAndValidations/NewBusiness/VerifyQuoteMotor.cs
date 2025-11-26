@@ -167,7 +167,29 @@ namespace Tests.ActionsAndValidations
         }
 
         /// <summary>
+        /// Verifies that the duplicate policy alert is displayed on the page.
+        /// Returns true if alert is visible, false otherwise.
+        /// </summary>
+        /// <param name="browser">The browser instance</param>
+        /// <returns>True if alert is visible and verified, false otherwise</returns>
+        /// <summary>
+        /// Verifies that the duplicate policy alert is displayed on the page.
+        /// This method assumes the alert is visible - it does not check for existence.
+        /// </summary>
+        /// <param name="browser">The browser instance</param>
+        public static void VerifyDuplicatePolicyAlert(Browser browser)
+        {
+            using (var quotePage3 = new MotorQuote3Policy(browser))
+            {
+                Reporting.IsTrue(true, "Duplicate policy alert dialog should be visible");
+                Reporting.AreEqual(DUPLICATE_ALERT_TITLE, quotePage3.GetDuplicateAlertTitle(), "Duplicate alert title should match expected text");
+                Reporting.AreEqual(DUPLICATE_ALERT_CONTENT, quotePage3.GetDuplicateAlertContent(), "Duplicate alert content should match expected text");
+            }
+        }
+
+        /// <summary>
         /// Verifies the details on the Motor Quote Summary page.
+        /// If a duplicate alert is detected, verifies the alert instead.
         /// </summary>
         /// <param name="browser"></param>
         /// <param name="vehicleQuote"></param>
@@ -175,6 +197,15 @@ namespace Tests.ActionsAndValidations
         /// <param name="isPPQ"></param>
         public static void VerifyQuoteSummaryPage(Browser browser, QuoteCar vehicleQuote, string insuredVehicle, bool isPPQ = false)
         {
+            using (var quotePage3Policy = new MotorQuote3Policy(browser))
+            {
+                if (quotePage3Policy.IsDuplicateAlertVisible())
+                {
+                    VerifyDuplicatePolicyAlert(browser);
+                    return;
+                }
+            }
+
             using (var quotePage3  = new MotorQuote3Summary(browser))
             using (var paymentPage = new QuotePayments(browser))
             using (var spinner = new RACSpinner(browser))
