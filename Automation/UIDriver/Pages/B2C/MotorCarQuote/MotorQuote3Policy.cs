@@ -66,6 +66,12 @@ namespace UIDriver.Pages.B2C
 
         private const string XPR_EMAIL = "//span[text()='Email']/..";
         private const string XPR_POST  = "//span[text()='Post']/..";
+
+        // Duplicate alert dialog XPaths
+        private const string XP_DIALOG_BASE = "/html/body/div[starts-with(@class,'k-widget k-window')]";
+        private const string XP_DIALOG_TITLE = XP_DIALOG_BASE + "//span[@id='simple-dialog_wnd_title']";
+        private const string XP_DIALOG_CONTENT = XP_DIALOG_BASE + "//div[@id='simple-dialog']";
+        private const string XP_DIALOG_CLOSE = XP_DIALOG_BASE + "//div[@class='cluetip-close']/a";
         #endregion
 
         #region Settable properties and controls
@@ -326,7 +332,7 @@ namespace UIDriver.Pages.B2C
             ClickControl($"{XP_PANEL_BODY_X}[1]{XPR_CONTINUE_BTN}");
 
             // Animation from Car Details panel to Membership/Driver Details is hard to detect. Using fixed sleep.
-            Thread.Sleep(2000);
+            Thread.Sleep(SleepTimes.T2SEC);
         }
 
         public void ClickRACMembershipContinueButton()
@@ -334,7 +340,7 @@ namespace UIDriver.Pages.B2C
             ClickControl($"{XP_PANEL_BODY_X}[2]{XPR_CONTINUE_BTN}");
 
             // Animation from Membership Details panel to Driver Details is hard to detect. Using fixed sleep.
-            Thread.Sleep(2000);
+            Thread.Sleep(SleepTimes.T2SEC);
         }
 
         public void ClickDriverContinueButton(int index)
@@ -346,7 +352,7 @@ namespace UIDriver.Pages.B2C
             ClickControl($"{XP_PANEL_BODY_X}{offset}{XPR_CONTINUE_BTN}");
 
             // Animation from Car Details panel to Driver Details is hard to detect. Using fixed sleep.
-            Thread.Sleep(2000);
+            Thread.Sleep(SleepTimes.T2SEC);
         }
 
         public void WaitForDriverDetails(int index)
@@ -513,6 +519,34 @@ namespace UIDriver.Pages.B2C
             }
 
             Reporting.IsTrue(success, $"VerifyNameFieldLengthValidationErrors should display error on all 3 name input fields for contact, taking snapshot. {_driver.TakeSnapshot()}");
+        }
+
+        public void CloseDuplicateAlertDialog()
+        {
+            ClickControl(XP_DIALOG_CLOSE);
+            Thread.Sleep(SleepTimes.T2SEC);
+        }
+
+        public void OpenCarDetailsAccordion()
+        {
+            ClickControl(XP_VEHICLE_HEADING);
+            Thread.Sleep(SleepTimes.T2SEC);
+        }
+
+        public bool IsDuplicateAlertVisible()
+        {
+            IWebElement dialogTitle = null;
+            return _driver.TryWaitForElementToBeVisible(By.XPath(XP_DIALOG_TITLE), WaitTimes.T5SEC, out dialogTitle);
+        }
+
+        public string GetDuplicateAlertTitle()
+        {
+            return GetInnerText(XP_DIALOG_TITLE);
+        }
+
+        public string GetDuplicateAlertContent()
+        {
+            return GetInnerText(XP_DIALOG_CONTENT);
         }
     }
 }

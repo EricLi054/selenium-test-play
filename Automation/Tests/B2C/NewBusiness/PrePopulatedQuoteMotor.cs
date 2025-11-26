@@ -4,6 +4,7 @@ using Rac.TestAutomation.Common;
 using Rac.TestAutomation.Common.TestData.Quote;
 using Tests.ActionsAndValidations;
 using Rac.TestAutomation.Common.DatabaseCalls.Contacts;
+using Rac.TestAutomation.Common.DatabaseCalls.Policies;
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -57,7 +58,7 @@ namespace B2C.NewBusiness
 
             ActionsQuoteMotor.UpdateAndSubmitInitialQuotePage(browser: _browser, vehicleQuote: testVehicle, agreedQuotePrice: out firstPayment);
 
-            VerifyAndSubmitPage3PHDetails(testVehicle);
+            ActionsQuoteMotor.CompletePage3DetailsForPPQ(_browser, testVehicle);
 
             VerifyQuoteMotor.VerifyQuoteSummaryPage(browser: _browser,
                                                             vehicleQuote: testVehicle,
@@ -82,6 +83,49 @@ namespace B2C.NewBusiness
 
             // Verify policy against Shield
             VerifyQuoteMotor.VerifyMotorVehiclePolicyInShield(testVehicle, policyNumber);
+        }
+
+         /// <summary>
+        /// Automated version of mandatory regression test:
+        /// "B2C- Logged in - member takes out pre-populated quote"
+        /// 
+        /// Test verifies that when a logged-in member attempts to create a new quote
+        /// with the same member details (firstname, lastname, mobile number) and 
+        /// registration number as an existing policy, the system detects this as a 
+        /// duplicate and displays an alert after clicking the last Continue button 
+        /// on Page 3 and waiting for the spinner.
+        /// </summary>
+        [Test, Category(TestCategory.Regression), Category(TestCategory.Motor), Category(TestCategory.B2CPCM),
+            Category(TestCategory.New_Business), Category(TestCategory.Mock_Member_Central_Support)]
+        public void INSU_T254_LoggedInMember_DuplicateAlert()
+        {
+            var (duplicateQuoteData, existingMember) = BuildTestDataForDuplicateAlert();
+
+            _browser.LoginMemberToPCMAndBeginNewMotorQuote(existingMember);
+
+            var duplicateInsuredVehicle = VerifyAndSubmitPage1InitialDetails(duplicateQuoteData);
+            decimal duplicateFirstPayment = 0;
+            ActionsQuoteMotor.UpdateAndSubmitInitialQuotePage(browser: _browser, vehicleQuote: duplicateQuoteData, agreedQuotePrice: out duplicateFirstPayment);
+
+            // Fill in Page 3 details - duplicate detection occurs here
+            // Wait for spinner to allow Shield to process and search for duplicates
+            ActionsQuoteMotor.CompletePage3DetailsForPPQ(_browser, duplicateQuoteData);
+
+            // Verify duplicate alert is displayed - this is the main focus of the test
+            // VerifyQuoteSummaryPage will automatically detect and verify the alert if present
+            VerifyQuoteMotor.VerifyQuoteSummaryPage(browser: _browser, vehicleQuote: duplicateQuoteData, insuredVehicle: duplicateInsuredVehicle, isPPQ: true);
+
+            // Close alert, change rego, and continue
+            ActionsQuoteMotor.HandleDuplicateAlertAndContinueWithNewRego(_browser, duplicateQuoteData);
+
+            // Complete purchase flow
+            VerifyQuoteMotor.VerifyQuoteSummaryPage(browser: _browser, vehicleQuote: duplicateQuoteData, insuredVehicle: duplicateInsuredVehicle, isPPQ: true);
+            ActionsQuoteMotor.AcceptQuoteSummary(_browser);
+            ActionsQuoteMotor.SubmitPayment(browser: _browser, vehicleQuote: duplicateQuoteData, expectedPrice: duplicateFirstPayment);
+            
+            string receiptNumber = string.Empty;
+            VerifyQuoteMotor.VerifyMotorVehicleConfirmationPage(browser: _browser, vehicleQuote: duplicateQuoteData, expectedPrice: duplicateFirstPayment, 
+                                                               insuredVehicle: duplicateInsuredVehicle, receiptNumber: out receiptNumber);
         }
 
         /// <summary>
@@ -153,6 +197,36 @@ namespace B2C.NewBusiness
         }
 
         /// <summary>
+        /// Builds test data for a duplicate quote that uses the same member details 
+        /// (firstname, lastname, mobile number) and rego as an existing policy. 
+        /// This should trigger the duplicate alert when member match occurs.
+        /// </summary>
+        /// <returns>A tuple containing the duplicate quote vehicle and the existing member for login</returns>
+        private (QuoteCar vehicle, Contact existingMember) BuildTestDataForDuplicateAlert()
+        {
+            var existingPolicy = ShieldMotorDB.FindMotorPolicyNotInRenewal(policyCreatedinLast28days: false);
+            var vehicle = ShieldMotorDB.FetchVehicleFromMotorPolicy(existingPolicy.PolicyNumber);
+            var existingMember = DataHelper.MapContactWithPersonAPI(existingPolicy.ActivePolicyHolder.Id, existingPolicy.ActivePolicyHolder.ExternalContactNumber);
+
+            var duplicateMember = new ContactBuilder(existingMember)
+                .WithFirstName(existingMember.FirstName)
+                .WithSurname(existingMember.Surname)
+                .WithMobileNumber(existingMember.MobilePhoneNumber)
+                .Build();
+
+            var duplicateVehicle = new MotorCarBuilder().InitialiseMotorCarWithRandomData(duplicateMember, true)
+                                             .WithParkingAddress(duplicateMember.MailingAddress)
+                                             .WithLimitedValidRandomVehicleUsage()
+                                             .WithRandomCover()
+                                             .WithRego(vehicle.Registration)
+                                             .Build();
+
+            Reporting.LogTestData(TestContext.CurrentContext.Test.Name, duplicateVehicle.ToString());
+
+            return (duplicateVehicle, existingMember);
+        }
+
+        /// <summary>
         /// Could not leverage ActionsMotorVehicles methods as this has
         /// prefill validations sewn into each accordion.
         /// </summary>
@@ -210,41 +284,5 @@ namespace B2C.NewBusiness
             return insuredVehicle;
         }
 
-        /// <summary>
-        /// Could not leverage ActionsMotorVehicles methods as this has
-        /// prefill validations sewn into each accordion.
-        /// </summary>
-        private void VerifyAndSubmitPage3PHDetails(QuoteCar testVehicle)
-        {
-            /***********************************************************
-             * Complete Page 3 details
-             ***********************************************************/
-            using (var quotePage3 = new MotorQuote3Policy(_browser))
-            using (var quoteSummary = new MotorQuote3Summary(_browser))
-            using (var spinner = new RACSpinner(_browser))
-            {
-                quotePage3.WaitForPage();
-
-                // Complete the additional car details
-                Reporting.IsTrue(quotePage3.FillInAddedVehicleDetails(testVehicle), "successfully completed additional vehicle details");
-                quotePage3.ClickCarDetailsContinueButton();
-
-                Reporting.IsTrue(quotePage3.VerifyPPQPrePopulatedMainDriverDetails(testVehicle.Drivers[0]), "Main driver details were populated as expected.");
-                Reporting.Log("Capturing image of Main Driver Details immediately before Continue button is selected.", _browser.Driver.TakeSnapshot());
-                quotePage3.ClickDriverContinueButton(0);
-
-                // B2C may interchange some drivers, so we use a temporary list
-                // to search and eliminate from.
-                var workingDriversList = new List<Driver>(testVehicle.Drivers);
-                // Complete the additional driver details
-                for (int i = 1; i < testVehicle.Drivers.Count; i++)
-                {
-                    quotePage3.WaitForDriverDetails(i);
-                    quotePage3.FillInDriverDetails(i, workingDriversList, testVehicle.ParkingAddress, _browser);
-                    quotePage3.ClickDriverContinueButton(i);
-                }
-                spinner.WaitForSpinnerToFinish(nextPage: quoteSummary);
-            }
-        }
     }
 }
