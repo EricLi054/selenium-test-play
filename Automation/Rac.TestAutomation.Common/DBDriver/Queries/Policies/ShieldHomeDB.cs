@@ -1,10 +1,12 @@
 ﻿using Rac.TestAutomation.Common.DatabaseCalls.Claims;
+using Rac.TestAutomation.Common.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Newtonsoft.Json;
 
 using static Rac.TestAutomation.Common.Constants.PolicyGeneral;
 using static Rac.TestAutomation.Common.Constants.PolicyHome;
@@ -55,7 +57,7 @@ namespace Rac.TestAutomation.Common.DatabaseCalls.Policies
 
         /// <summary>       
         /// Find Landlord and Home Building Policies for spark fence claim flow.
-        /// </summary>     
+        /// </summary>
         public static List<string> FindListOfHomePolicyNumbersLandlordAndHomeownerBuilding()
         {
             var candidates = new List<string>();
@@ -69,7 +71,7 @@ namespace Rac.TestAutomation.Common.DatabaseCalls.Policies
                     var reader = db.ExecuteQuery(query, null);
                     while (reader.Read())
                     {
-                        candidates.Add(reader.GetDbValue(0));
+                        candidates.Add(reader.GetDbValueFromColumnName("EXTERNAL_POLICY_NUMBER"));
                     }
                 }
             }
@@ -79,6 +81,47 @@ namespace Rac.TestAutomation.Common.DatabaseCalls.Policies
             }
 
             return candidates;
+        }
+
+        /// <summary>
+        /// Find a Landlord or Homeowner Building Policy with valid address and policyholder contact
+        /// for duplicate alert test scenarios. Returns the first suitable policy found.
+        /// </summary>
+        public static (Address address, Contact policyholder) FindLandlordPolicyWithAddressAndPolicyholder()
+        {
+            var candidatePolicies = FindListOfHomePolicyNumbersLandlordAndHomeownerBuilding();
+
+            foreach (var policyNumber in candidatePolicies)
+            {
+                try
+                {
+                    var apiPolicyDetails = DataHelper.GetPolicyDetails(policyNumber);
+
+                    var address = apiPolicyDetails?.HomeAsset?.Address;
+
+                    if ((address == null) ||
+                        string.IsNullOrEmpty(address.StreetOrPOBox) ||
+                        string.IsNullOrEmpty(address.Suburb))
+                    {
+                        continue;
+                    }
+
+                    var policyholder = DataHelper.MapContactWithPersonAPI(apiPolicyDetails.Policyholder.Id.ToString());
+                    if (policyholder == null)
+                    {
+                        continue;
+                    }
+
+                    return (address, policyholder);
+                }
+                catch (Exception ex) when (ex is ShieldApiException || ex is JsonException || ex is NullReferenceException || ex is ArgumentNullException)
+                {
+                    continue;
+                }
+            }
+
+            Reporting.Error("Unable to locate a landlord property policy with a valid address and policyholder for duplicate alert scenario.");
+            return (null, null);
         }
 
         /// <summary>

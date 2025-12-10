@@ -42,6 +42,7 @@ namespace UIDriver.Pages.B2C
         private const string XP_BUILDING_MATERIAL_OPTION = "id('Question_Building_Building_MainConstructionMaterial_listbox')/li";
         private const string XP_CONSTRUCTION_YEAR        = FORM + "//span[@aria-owns='Question_Building_Building_YearBuilt_listbox']";
         private const string XP_CONSTRUCTION_YEAR_OPTION = "id('Question_Building_Building_YearBuilt_listbox')/li";
+        private const string XP_CHANGE_SELECTED_ADDRESS  = "//a[contains(text(),'Change selected address')]";
         private const string XP_MAILINGADDRESS           = "id('Question_Building_RiskLocation_qasautocomplete')";
         private const string XP_ADDR_SUGGESTION          = "//div[@id='Question_Building_RiskLocation']//table[@class='address-find-table']//tr/td[1]";
         private const string XP_WEEKLY_RENTAL_AMOUNT     = "id('Question_Building_WeeklyRentalAmount')";
@@ -284,6 +285,17 @@ namespace UIDriver.Pages.B2C
         public HomeQuote1Details(Browser browser) : base(browser)
         { }
 
+        /// <summary>
+        /// Clicks the "Change selected address" link to enable address editing.
+        /// Assumes the element exists and is visible. Caller should check for element existence first.
+        /// </summary>
+        public void ClickChangeSelectedAddress()
+        {
+            ClickControl(XP_CHANGE_SELECTED_ADDRESS);
+            Thread.Sleep(1000);
+            _driver.WaitForElementToBeVisible(By.XPath(XP_MAILINGADDRESS), WaitTimes.T5SEC);
+        }
+
         public override bool IsDisplayed()
         {
             try
@@ -372,6 +384,12 @@ namespace UIDriver.Pages.B2C
 
             Material = quoteDetails.WallMaterial;
             YearBuilt = quoteDetails.YearBuilt;
+
+            IWebElement changeAddressLink = null;
+            if (_driver.TryWaitForElementToBeVisible(By.XPath(XP_CHANGE_SELECTED_ADDRESS), WaitTimes.T5SEC, out changeAddressLink))
+            {
+                ClickChangeSelectedAddress();
+            }
 
             QASSearchForAddress(XP_MAILINGADDRESS, XP_ADDR_SUGGESTION, quoteDetails.PropertyAddress.StreetSuburbState());
 

@@ -4,6 +4,8 @@ using Rac.TestAutomation.Common.TestData.Quote;
 using Tests.ActionsAndValidations;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using Rac.TestAutomation.Common.DatabaseCalls.Policies;
 
 using static Rac.TestAutomation.Common.Constants.Contacts;
 using static Rac.TestAutomation.Common.Constants.General;
@@ -96,6 +98,33 @@ namespace B2C.NewBusiness
             string policyNumber = ActionsQuoteHome.PurchaseHomePolicy(_browser, testData);
             // Verify Policy against Shield database
             VerifyQuoteHome.VerifyHomePolicyInShield(testData, policyNumber);
+        }
+
+        /// <summary>
+        /// Anonymous attempt to purchase landlord building cover using a known landlord property address.
+        /// Duplicate alert should appear on page 3.
+        /// </summary>
+        [Test, Category(TestCategory.Regression), Category(TestCategory.New_Business), Category(TestCategory.Home),
+            Category(TestCategory.B2CPCM)]
+        public void INSU_T222_LandlordAttemptToDuplicate_Building()
+        {
+            var testData = BuildTestDataDuplicateLandlordBuildingWithKnownAddress();
+
+            ActionsQuoteHome.GetNewHomeQuote(_browser, testData, out _);
+            ActionsQuoteHome.HomeQuoteClickBuyPage2(_browser);
+            ActionsQuoteHome.HomeQuoteAddedDetailsPage3(_browser, testData);
+
+            VerifyQuoteHome.VerifyDuplicatePolicyAlert(_browser);
+            
+            // Handle duplicate alert by changing address and continue the flow
+            ActionsQuoteHome.HandleDuplicateAlertAndChangeAddress(_browser, testData);
+            
+            // Continue with Page 2 and Page 3 after address change
+            ActionsQuoteHome.HomeQuoteClickBuyPage2(_browser);
+            ActionsQuoteHome.HomeQuoteAddedDetailsPage3(_browser, testData);
+            
+            // Verify we're now on the summary page (no duplicate alert)
+            VerifyQuoteHome.VerifyQuoteSummaryPage(_browser, testData);
         }
 
         /// <summary>
@@ -248,6 +277,29 @@ namespace B2C.NewBusiness
             return testData;
         }
 
+        private QuoteHome BuildTestDataDuplicateLandlordBuildingWithKnownAddress()
+        {
+            var (duplicateAddress, policyholderContact) = ShieldHomeDB.FindLandlordPolicyWithAddressAndPolicyholder();
+            var firstPolicyHolder = new ContactBuilder(policyholderContact).Build();
+            
+            var testData = new HomeBuilder().InitialiseHomeWithRandomData(HomeOccupancy.OwnerOccupied,
+                                                                          new List<Contact>() { firstPolicyHolder })
+                                            .WithPropertyAddress(duplicateAddress)
+                                            .WithAlarmSystem(Alarm.NonMonitoredAlarm)
+                                            .WithAreDoorsSecured(true)
+                                            .WithAreWindowsSecured(false)
+                                            .WithRandomBuildingSumInsured(200000, 1000000)
+                                            .WithoutContentsSumInsured()
+                                            .WithInsuranceHistory(HomePreviousInsuranceTime.LessThan1, null)
+                                            .WithoutFinancier()
+                                            .WithPaymentMethod(new Payment(firstPolicyHolder).BankAccount().Annual())
+                                            .Build();
+
+            Reporting.LogTestData(TestContext.CurrentContext.Test.Name, testData.ToString());
+
+            return testData;
+        }
+
         private QuoteHome BuildTestDataRetrieveQuoteBuildingContentsOwnerOccupied()
         {
             // Setup test data
@@ -295,5 +347,6 @@ namespace B2C.NewBusiness
 
             return testData;
         }
+
     }
 }
