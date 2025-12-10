@@ -419,20 +419,22 @@ namespace Tests.ActionsAndValidations
         public static void HandleDuplicateAlertAndChangeAddress(Browser browser, QuoteHome quoteDetails)
         {
             using (var quotePage3 = new HomeQuote3Policy(browser))
-            using (var quotePage2 = new HomeQuote2Quote(browser))
             {
                 quotePage3.CloseDuplicateAlertDialog();
-                browser.Driver.Navigate().Back();
-                quotePage2.WaitForPage();
-                browser.Driver.Navigate().Back();
             }
 
-            // Generate a new random address to avoid duplicate
+            browser.Driver.Navigate().Back();
+            using (var quotePage2 = new HomeQuote2Quote(browser))
+            {
+                quotePage2.WaitForPage();
+            }
+
+            browser.Driver.Navigate().Back();
+
             var newAddress = new AddressBuilder().InitialiseRandomMailingAddress().Build();
             quoteDetails.PropertyAddress = newAddress;
 
             SubmitInitialHomeQuoteRatingValues(browser, quoteDetails);
         }
-
     }
 }
