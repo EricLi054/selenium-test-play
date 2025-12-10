@@ -42,9 +42,9 @@ namespace UIDriver.Pages.B2C
         private const string XP_BUILDING_MATERIAL_OPTION = "id('Question_Building_Building_MainConstructionMaterial_listbox')/li";
         private const string XP_CONSTRUCTION_YEAR        = FORM + "//span[@aria-owns='Question_Building_Building_YearBuilt_listbox']";
         private const string XP_CONSTRUCTION_YEAR_OPTION = "id('Question_Building_Building_YearBuilt_listbox')/li";
+        private const string XP_CHANGE_SELECTED_ADDRESS  = "//a[contains(text(),'Change selected address')]";
         private const string XP_MAILINGADDRESS           = "id('Question_Building_RiskLocation_qasautocomplete')";
         private const string XP_ADDR_SUGGESTION          = "//div[@id='Question_Building_RiskLocation']//table[@class='address-find-table']//tr/td[1]";
-        private const string XP_CHANGE_SELECTED_ADDRESS = "//a[contains(text(),'Change selected address')]";
         private const string XP_WEEKLY_RENTAL_AMOUNT     = "id('Question_Building_WeeklyRentalAmount')";
         private const string XP_PROPERTY_MANAGER         = FORM + "//span[@aria-owns='Question_Building_PropertyManagerType_listbox']";
         private const string XP_PROPERTY_MANAGER_OPTION  = "id('Question_Building_PropertyManagerType_listbox')/li";
@@ -285,6 +285,17 @@ namespace UIDriver.Pages.B2C
         public HomeQuote1Details(Browser browser) : base(browser)
         { }
 
+        /// <summary>
+        /// Clicks the "Change selected address" link to enable address editing.
+        /// Assumes the element exists and is visible. Caller should check for element existence first.
+        /// </summary>
+        public void ClickChangeSelectedAddress()
+        {
+            ClickControl(XP_CHANGE_SELECTED_ADDRESS);
+            Thread.Sleep(1000);
+            _driver.WaitForElementToBeVisible(By.XPath(XP_MAILINGADDRESS), WaitTimes.T5SEC);
+        }
+
         public override bool IsDisplayed()
         {
             try
@@ -379,6 +390,7 @@ namespace UIDriver.Pages.B2C
             {
                 ClickChangeSelectedAddress();
             }
+
             QASSearchForAddress(XP_MAILINGADDRESS, XP_ADDR_SUGGESTION, quoteDetails.PropertyAddress.StreetSuburbState());
 
             if (quoteDetails.Occupancy == HomeOccupancy.InvestmentProperty)
@@ -411,13 +423,6 @@ namespace UIDriver.Pages.B2C
             YearsPreviouslyInsured = quoteDetails.PreviousInsuranceTime;
 
             ClickControl(XP_CONTINUE_ACDN_2_BTN);
-        }
-        public void ClickChangeSelectedAddress()
-        {
-
-            ClickControl(XP_CHANGE_SELECTED_ADDRESS);
-            Thread.Sleep(1000);
-            _driver.WaitForElementToBeVisible(By.XPath(XP_MAILINGADDRESS), WaitTimes.T5SEC);
         }
 
         /// <summary>
@@ -600,7 +605,7 @@ namespace UIDriver.Pages.B2C
             Reporting.AreEqual(DECLINE_NOTICE_HEADER_TEXT, GetInnerText(XP_DECLINED_NOTICE_HEADER), false);
 
             var dialogText = GetInnerText(XP_DECLINED_NOTICE_TEXT).StripLineFeedAndCarriageReturns();
-            Regex declineDialogRegEx = new Regex(FixedTextRegex.QUOTE_HOME_COVER_DECLINED_TEXT);
+            Regex declineDialogRegEx = new Regex(FixedTextRegex.QUOTE_COVER_DECLINED_TEXT);
             Match match = declineDialogRegEx.Match(dialogText);
             Reporting.IsTrue(match.Success, $"Asserting the cover declined dialog text ");
 

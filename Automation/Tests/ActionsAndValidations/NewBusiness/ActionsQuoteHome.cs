@@ -81,7 +81,6 @@ namespace Tests.ActionsAndValidations
         public static void HomeQuoteAddedDetailsPage3(Browser browser, QuoteHome quoteDetails)
         {
             using (var quotePage3 = new HomeQuote3Policy(browser))
-            using (var quoteSummary = new HomeQuote3Summary(browser))
             using (var spinner = new RACSpinner(browser))
             using (var callback = new QuoteCallback(browser))
             {

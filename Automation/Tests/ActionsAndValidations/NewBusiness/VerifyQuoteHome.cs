@@ -14,7 +14,7 @@ namespace Tests.ActionsAndValidations
     {
         // OVS and OVU covers have a fixed excess of $200.
         private const string EXCESS_OUTSIDE_VALUABLES = "200";
-        private const string DUPLICATE_ALERT_TITLE = "You may already be insured";
+        private const string DUPLICATE_ALERT_TITLE   = "You may already be insured";
         private const string DUPLICATE_ALERT_CONTENT = "Please call us on 13 17 03 so we can help you.";
 
         /// <summary>
@@ -88,11 +88,15 @@ namespace Tests.ActionsAndValidations
         public static void VerifyQuoteSummaryPage(Browser browser, QuoteHome quoteDetails)
         {
             using (var quotePage3Policy = new HomeQuote3Policy(browser))
-            using (var quotePage3 = new HomeQuote3Summary(browser))
-            using (var paymentPage = new QuotePayments(browser))
-            using (var spinner = new RACSpinner(browser))
             {
-                Reporting.IsFalse(quotePage3Policy.IsDuplicateAlertVisible(), "we did not expecte the duplicate policy warning. If failed, verify test data to check whether the duplicate policy logic in Shield is wrong.");
+                Reporting.IsFalse(quotePage3Policy.IsDuplicateAlertVisible(), 
+                    "We did not encounter the duplicate policy warning. If failed, verify test data to check whether the duplicate policy logic in Shield is wrong.");
+            }
+
+            using (var quotePage3  = new HomeQuote3Summary(browser))
+            using (var paymentPage = new QuotePayments(browser))
+            using (var spinner     = new RACSpinner(browser))
+            {
                 Reporting.Log("Begin verify policy home details");
 
                 quotePage3.VerifyPolicyholderDetails(quoteDetails.PolicyHolders[0]);

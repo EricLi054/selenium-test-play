@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using Rac.TestAutomation.Common.DatabaseCalls.Claims;
 using Rac.TestAutomation.Common.Exceptions;
 using System;
@@ -56,7 +56,7 @@ namespace Rac.TestAutomation.Common.DatabaseCalls.Policies
 
         /// <summary>       
         /// Find Landlord and Home Building Policies for spark fence claim flow.
-        /// </summary>     
+        /// </summary>
         public static List<string> FindListOfHomePolicyNumbersLandlordAndHomeownerBuilding()
         {
             var candidates = new List<string>();
@@ -70,7 +70,7 @@ namespace Rac.TestAutomation.Common.DatabaseCalls.Policies
                     var reader = db.ExecuteQuery(query, null);
                     while (reader.Read())
                     {
-                        candidates.Add(reader.GetDbValue(0));
+                        candidates.Add(reader.GetDbValueFromColumnName("EXTERNAL_POLICY_NUMBER"));
                     }
                 }
             }
