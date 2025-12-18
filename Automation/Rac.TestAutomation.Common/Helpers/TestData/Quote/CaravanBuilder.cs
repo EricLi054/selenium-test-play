@@ -260,6 +260,36 @@ namespace Rac.TestAutomation.Common.TestData.Quote
             return this;
         }
 
+        public CaravanBuilder WithRegistration(string registration)
+        {
+            Set(x => x.Registration, registration);
+            return this;
+        }
+
+        public CaravanBuilder WithMake(string make)
+        {
+            Set(x => x.Make, make);
+            return this;
+        }
+
+        public CaravanBuilder WithModel(string model)
+        {
+            Set(x => x.Model, model);
+            return this;
+        }
+
+        public CaravanBuilder WithYear(int year)
+        {
+            Set(x => x.Year, year);
+            return this;
+        }
+
+        public CaravanBuilder WithParkingAddress(Address address)
+        {
+            Set(x => x.ParkingAddress, address);
+            return this;
+        }
+
         protected override QuoteCaravan BuildEntity()
         {
             return new QuoteCaravan
