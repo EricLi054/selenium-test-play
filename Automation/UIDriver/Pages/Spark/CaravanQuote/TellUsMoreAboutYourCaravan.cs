@@ -42,13 +42,13 @@ namespace UIDriver.Pages.Spark.CaravanQuote
                 public const string Input   = "id('select-overnight-parking')";
                 public const string Options = "//ul[@role='listbox']/li";
             }
-            public static class Button
-            {
-                public const string Next = FORM + "//button[@data-testid='submit']";
-            }
             public static class Registration
             {
                 public const string Input = "id('input-registration-number')";
+            }
+            public static class Button
+            {
+                public const string Next = FORM + "//button[@data-testid='submit']";
             }
         }
 
@@ -109,6 +109,7 @@ namespace UIDriver.Pages.Spark.CaravanQuote
             get => GetInnerText(XPath.Overnight.Input);
             set => WaitForSelectableAndPickFromDropdown(XPath.Overnight.Input, XPath.Overnight.Options, value);
         }
+
         public string Registration
         {
             get => GetValue(XPath.Registration.Input);

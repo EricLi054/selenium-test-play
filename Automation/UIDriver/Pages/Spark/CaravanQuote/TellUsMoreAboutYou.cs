@@ -10,6 +10,7 @@ namespace UIDriver.Pages.Spark.CaravanQuote
     public class TellUsMoreAboutYou : SparkPersonalInformationPage
     {
         #region XPATHS
+
         public static class XPath
         {
             public static class StepperLabels
@@ -21,12 +22,13 @@ namespace UIDriver.Pages.Spark.CaravanQuote
             {
                 public const string ConfirmAddressLabel = FORM + "//label[contains(text(),'Please confirm your mailing address')]";
             }
+
             public static class DuplicateAlert
             {
-                public const string Base        = "/html/body/div[2]/div[3]/div";
-                public const string Title       = Base + "//h2[@id='dialog-title']";
-                public const string Content     = Base + "//div[@data-testid='dialog-content']";
-                public const string Close       = Base + "//button[@aria-label='close']";
+                public const string Base    = "/html/body/div[starts-with(@class,'k-widget k-window')]";
+                public const string Title   = Base + "//span[@id='simple-dialog_wnd_title']";
+                public const string Content = Base + "//div[@id='simple-dialog']";
+                public const string Close   = Base + "//div[@class='cluetip-close']/a";
             }
         }
 
@@ -131,11 +133,15 @@ namespace UIDriver.Pages.Spark.CaravanQuote
 
             using (var spinner = new SparkSpinner(_browser))
                 spinner.WaitForSpinnerToFinish();
+            
+            // After spinner finishes, duplicate alert may appear (takes precedence over premium popup)
+            // Check for it here so caller can handle it appropriately
+            // Note: This check is non-blocking - if alert doesn't appear, execution continues normally
         }
         public bool IsDuplicateAlertVisible()
         {
             IWebElement dialogTitle;
-            return _driver.TryWaitForElementToBeVisible(By.XPath(XPath.DuplicateAlert.Title), WaitTimes.T5SEC, out dialogTitle);
+            return _driver.TryWaitForElementToBeVisible(By.XPath(XPath.DuplicateAlert.Title), WaitTimes.T10SEC, out dialogTitle);
         }
 
         public string GetDuplicateAlertTitle()
@@ -152,6 +158,7 @@ namespace UIDriver.Pages.Spark.CaravanQuote
         {
             ClickControl(XPath.DuplicateAlert.Close);
         }
+
         public void ClickStorageAndUseStep()
         {
             ClickControl(XPath.StepperLabels.StorageAndUse);

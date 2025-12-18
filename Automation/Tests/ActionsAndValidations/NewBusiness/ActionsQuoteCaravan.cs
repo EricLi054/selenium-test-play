@@ -450,6 +450,7 @@ namespace Tests.ActionsAndValidations
 
             return policyNo;
         }
+
         /// <summary>
         /// Handles the duplicate policy alert by closing it, navigating back to "Storage and use" step,
         /// and changing the registration number.
@@ -463,7 +464,7 @@ namespace Tests.ActionsAndValidations
             using (var spinner = new SparkSpinner(browser))
             {
                 tellUsMoreAboutYou.CloseDuplicateAlertDialog();
-
+                
                 NavigateBackToStorageAndUseStep(browser);
                 UpdateRegistration(tellUsMoreAboutYourCaravan, quoteCaravan, browser);
                 NavigateForwardThroughQuotePages(browser, quoteCaravan, spinner);
@@ -483,16 +484,16 @@ namespace Tests.ActionsAndValidations
         private static void UpdateRegistration(TellUsMoreAboutYourCaravan page, QuoteCaravan quoteCaravan, Browser browser)
         {
             page.WaitForPage();
-
+            
             string newRego;
             do
             {
                 newRego = DataHelper.RandomAlphanumerics(5, 8);
             } while (newRego == quoteCaravan.Registration);
-
+            
             quoteCaravan.Registration = newRego;
             page.Registration = newRego;
-
+            
             Reporting.Log($"Changed caravan registration to: {newRego}", browser.Driver.TakeSnapshot());
         }
 

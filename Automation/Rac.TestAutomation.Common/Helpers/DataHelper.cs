@@ -928,6 +928,11 @@ namespace Rac.TestAutomation.Common
             return !string.IsNullOrEmpty(registration) && !registration.Equals("TBA", StringComparison.OrdinalIgnoreCase);
         }
 
+        public static bool IsValidCaravanRegistration(string registration)
+        {
+            return !string.IsNullOrEmpty(registration) && !registration.Equals("TBA", StringComparison.OrdinalIgnoreCase);
+        }
+
         /// <summary>
         /// Removes the monetary notations used in strings such as
         /// "$" and "," symbols. This is to facilitate simpler string
