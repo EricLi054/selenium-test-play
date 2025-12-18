@@ -457,6 +457,60 @@ namespace Rac.TestAutomation.Common.DatabaseCalls.Policies
         }
 
         /// <summary>
+        /// Finds a caravan policy for duplicate alert testing.
+        /// Returns policy with contact details already populated.
+        /// </summary>
+        public static CaravanPolicy FindCaravanPolicy()
+        {
+            CaravanPolicy policy = null;
+            var candidates = new List<CaravanPolicy>();
+
+            try
+            {
+                string query = ShieldDB.ReadSQLFromFile("Policies\\FindPolicyCaravan.sql");
+
+                using (var db = ShieldDB.GetDatabaseHandle())
+                {
+                    var reader = db.ExecuteQuery(query, null);
+                    while (reader.Read())
+                    {
+                        var result = new CaravanPolicy()
+                        {
+                            PolicyNumber = reader.GetDbValueFromColumnName("policy_number"),
+                            ActivePolicyHolder = new Contact(contactId: reader.GetDbValueFromColumnName("contact_id"))
+                        };
+
+                        try
+                        {
+                            result.ActivePolicyHolder = new ContactBuilder(reader.GetDbValueFromColumnName("contact_id")).Build();
+                        }
+                        catch
+                        {
+                            continue;
+                        }
+
+                        if (!PolicyHasUnsupportedCriteria(result.PolicyNumber))
+                        {
+                            candidates.Add(result);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex) when (ex is ArgumentException || ex is IOException || ex is SqlException || ex is FormatException)
+            {
+                Reporting.Error($"SQL error encountered: {ex.Message}");
+            }
+
+            if (candidates.Count > 0)
+            {
+                policy = candidates[0];
+            }
+
+            Reporting.IsNotNull(policy, "that a valid caravan policy was found for duplicate alert test.");
+            return policy;
+        }
+
+        /// <summary>
         /// Caravan Endorsements, including renewals, are blocked if:
         /// 1. the sum insured is more than +/- 30% market value
         /// 2. the contents SI is not rounded to thousands
