@@ -1,10 +1,12 @@
-﻿using NUnit.Framework;
+﻿using System;
+using NUnit.Framework;
 using Rac.TestAutomation.Common;
 using Rac.TestAutomation.Common.TestData.Quote;
 using Tests.ActionsAndValidations;
 using System.Collections.Generic;
 using UIDriver.Pages.Spark.CaravanQuote;
 using Rac.TestAutomation.Common.DatabaseCalls.Contacts;
+using Rac.TestAutomation.Common.DatabaseCalls.Policies;
 
 using static Rac.TestAutomation.Common.Constants.Contacts;
 using static Rac.TestAutomation.Common.Constants.General;
@@ -192,6 +194,42 @@ namespace Spark.NewBusiness
             Reporting.LogTestShieldValidations("policy", policyNumber);
             VerifyQuoteCaravan.VerifyCaravanPolicyInShield(_browser, quoteInputs, policyNumber);
         }
+
+        /// <summary>
+        /// Test emulates the workflow of a member with existing Caravan policy attempting to create a duplicate:
+        /// 1. Find existing Caravan policy (not in renewal)
+        /// 2. Select "Yes" for "Are you an RAC member?" on Page 1 (upfront match)
+        /// 3. Create new quote with same member details (firstname, lastname, mobile) and same caravan registration
+        /// 4. Fill quote details through to "Tell us more about you" page
+        /// 5. After filling personal information, duplicate alert should appear (due to same registration)
+        /// 6. Verify duplicate alert content
+        /// 7. Handle alert by closing it and changing caravan registration
+        /// 8. Complete purchase flow with new registration
+        /// 9. Verify policy is created successfully
+        /// </summary>
+        [Category(TestCategory.New_Business), Category(TestCategory.Caravan), Category(TestCategory.Spark), Category(TestCategory.Regression)]
+        [Test(Description = "Caravan: Duplicate alert when using same member details and caravan registration")]
+        public void INSU_TXXX_Caravan_MemberMatch_DuplicateAlert()
+        {
+            var quoteInputs = BuildTestDataForDuplicateAlert();
+
+            Reporting.LogTestStart();
+            ActionsQuoteCaravan.CreateNewCaravanQuote(_browser, quoteInputs);
+            ActionsQuoteCaravan.ConfirmQuote(_browser);
+            ActionsQuoteCaravan.SetPolicyStartDate(_browser, quoteInputs);
+            ActionsQuoteCaravan.ProvidePersonalInformationMainPH(_browser, quoteInputs);
+
+            VerifyQuoteCaravan.VerifyDuplicatePolicyAlert(_browser);
+
+            ActionsQuoteCaravan.HandleDuplicateAlertAndChangeRegistration(_browser, quoteInputs);
+
+            ActionsQuoteCaravan.ProvidePaymentDetails(_browser, quoteInputs);
+
+            string policyNumber = ActionsQuoteCaravan.GetPolicyNumberFromConfirmationPage(_browser);
+
+            Reporting.LogTestShieldValidations("policy", policyNumber);
+            VerifyQuoteCaravan.VerifyCaravanPolicyInShield(_browser, quoteInputs, policyNumber);
+        }
         #endregion
 
         #region Test cases helper methods        
@@ -291,6 +329,63 @@ namespace Spark.NewBusiness
 
             return caravanQuote;
         }
+
+        private QuoteCaravan BuildTestDataForDuplicateAlert()
+        {
+            const int maxRetries = 10;
+            
+            for (int attempt = 1; attempt <= maxRetries; attempt++)
+            {
+                var existingPolicy = ShieldCaravanDB.FindCaravanPolicy();
+                var existingCaravan = ShieldCaravanDB.FetchCaravanDetailsForPolicyCard(existingPolicy.PolicyNumber);
+                
+                if (!DataHelper.IsValidCaravanRegistration(existingCaravan?.Registration))
+                {
+                    Reporting.Log($"Attempt {attempt}: Policy {existingPolicy.PolicyNumber} has invalid registration (found: '{existingCaravan?.Registration ?? "null"}')");
+                    continue;
+                }
+
+                Contact existingMember = null;
+                try
+                {
+                    existingMember = DataHelper.MapContactWithPersonAPI(existingPolicy.ActivePolicyHolder.Id, existingPolicy.ActivePolicyHolder.ExternalContactNumber);
+                }
+                catch
+                {
+                    Reporting.Log($"Attempt {attempt}: Failed to map contact for policy {existingPolicy.PolicyNumber}");
+                }
+                
+                if (existingMember != null && 
+                    !string.IsNullOrEmpty(existingMember.FirstName) &&
+                    !string.IsNullOrEmpty(existingMember.Surname) &&
+                    !string.IsNullOrEmpty(existingMember.MobilePhoneNumber))
+                {
+                    var duplicateMember = new ContactBuilder(existingMember)
+                        .WithMemberMatchRule(MemberMatchRule.Rule1)
+                        .WithoutDeclaringMembership(false)
+                        .Build();
+
+                    var caravanQuote = new CaravanBuilder()
+                        .InitialiseCaravanWithRandomData(new List<Contact>() { duplicateMember })
+                        .WithRandomCaravan(minValue: 30000)
+                        .WithRegistration(existingCaravan.Registration)
+                        .WithParkingAddress(duplicateMember.MailingAddress)
+                        .Build();
+
+                    Reporting.LogTestData(TestContext.CurrentContext.Test.Name, caravanQuote.ToString());
+                    return caravanQuote;
+                }
+                
+                if (attempt == maxRetries)
+                {
+                    Reporting.Error($"Failed to find valid caravan policy for duplicate alert test after maximum retries ({maxRetries}).");
+                    throw new InvalidOperationException("Failed to find valid caravan policy for duplicate alert test.");
+                }
+            }
+            
+            throw new InvalidOperationException("Unexpected exit from retry loop.");
+        }
+
         /// <summary>
         /// Creates a policyHolder contact with the given:
         /// 1. matchRule: Member match Rule (e.g:-MemberMatchRule.Rule1)

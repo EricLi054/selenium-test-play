@@ -740,6 +740,9 @@
     <Content Include="DBDriver\SQL\Policies\FindPolicyCaravanRenewal.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="DBDriver\SQL\Policies\FindPolicyCaravan.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="DBDriver\SQL\Policies\FindPolicyMotorWithOpenClaim.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

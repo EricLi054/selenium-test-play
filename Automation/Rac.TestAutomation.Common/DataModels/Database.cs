@@ -263,6 +263,7 @@ namespace Rac.TestAutomation.Common
         public Decimal InstallmentAmount { get; set; }
         public CaravanPolicyOutput CaravanPolicyOutput { get; set; }
         public CaravanPolicyInput CaravanPolicyInput { get; set; }
+        public Contact ActivePolicyHolder { get; set; }
     }
     public class CaravanPolicyInput
     {

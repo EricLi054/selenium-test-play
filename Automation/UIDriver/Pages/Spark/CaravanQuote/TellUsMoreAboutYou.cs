@@ -2,6 +2,7 @@
 using Rac.TestAutomation.Common;
 
 using static Rac.TestAutomation.Common.Constants.Contacts;
+using static Rac.TestAutomation.Common.Constants.General;
 using static Rac.TestAutomation.Common.Constants.PolicyGeneral;
 
 namespace UIDriver.Pages.Spark.CaravanQuote
@@ -10,11 +11,24 @@ namespace UIDriver.Pages.Spark.CaravanQuote
     {
         #region XPATHS
 
-        private class XPath
+        public static class XPath
         {
+            public static class StepperLabels
+            {
+                public const string StorageAndUse = "id('storage-and-use-step')";
+            }
+
             public static class MatchedMember
             {
                 public const string ConfirmAddressLabel = FORM + "//label[contains(text(),'Please confirm your mailing address')]";
+            }
+
+            public static class DuplicateAlert
+            {
+                public const string Base    = "/html/body/div[starts-with(@class,'k-widget k-window')]";
+                public const string Title   = Base + "//span[@id='simple-dialog_wnd_title']";
+                public const string Content = Base + "//div[@id='simple-dialog']";
+                public const string Close   = Base + "//div[@class='cluetip-close']/a";
             }
         }
 
@@ -119,6 +133,35 @@ namespace UIDriver.Pages.Spark.CaravanQuote
 
             using (var spinner = new SparkSpinner(_browser))
                 spinner.WaitForSpinnerToFinish();
+            
+            // After spinner finishes, duplicate alert may appear (takes precedence over premium popup)
+            // Check for it here so caller can handle it appropriately
+            // Note: This check is non-blocking - if alert doesn't appear, execution continues normally
+        }
+        public bool IsDuplicateAlertVisible()
+        {
+            IWebElement dialogTitle;
+            return _driver.TryWaitForElementToBeVisible(By.XPath(XPath.DuplicateAlert.Title), WaitTimes.T10SEC, out dialogTitle);
+        }
+
+        public string GetDuplicateAlertTitle()
+        {
+            return GetInnerText(XPath.DuplicateAlert.Title);
+        }
+
+        public string GetDuplicateAlertContent()
+        {
+            return GetInnerText(XPath.DuplicateAlert.Content);
+        }
+
+        public void CloseDuplicateAlertDialog()
+        {
+            ClickControl(XPath.DuplicateAlert.Close);
+        }
+
+        public void ClickStorageAndUseStep()
+        {
+            ClickControl(XPath.StepperLabels.StorageAndUse);
         }
     }
 }

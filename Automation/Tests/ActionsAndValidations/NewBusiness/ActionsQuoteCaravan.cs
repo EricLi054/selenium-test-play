@@ -310,6 +310,11 @@ namespace Tests.ActionsAndValidations
 
                 tellUsMoreAboutYou.FillPersonalInformation(mainPH);
 
+                if (tellUsMoreAboutYou.IsDuplicateAlertVisible())
+                {
+                    return;
+                }
+
                 if (mainPH.SkipDeclaringMembership && mainPH.IsMultiMatchRSAMember)
                 {
                     //When a Multi-Match main policyholder, skipped declaring membership on Page 1 ('Are you an RAC member'),
@@ -444,6 +449,82 @@ namespace Tests.ActionsAndValidations
             }
 
             return policyNo;
+        }
+
+        /// <summary>
+        /// Handles the duplicate policy alert by closing it, navigating back to "Storage and use" step,
+        /// and changing the registration number.
+        /// </summary>
+        /// <param name="browser">The browser instance</param>
+        /// <param name="quoteCaravan">The quote data to update with new registration</param>
+        public static void HandleDuplicateAlertAndChangeRegistration(Browser browser, QuoteCaravan quoteCaravan)
+        {
+            using (var tellUsMoreAboutYou = new TellUsMoreAboutYou(browser))
+            using (var tellUsMoreAboutYourCaravan = new TellUsMoreAboutYourCaravan(browser))
+            using (var spinner = new SparkSpinner(browser))
+            {
+                tellUsMoreAboutYou.CloseDuplicateAlertDialog();
+                
+                NavigateBackToStorageAndUseStep(browser);
+                UpdateRegistration(tellUsMoreAboutYourCaravan, quoteCaravan, browser);
+                NavigateForwardThroughQuotePages(browser, quoteCaravan, spinner);
+            }
+        }
+
+        private static void NavigateBackToStorageAndUseStep(Browser browser)
+        {
+            using (var tellUsMoreAboutYou = new TellUsMoreAboutYou(browser))
+            using (var spinner = new SparkSpinner(browser))
+            {
+                tellUsMoreAboutYou.ClickStorageAndUseStep();
+                spinner.WaitForSpinnerToFinish();
+            }
+        }
+
+        private static void UpdateRegistration(TellUsMoreAboutYourCaravan page, QuoteCaravan quoteCaravan, Browser browser)
+        {
+            page.WaitForPage();
+            
+            string newRego;
+            do
+            {
+                newRego = DataHelper.RandomAlphanumerics(5, 8);
+            } while (newRego == quoteCaravan.Registration);
+            
+            quoteCaravan.Registration = newRego;
+            page.Registration = newRego;
+            
+            Reporting.Log($"Changed caravan registration to: {newRego}", browser.Driver.TakeSnapshot());
+        }
+
+        private static void NavigateForwardThroughQuotePages(Browser browser, QuoteCaravan quoteCaravan, SparkSpinner spinner)
+        {
+            using (var tellUsMoreAboutYourCaravan = new TellUsMoreAboutYourCaravan(browser))
+            {
+                tellUsMoreAboutYourCaravan.ClickNext();
+                spinner.WaitForSpinnerToFinish();
+            }
+
+            using (var nowABitAboutThePolicyholders = new NowABitAboutThePolicyholders(browser))
+            {
+                if (nowABitAboutThePolicyholders.IsDisplayed())
+                {
+                    nowABitAboutThePolicyholders.ClickNext();
+                    spinner.WaitForSpinnerToFinish();
+                }
+            }
+
+            using (var heresYourQuote = new HeresYourQuote(browser))
+            {
+                if (heresYourQuote.IsDisplayed())
+                {
+                    heresYourQuote.ClickGetPolicy();
+                    spinner.WaitForSpinnerToFinish();
+                }
+            }
+
+            SetPolicyStartDate(browser, quoteCaravan);
+            ProvidePersonalInformationMainPH(browser, quoteCaravan);
         }
     }
 }

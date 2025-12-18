@@ -3,6 +3,7 @@ using Rac.TestAutomation.Common.API;
 using Rac.TestAutomation.Common.DatabaseCalls.Policies;
 using System;
 using System.Linq;
+using UIDriver.Pages.Spark.CaravanQuote;
 
 using static Rac.TestAutomation.Common.Constants.Contacts;
 using static Rac.TestAutomation.Common.Constants.PolicyCaravan;
@@ -13,14 +14,20 @@ namespace Tests.ActionsAndValidations
 {
     public static class VerifyQuoteCaravan
     {
-        public const int CARAVAN_DEFAULT_ANNEXE_COVER = 3000;
-        private const string CARAVAN_DEFAULT_REGISTRATION_NUMBER = "TBA";
-        private const string CARAVAN_CAMPAIGN_CODE = "2000001";
-        private const string CARAVAN_ONSITE_COVER_TYPE = "ACAO";
-        private const string CARAVAN_CONTENT_COVER_TYPE = "AOCO";
-        private const string CARAVAN_EMAIL_TYPE = "1";
-        private const string CARAVAN_INSTALLMENT_NUMBER = "1";
-        private const string CARAVAN_INSTALLMENT_TYPE = "1";
+        #region Constants
+
+        private const string DUPLICATE_ALERT_TITLE                = "You may already be insured";
+        private const string DUPLICATE_ALERT_CONTENT              = "Please call us on 13 17 03 so we can help you.";
+        public const int     CARAVAN_DEFAULT_ANNEXE_COVER         = 3000;
+        private const string CARAVAN_DEFAULT_REGISTRATION_NUMBER  = "TBA";
+        private const string CARAVAN_CAMPAIGN_CODE                = "2000001";
+        private const string CARAVAN_ONSITE_COVER_TYPE            = "ACAO";
+        private const string CARAVAN_CONTENT_COVER_TYPE           = "AOCO";
+        private const string CARAVAN_EMAIL_TYPE                   = "1";
+        private const string CARAVAN_INSTALLMENT_NUMBER           = "1";
+        private const string CARAVAN_INSTALLMENT_TYPE             = "1";
+
+        #endregion
 
         /// <summary>
         /// This method uses the following Shield API calls to verify the quote parameters.
@@ -123,10 +130,19 @@ namespace Tests.ActionsAndValidations
 
         private static void VerifyCaravanPolicyInShieldBasicCoverDetails(QuoteCaravan caravanQuote, CaravanPolicy policyInfo)
         {
-
-            // Verify General Policy details
-            Reporting.AreEqual(caravanQuote.ParkLocation.GetDescription(), policyInfo.CaravanPolicyOutput.CaravanLocation, ignoreCase: true, "Caravan parking location in Shield DB");
-            Reporting.AreEqual(CARAVAN_DEFAULT_REGISTRATION_NUMBER, policyInfo.CaravanPolicyOutput.RegistrationValue, "Caravan registration number in Shield DB");
+            Reporting.AreEqual(caravanQuote.ParkLocation.GetDescription(), policyInfo.CaravanPolicyOutput.CaravanLocation, 
+                ignoreCase: true, "Caravan parking location in Shield DB");
+            
+            if (!string.IsNullOrEmpty(caravanQuote.Registration) && !caravanQuote.Registration.Equals("TBA", StringComparison.OrdinalIgnoreCase))
+            {
+                Reporting.AreEqual(caravanQuote.Registration, policyInfo.CaravanPolicyOutput.RegistrationValue, "Caravan registration number in Shield DB");
+            }
+            else
+            {
+                Reporting.AreEqual(CARAVAN_DEFAULT_REGISTRATION_NUMBER, policyInfo.CaravanPolicyOutput.RegistrationValue, 
+                    "Caravan registration number in Shield DB (default TBA when not provided)");
+            }
+            
             Reporting.AreEqual(CARAVAN_CAMPAIGN_CODE, policyInfo.CaravanPolicyOutput.Campaign_Code, "Caravan campaign code in Shield DB");
 
             Reporting.IsNull(policyInfo.CaravanPolicyOutput.NCBLevel, "Caravan NCB level should be null for policies bought after August 2024");
@@ -186,6 +202,23 @@ namespace Tests.ActionsAndValidations
             }
 
             VerifyPolicy.VerifyNewPolicyInstalments(policyNumber);
+        }
+
+        public static void VerifyDuplicatePolicyAlert(Browser browser)
+        {
+            using (var tellUsMoreAboutYou = new TellUsMoreAboutYou(browser))
+            {
+                Reporting.Log("Verifying duplicate policy alert dialog.", browser.Driver.TakeSnapshot());
+                
+                if (!tellUsMoreAboutYou.IsDuplicateAlertVisible())
+                {
+                    System.Threading.Thread.Sleep(2000);
+                    Reporting.IsTrue(tellUsMoreAboutYou.IsDuplicateAlertVisible(), "Duplicate policy alert dialog should be visible");
+                }
+                
+                Reporting.AreEqual(DUPLICATE_ALERT_TITLE, tellUsMoreAboutYou.GetDuplicateAlertTitle(), "Duplicate alert title should match expected text");
+                Reporting.AreEqual(DUPLICATE_ALERT_CONTENT, tellUsMoreAboutYou.GetDuplicateAlertContent(), "Duplicate alert content should match expected text");
+            }
         }
     }
 }
