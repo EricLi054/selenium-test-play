@@ -653,5 +653,76 @@ namespace Tests.ActionsAndValidations
                 }
             }
         }
+
+        /// <summary>
+        /// Processes quote with existing policy details that will trigger duplicate alert.
+        /// This includes adjusting quote parameters, confirming policy details, and providing personal information.
+        /// </summary>
+        public static void ProcessQuoteWithExistingDetails(Browser browser, QuoteMotorcycle quoteMotorcycle)
+        {
+            AdjustQuoteParametersAndBeginPurchase(browser, quoteMotorcycle);
+            
+            using (var letsClarifyFewMoreDetails = new LetsClarifyFewMoreDetails(browser))
+            using (var spinner = new SparkSpinner(browser))
+            {
+                spinner.WaitForSpinnerToFinish(nextPage: letsClarifyFewMoreDetails);
+                letsClarifyFewMoreDetails.WaitForPage();
+                letsClarifyFewMoreDetails.FillClarifyFewDetails(quoteMotorcycle);
+            }
+            
+            using (var tellUsMoreAboutYou = new TellUsMoreAboutYou(browser))
+            using (var spinner = new SparkSpinner(browser))
+            {
+                spinner.WaitForSpinnerToFinish(nextPage: tellUsMoreAboutYou);
+                tellUsMoreAboutYou.WaitForPage();
+                tellUsMoreAboutYou.FillTellUsMoreAboutYou(quoteMotorcycle);
+            }
+        }
+
+        /// <summary>
+        /// Handles the duplicate policy alert by closing it, navigating back to "Confirm policy details" step,
+        /// and changing the registration number.
+        /// </summary>
+        /// <param name="browser">The browser instance</param>
+        /// <param name="quoteMotorcycle">The quote data to update with new registration</param>
+        public static void HandleDuplicateAlertAndChangeRegistration(Browser browser, QuoteMotorcycle quoteMotorcycle)
+        {
+            using (var tellUsMoreAboutYou = new TellUsMoreAboutYou(browser))
+            using (var letsClarifyFewMoreDetails = new LetsClarifyFewMoreDetails(browser))
+            using (var spinner = new SparkSpinner(browser))
+            {
+                tellUsMoreAboutYou.CloseDuplicateAlertDialog();
+                
+                // Navigate back to "Confirm policy details" step
+                tellUsMoreAboutYou.ClickConfirmDetailsStep();
+                spinner.WaitForSpinnerToFinish(nextPage: letsClarifyFewMoreDetails);
+                letsClarifyFewMoreDetails.WaitForPage();
+                
+                // Update registration to a new random value
+                string newRego;
+                do
+                {
+                    newRego = DataHelper.RandomAlphanumerics(5, 8);
+                } while (newRego == quoteMotorcycle.Registration);
+                
+                quoteMotorcycle.Registration = newRego;
+                letsClarifyFewMoreDetails.BikeRego = newRego;
+                
+                Reporting.Log($"Changed motorcycle registration to: {newRego}", browser.Driver.TakeSnapshot());
+                
+                // Navigate forward to complete the flow
+                letsClarifyFewMoreDetails.ClickNext();
+                spinner.WaitForSpinnerToFinish(nextPage: tellUsMoreAboutYou);
+                
+                // Re-fill personal information
+                tellUsMoreAboutYou.WaitForPage();
+                tellUsMoreAboutYou.FillTellUsMoreAboutYou(quoteMotorcycle);
+                
+                if (quoteMotorcycle.IsPremiumChangeExpected)
+                {
+                    VerifyAnyPremiumChangePopup(browser, quoteMotorcycle);
+                }
+            }
+        }
     }
 }
