@@ -8,6 +8,35 @@ namespace Tests.ActionsAndValidations
 {
     public static class VerifyQuoteMotorcycle
     {
+        #region Constants
+
+        public const string DUPLICATE_ALERT_TITLE = "You may already be insured";
+        public const string DUPLICATE_ALERT_CONTENT = "Please call us on 13 17 03 so we can help you.";
+
+        #endregion
+
+        /// <summary>
+        /// Verifies that the duplicate policy alert is displayed on the page.
+        /// This method checks for the alert visibility and validates its title and content.
+        /// </summary>
+        /// <param name="browser">The browser instance</param>
+        public static void VerifyDuplicatePolicyAlert(Browser browser)
+        {
+            using (var tellUsMoreAboutYou = new TellUsMoreAboutYou(browser))
+            {
+                Reporting.Log("Verifying duplicate policy alert dialog.", browser.Driver.TakeSnapshot());
+                
+                if (!tellUsMoreAboutYou.IsDuplicateAlertVisible())
+                {
+                    System.Threading.Thread.Sleep(2000);
+                    Reporting.IsTrue(tellUsMoreAboutYou.IsDuplicateAlertVisible(), "Duplicate policy alert dialog should be visible");
+                }
+                
+                Reporting.AreEqual(DUPLICATE_ALERT_TITLE, tellUsMoreAboutYou.GetDuplicateAlertTitle(), "Duplicate alert title should match expected text");
+                Reporting.AreEqual(DUPLICATE_ALERT_CONTENT, tellUsMoreAboutYou.GetDuplicateAlertContent(), "Duplicate alert content should match expected text");
+            }
+        }
+
         /// <summary>
         /// Answers the "Are you a member?" question.
         /// </summary>

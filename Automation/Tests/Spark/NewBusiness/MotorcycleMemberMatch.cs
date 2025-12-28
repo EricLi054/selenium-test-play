@@ -2,7 +2,9 @@
 using Rac.TestAutomation.Common;
 using Rac.TestAutomation.Common.TestData.Quote;
 using Rac.TestAutomation.Common.DatabaseCalls.Contacts;
+using Rac.TestAutomation.Common.DatabaseCalls.Policies;
 using Tests.ActionsAndValidations;
+using System;
 using System.Collections.Generic;
 
 using static Rac.TestAutomation.Common.Constants.Contacts;
@@ -181,6 +183,34 @@ namespace Spark.NewBusiness
             VerifyPolicyMotorcycle.VerifyQuoteContactAndVehicleDetailsInShield(quoteInputs, quoteNumber, expectedContact, SparkBasePage.QuoteStage.AFTER_QUOTE);
         }
 
+        /// <summary>
+        /// Tests duplicate policy alert for Motorcycle when attempting to create a quote
+        /// with same registration as an existing policy. Verifies alert appears, then changes
+        /// registration to complete purchase.
+        /// </summary>
+        [Test, Description("MCO: Duplicate alert when using same member details and motorcycle registration")]
+        [Category(TestCategory.Regression), Category(TestCategory.New_Business), Category(TestCategory.Spark), Category(TestCategory.Motorcycle),
+            Category(TestCategory.Mock_Member_Central_Support), Category(TestCategory.InsuranceContactService)]
+        public void INSU_TXXX_MCO_MemberMatch_DuplicateAlert()
+        {
+            var quoteInputs = BuildTestDataForDuplicateAlert();
+
+            Reporting.LogTestStart();
+            ActionsQuoteMotorcycle.FetchNewMotorCycleQuote(_browser, quoteInputs);
+            ActionsQuoteMotorcycle.ProcessQuoteWithExistingDetails(_browser, quoteInputs);
+
+            VerifyQuoteMotorcycle.VerifyDuplicatePolicyAlert(_browser);
+
+            ActionsQuoteMotorcycle.HandleDuplicateAlertAndChangeRegistration(_browser, quoteInputs);
+
+            VerifyQuoteMotorcycle.VerifyQuoteDetailsOnPaymentPage(_browser, quoteInputs);
+            
+            string policyNumber = ActionsQuoteMotorcycle.EnterPaymentDetailAndPurchasePolicy(_browser, quoteInputs);
+
+            Reporting.LogTestShieldValidations("policy", policyNumber);
+            VerifyPolicyMotorcycle.VerifyPolicyDetailsInShieldDB(policyNumber, quoteInputs);
+        }
+
         private QuoteMotorcycle BuildTestDataTest002()
         {
             // Setup test data
@@ -332,6 +362,65 @@ namespace Spark.NewBusiness
             Reporting.Log(motorcycleQuote.ToString());
 
             return motorcycleQuote;
+        }
+
+        private QuoteMotorcycle BuildTestDataForDuplicateAlert()
+        {
+            const int maxRetries = 10;
+            
+            for (int attempt = 1; attempt <= maxRetries; attempt++)
+            {
+                var existingPolicy = ShieldMotorDB.FindMotorcyclePolicy();
+                
+                if (existingPolicy?.Vehicle == null || 
+                    !DataHelper.IsRegistrationNumberConsideredValid(existingPolicy.Vehicle.Registration))
+                    continue;
+
+                Contact existingMember = null;
+                try
+                {
+                    var shieldContact = new ContactBuilder(existingPolicy.PolicyHolders[0].Id).Build();
+                    existingMember = DataHelper.MapContactWithPersonAPI(shieldContact.Id, shieldContact.ExternalContactNumber);
+                }
+                catch
+                {
+                    // Ignore exceptions when mapping contact with Member Central.
+                    // This is expected for contacts that are not single match or have sync issues.
+                    // The retry loop will attempt to find another valid policy.
+                }
+                
+                if (existingMember == null || 
+                    string.IsNullOrEmpty(existingMember.FirstName) ||
+                    string.IsNullOrEmpty(existingMember.Surname) ||
+                    string.IsNullOrEmpty(existingMember.MobilePhoneNumber))
+                    continue;
+
+                var duplicateMember = new ContactBuilder(existingMember)
+                    .WithMemberMatchRule(MemberMatchRule.Rule1)
+                    .WithoutDeclaringMembership(false)
+                    .Build();
+
+                var motorcycleQuote = new MotorCycleBuilder()
+                    .InitialiseMotorCycleQuoteWithRandomData(duplicateMember, true)
+                    .WithRandomVehicle(minValue: 30000)
+                    .WithRego(existingPolicy.Vehicle.Registration)
+                    .WithAnnualPaymentFrequency()
+                    .WithCover(MotorCovers.MFCO)
+                    .WithoutFinancier()
+                    .WithIsModified(false)
+                    .WithIsGaraged(true)
+                    .WithTracker()
+                    .WithUsage(MotorcycleUsage.Private)
+                    .WithPaymentMethod(new Payment(duplicateMember).CreditCard().Annual())
+                    .WithIsPremiumChangeExpected(true)
+                    .Build();
+
+                Reporting.Log(duplicateMember.ToString());
+                Reporting.Log(motorcycleQuote.ToString());
+                return motorcycleQuote;
+            }
+            
+            throw new InvalidOperationException($"Failed to find valid motorcycle policy after {maxRetries} attempts.");
         }
     }
 }
