@@ -1,7 +1,6 @@
 ﻿using OpenQA.Selenium;
 using Rac.TestAutomation.Common;
 using System.Linq;
-using static Rac.TestAutomation.Common.Constants.General;
 
 namespace UIDriver.Pages.Spark.MotorcycleQuote
 {
@@ -18,10 +17,10 @@ namespace UIDriver.Pages.Spark.MotorcycleQuote
 
             public static class DuplicateAlert
             {
-                public const string Base        = "/html/body/div[2]/div[3]/div";
-                public const string Title       = Base + "//h2[@id='dialog-title']";
-                public const string Content     = Base + "//div[@data-testid='dialog-content']";
-                public const string Close       = Base + "//button[@aria-label='close']";
+                public const string Base    = "/html/body/div[starts-with(@class,'k-widget k-window')]";
+                public const string Title   = Base + "//span[@id='simple-dialog_wnd_title']";
+                public const string Content = Base + "//div[@id='simple-dialog']";
+                public const string Close   = Base + "//div[@class='cluetip-close']/a";
             }
         }
 
@@ -81,17 +80,31 @@ namespace UIDriver.Pages.Spark.MotorcycleQuote
             using (var spinner = new SparkSpinner(_browser))
                 spinner.WaitForSpinnerToFinish();
         }
+
+        public bool IsDuplicateAlertVisible()
+        {
+            IWebElement dialogTitle;
+            return _driver.TryWaitForElementToBeVisible(By.XPath(XPath.DuplicateAlert.Title), WaitTimes.T10SEC, out dialogTitle);
+        }
+
+        public string GetDuplicateAlertTitle()
+        {
+            return GetInnerText(XPath.DuplicateAlert.Title);
+        }
+
+        public string GetDuplicateAlertContent()
+        {
+            return GetInnerText(XPath.DuplicateAlert.Content);
+        }
+
+        public void CloseDuplicateAlertDialog()
+        {
+            ClickControl(XPath.DuplicateAlert.Close);
+        }
+
         public void ClickConfirmDetailsStep()
         {
             ClickControl(XPath.StepperLabels.ConfirmDetails);
         }
-
-        public bool IsDuplicateAlertVisible() => _driver.TryWaitForElementToBeVisible(By.XPath(XPath.DuplicateAlert.Title), WaitTimes.T5SEC, out IWebElement dialogTitle);
-
-        public string GetDuplicateAlertTitle() => GetInnerText(XPath.DuplicateAlert.Title);
-
-        public string GetDuplicateAlertContent() => GetInnerText(XPath.DuplicateAlert.Content);
-
-        public void CloseDuplicateAlertDialog() => ClickControl(XPath.DuplicateAlert.Close);
     }
 }

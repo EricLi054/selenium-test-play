@@ -549,5 +549,60 @@ namespace Rac.TestAutomation.Common.DatabaseCalls.Policies
                 { "motorcover", motorCoverId }
             };
         }
+
+        /// <summary>
+        /// Finds a motorcycle policy for duplicate alert testing.
+        /// Returns policy with contact details and motorcycle registration.
+        /// </summary>
+        public static MotorPolicy FindMotorcyclePolicy()
+        {
+            MotorPolicy policy = null;
+            var candidates = new List<MotorPolicy>();
+
+            try
+            {
+                string query = ShieldDB.ReadSQLFromFile("Policies\\FindPolicyMotorcycle.sql");
+
+                using (var db = ShieldDB.GetDatabaseHandle())
+                {
+                    var reader = db.ExecuteQuery(query, null);
+                    while (reader.Read())
+                    {
+                        var result = new MotorPolicy()
+                        {
+                            PolicyNumber = reader.GetDbValueFromColumnName("policy_number"),
+                            PolicyHolders = new List<PolicyContactDB>()
+                            {
+                                new PolicyContactDB()
+                                {
+                                    Id = reader.GetDbValueFromColumnName("contact_id"),
+                                    FirstName = reader.GetDbValueFromColumnName("first_name"),
+                                    Surname = reader.GetDbValueFromColumnName("surname"),
+                                    DateOfBirth = DateTime.Parse(reader.GetDbValueFromColumnName("date_of_birth"))
+                                }
+                            },
+                            Vehicle = new Car()
+                            {
+                                Registration = reader.GetDbValueFromColumnName("registration")
+                            }
+                        };
+
+                        candidates.Add(result);
+                    }
+                }
+            }
+            catch (Exception ex) when (ex is ArgumentException || ex is IOException || ex is SqlException || ex is FormatException)
+            {
+                Reporting.Error($"SQL error encountered: {ex.Message}");
+            }
+
+            if (candidates.Count > 0)
+            {
+                policy = candidates[0];
+            }
+
+            Reporting.IsNotNull(policy, "that a valid motorcycle policy was found for duplicate alert test.");
+            return policy;
+        }
     }
 }

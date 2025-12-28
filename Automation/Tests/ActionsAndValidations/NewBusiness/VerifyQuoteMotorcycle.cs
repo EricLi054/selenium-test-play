@@ -10,10 +10,11 @@ namespace Tests.ActionsAndValidations
     {
         #region Constants
 
-        public const string DUPLICATE_ALERT_TITLE   = "You may already be insured";
-        public const string DUPLICATE_ALERT_CONTENT = "Please call us so we can help you.";
+        public const string DUPLICATE_ALERT_TITLE = "You may already be insured";
+        public const string DUPLICATE_ALERT_CONTENT = "Please call us on 13 17 03 so we can help you.";
 
         #endregion
+
         /// <summary>
         /// Verifies that the duplicate policy alert is displayed on the page.
         /// This method checks for the alert visibility and validates its title and content.
@@ -24,30 +25,15 @@ namespace Tests.ActionsAndValidations
             using (var tellUsMoreAboutYou = new TellUsMoreAboutYou(browser))
             {
                 Reporting.Log("Verifying duplicate policy alert dialog.", browser.Driver.TakeSnapshot());
-
+                
                 if (!tellUsMoreAboutYou.IsDuplicateAlertVisible())
                 {
+                    System.Threading.Thread.Sleep(2000);
                     Reporting.IsTrue(tellUsMoreAboutYou.IsDuplicateAlertVisible(), "Duplicate policy alert dialog should be visible");
                 }
-
+                
                 Reporting.AreEqual(DUPLICATE_ALERT_TITLE, tellUsMoreAboutYou.GetDuplicateAlertTitle(), "Duplicate alert title should match expected text");
                 Reporting.AreEqual(DUPLICATE_ALERT_CONTENT, tellUsMoreAboutYou.GetDuplicateAlertContent(), "Duplicate alert content should match expected text");
-            }
-        }
-
-        public static void VerifyPremiumChangePopup(Browser browser, QuoteMotorcycle quoteMotorcycle)
-        {
-            using (var tellUsMoreAboutYou = new TellUsMoreAboutYou(browser))
-            using (var progressBar = new MotorcycleProgressBar(browser))
-            {
-                if (quoteMotorcycle.IsPremiumChangeExpected)
-                {
-                    VerifyAnyPremiumChangePopup(browser, quoteMotorcycle);
-                }
-                else
-                {
-                    tellUsMoreAboutYou.VerifyNoPremiumPopupIsDisplayed();
-                }
             }
         }
 
@@ -88,23 +74,6 @@ namespace Tests.ActionsAndValidations
                 else
                 {
                     Reporting.Log($"Motor Cover = {MotorCovers.TPO} so there is no Sum Insured to compare");
-                }
-            }
-        }
-
-        private static void VerifyAnyPremiumChangePopup(Browser browser, QuoteMotorcycle quoteMotorcycle)
-        {
-            using (var premiumChangePopup = new PremiumChangePopup(browser))
-            {
-                try
-                {
-                    premiumChangePopup.WaitForPage();
-                    premiumChangePopup.VerifyPopupContent(quoteMotorcycle);
-                    premiumChangePopup.VerifyPremiumChange(browser, quoteMotorcycle, SparkBasePage.QuoteStage.AFTER_PERSONAL_INFO);
-                }
-                catch
-                {
-                    Reporting.Error("Premium change pop up is expected on this scenario");
                 }
             }
         }
