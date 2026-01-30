@@ -578,13 +578,6 @@ namespace UIDriver.Pages.Spark.CaravanQuote
         /// The dynamic CSS that needs to be ignored from visual testing.
         /// </summary>
         public List<string> GetPercyIgnoreCSS() =>
-          new List<string>()
-          {
-              "#heading-quote-number", // Quote number in header
-              "#label-payment-amount", // premium amount
-              "div[class*='css-dsartl']", // "paying annually is cheaper..." text
-              "#excess-dropdown",
-              "#input-caravan-sumInsured"
-          };
+          new List<string>() {};
     }
 }

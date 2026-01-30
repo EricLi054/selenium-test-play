@@ -132,7 +132,7 @@ namespace UIDriver.Pages.Spark.Claim.UploadInvoice
             }
             else
             {
-                Reporting.Error("Upload File failed", _browser.Driver.TakeSnapshot());
+                Reporting.Error("Upload File failed, either due to failure to be uploaded, or it did not complete upload", _browser.Driver.TakeSnapshot());
             }
         }
 
@@ -242,6 +242,8 @@ namespace UIDriver.Pages.Spark.Claim.UploadInvoice
                             success = true;
                             break;
                         }
+                        else
+                        { success = false; }
                     }
                     catch
                     {

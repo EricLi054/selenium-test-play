@@ -40,29 +40,23 @@ namespace Tests.ActionsAndValidations
 
                 var policyDetails = DataHelper.GetPolicyDetails(testData.PolicyNumber);
 
-                // TODO: B2C-4561 Remove toggle and old Risk Suburb references as
-                // appropriate when removing toggle from B2C/PCM Functional code.
                 // If non-null address, we would have changed parking address:
-                if (testData.ParkingAddress != null)
+                if (testData.ParkingAddress == null ||
+                    policyDetails.MotorAsset.Address != null)
                 {
-                    if (Config.Get().IsMotorRiskAddressEnabled() && policyDetails.MotorAsset.Address != null)
-                    {
-                        Reporting.AreEqual($"{testData.ParkingAddress.StreetSuburbStateShortened(longStreetType: true)} {testData.ParkingAddress.PostCode}", 
-                            pcmHomePage.MotorPolicyParkingRiskAddress, ignoreCase: true, "expected value for 'Street address where your car is parked overnight' with displayed value");
-                    }
-                    else
-                    {
-                        Reporting.AreEqual(testData.ParkingAddress.Suburb, pcmHomePage.MotorPolicyParkingSuburb, true);
-                    }
+                    Reporting.IsTrue(testData.OriginalPolicyData.MotorAsset.Address.IsEqualToString(pcmHomePage.MotorPolicyParkingRiskAddress),
+                        $"expected value ({testData.OriginalPolicyData.MotorAsset.Address.StreetSuburbStateShortened(longStreetType: false)}) for " +
+                        $"'Street address where your car is parked overnight' with displayed value ({pcmHomePage.MotorPolicyParkingRiskAddress})");
                 }
                 else
                 {
-                    Reporting.AreEqual($"{testData.OriginalPolicyData.MotorAsset.Address.StreetSuburbStateShortened(longStreetType: false)} {testData.OriginalPolicyData.MotorAsset.Address.PostCode}", 
-                        pcmHomePage.MotorPolicyParkingRiskAddress, ignoreCase: true, "expected value for 'Street address where your car is parked overnight' with displayed value");
+                    Reporting.AreEqual(testData.ParkingAddress.Suburb, pcmHomePage.MotorPolicyParkingSuburb, ignoreCase: true);
                 }
+
                 // If non-null, we would have changed the Financier
+                // Forced to uppercase as Spark MEO tests use Shield's case bu PCM displays in uppercase
                 if (testData.Financier != null)
-                { Reporting.AreEqual(testData.Financier, pcmHomePage.Financier, "Financier"); }
+                { Reporting.AreEqual(testData.Financier.ToUpper(), pcmHomePage.Financier, "Financier"); }
             }
         }
 
@@ -97,8 +91,9 @@ namespace Tests.ActionsAndValidations
                     Reporting.AreEqual(testData.PremiumChangesAfterEndorsement.Total, pcmHomePage.PolicyAnnualPremium, "expected annual premium reflects new premium value in PCM.");
                 }
                 // If non-null, we would have changed the Financier
+                // Forced to uppercase as Spark MEO tests use Shield's case bu PCM displays in uppercase
                 if (testData.Financier != null)
-                { Reporting.AreEqual(testData.Financier, pcmHomePage.Financier, "Financier"); }
+                { Reporting.AreEqual(testData.Financier.ToUpper(), pcmHomePage.Financier, "Financier"); }
                 VerifyPolicyDetailsViaApi(testData.PolicyNumber, testData, pcmHomePage);
             }
         }

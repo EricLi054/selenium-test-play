@@ -791,7 +791,7 @@ namespace Rac.TestAutomation.Common.DatabaseCalls.Policies
             return result;
         }
 
-        public static List<string> FindRejectedInstallmentForPayNow(ShieldProductType productId, PaymentScenario paymentScenario)
+        public static List<string> FindPolicyAndAddRejectedInstallmentForPayNow(ShieldProductType productId, PaymentScenario paymentScenario)
         {
             var policyNumbers = new List<string>();
 
@@ -801,7 +801,7 @@ namespace Rac.TestAutomation.Common.DatabaseCalls.Policies
 
             try
             {
-                string query = ShieldDB.ReadSQLFromFile("Policies\\FindRejectedInstallmentForPayNow.sql");
+                string query = ShieldDB.ReadSQLFromFile("Policies\\FindPolicyForPayNowRejectedInstallment.sql");
                 var queryParameter = ShieldDB.SetSqlParameterForProductId(((int)productId).ToString());
                 queryParameter.Add("collectionMethod", collectionMethod.ToString());
 
@@ -881,6 +881,41 @@ namespace Rac.TestAutomation.Common.DatabaseCalls.Policies
 
             Reporting.IsTrue(policyNumbers.Count > 0, "that we found at least one suitable policy matching test criteria");
             return policyNumbers;
+        }
+
+        /// <summary>
+        /// Finds a current policy that is not in renewal. Suitable for
+        /// policies for vehicle assets, such as Motor, Caravan, Motorcycle.
+        /// Ensures that the asset has a defined registration value.
+        /// </summary>
+        public static List<string> FindPolicyForVehicle(ShieldProductType productType)
+        {
+            var candidates = new List<string>();
+
+            try
+            {
+                string query = ShieldDB.ReadSQLFromFile("Policies\\FindPolicyMidtermVehicle.sql");
+
+                var queryProductIdParam = new Dictionary<string, string>()
+                {
+                    { "productId", ((int)productType).ToString()}
+                };
+
+                using (var db = ShieldDB.GetDatabaseHandle())
+                {
+                    var reader = db.ExecuteQuery(query, queryProductIdParam);
+                    while (reader.Read())
+                    {
+                        candidates.Add(reader.GetDbValueFromColumnName("policy_number"));
+                    }
+                }
+            }
+            catch (Exception ex) when (ex is ArgumentException || ex is IOException || ex is SqlException || ex is FormatException)
+            {
+                Reporting.Error($"SQL error encountered: {ex.Message}");
+            }
+
+            return candidates;
         }
 
         /// <summary>

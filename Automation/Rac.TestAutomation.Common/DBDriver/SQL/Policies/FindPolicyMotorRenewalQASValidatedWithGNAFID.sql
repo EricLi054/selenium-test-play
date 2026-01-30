@@ -13,6 +13,7 @@ SELECT TOP 50 ppc.contact_id ContactId,
   JOIN p_pol_header ph						ON p.id = ph.active_policy_id
   JOIN p_policy_contact ppc					ON  ppc.policy_id = PH.ACTIVE_POLICY_ID
   join cn_person cnp						ON cnp.contact_id = ppc.contact_id
+  JOIN CN_CONTACT_RACI cnr                  ON cnr.ID = ppc.contact_id
   join p_cover  pc							ON p.id=pc.ENDORSMENT_ID and pc.PARENT_COVER_ID is null -- because we retrieve cover, we only want the parent cover
   join t_product_line_option tplo			ON pc.product_option_id = tplo.id
   JOIN p_policy_lob ppl						ON ph.active_policy_id = ppl.policy_id
@@ -40,4 +41,5 @@ SELECT TOP 50 ppc.contact_id ContactId,
   AND p.payment_term_id       = @paymentterm -- 1 is Yearly Direct Debit | 4 is Monthly Direct Debit | 6 = Yearly Cash | 1000002 = Monthly Credit Card
   AND cnp.date_of_birth is not null -- helps screen out company policies.
   and tplot.id                = @motorcover -- 1000013 is MFCO cover | 1000017 is MTFT cover | 1000018 is TPO cover
+  AND ((cnr.WESTPAC_CUSTOMER_ID is null) OR (cnr.WESTPAC_CUSTOMER_ID = cnr.ID)) -- Prevent NPE Westpac Tokenisation issues
 ORDER BY newid();

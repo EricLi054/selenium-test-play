@@ -164,8 +164,6 @@ namespace Rac.TestAutomation.Common
     public class AzureTable
     {
         public string URI { get; set; }
-        public string AccountName { get; set; }
-        public string AccountKey { get; set; }
     }
 
     public class EmailConfiguration
@@ -421,28 +419,6 @@ namespace Rac.TestAutomation.Common
         public bool IsUseAddressManagementApiEnabled => B2C.FeatureToggles.Any(
                             x => x.Key == B2CFeatureToggles.UseAddressManagementApi.GetDescription() && 
                             x.Value == true);
-
-        // TODO: B2C-4561 Remove MotorRiskAddress toggle code when removing toggle from B2C/PCM Functional code
-        //       including B2CFeatureToggles in General.cs
-        /// <summary>
-        /// Determines if MotorRiskAddress feature toggle is enabled via config for B2C/PCM
-        /// 
-        /// The feature toggle must be explicitly defined as TRUE until it becomes
-        /// the norm in functional code at which time this should be removed.
-        /// 
-        /// EXAMPLE BEHAVIOURS DRIVEN BY THIS
-        /// - Expect to provide a full QAS-validated Risk Address instead of 
-        ///   just a Suburb when obtaining a quote or endorsing a policy.
-        /// </summary>
-        public bool IsMotorRiskAddressEnabled()
-        {
-            List<bool> featureTogglesList = new List<bool>
-            {
-                B2C.FeatureToggles.Any(x => x.Key        == B2CFeatureToggles.MotorRiskAddress.GetDescription() && x.Value == true)
-            };
-
-            return featureTogglesList.Contains(true);
-        }
 
         /// <summary>
         /// Returns whether the B2C feature toggle for the 2025 changes to use new 

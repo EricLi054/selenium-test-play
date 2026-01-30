@@ -20,7 +20,7 @@ namespace UIDriver.Pages.Spark.MemberRefund
                 public static readonly string NoOTPWarningMessage = "Please enter a valid verification code";
                 public static readonly string OTPMobileNumberHeading = "^We\'ve sent an SMS with a verification code to mobile \\*{4} \\*{3} \\d{3}\\.\\s*Please enter the code to verify it\'s you\\.$";
                 public static readonly string NotYourPhoneNumberWarning = "If this is not your number or you don't have access to this phone, " +
-                                                                            "please call us on our dedicated reimbursement line - 1300 657 627.";
+                                                                            "please call us on our dedicated reimbursement line - 13 17 03.";
             }
         }
         #endregion

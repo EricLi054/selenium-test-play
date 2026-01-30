@@ -15,7 +15,7 @@ namespace UIDriver.Pages.Spark.MemberRefund
         {
             public static readonly string PageSubHeading = "A payment will be made into your bank account within 15 business days.\r\n" +
                                                             "If you haven't received it within this timeframe, " +
-                                                            "please email us on insurancereimbursements@rac.com.au or call us on our dedicated reimbursement line - 1300 657 627.";
+                                                            "please email us on insurancereimbursements@rac.com.au or call us on our dedicated reimbursement line - 13 17 03.";
         }
         #endregion
 

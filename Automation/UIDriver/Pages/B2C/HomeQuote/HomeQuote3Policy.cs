@@ -4,6 +4,7 @@ using System;
 using System.Threading;
 
 using static Rac.TestAutomation.Common.Constants.Contacts;
+using static Rac.TestAutomation.Common.Constants.General;
 using static Rac.TestAutomation.Common.Constants.PolicyHome;
 
 namespace UIDriver.Pages.B2C
@@ -56,6 +57,7 @@ namespace UIDriver.Pages.B2C
         private const string XPR_PH_DOB_YEAR       = "//input[contains(@id,'__Dob_Year')]";
         private const string XPR_IS_ADDRESS_THE_SAME_YN  = "//div[contains(@id,'__IsMailingAddressSameAs')]";
         private const string XPR_MAILINGADDRESS    = "//input[contains(@id,'__MailingAddress_qasautocomplete')]";
+        private const string XPR_CHANGE_SELECTED_ADDRESS = "//a[contains(text(),'Change selected address')]";
         private const string XPR_ADDR_SUGGESTION   = "//div[contains(@id,'__MailingAddress')]//table[@class='address-find-table']//tr/td[1]";
         private const string XPR_PH_PHONE          = "//input[contains(@id,'__PhoneNumber')]";
         private const string XPR_PH_EMAIL          = "//input[contains(@id,'__EmailAddress')]";
@@ -65,6 +67,12 @@ namespace UIDriver.Pages.B2C
 
         private const string XPR_ADD_POLICYHOLDER_BTN = "//div[contains(@class,'addPolicyHolder')]";
         private const string XPR_CONTINUE_BTN         = "//button[contains(@class,'accordion-button')]";
+
+        private const string XP_DUPLICATE_ALERT_BASE = "/html/body/div[starts-with(@class,'k-widget k-window')]";
+        private const string XP_DUPLICATE_ALERT_TITLE = XP_DUPLICATE_ALERT_BASE + "//span[@id='simple-dialog_wnd_title']";
+        private const string XP_DUPLICATE_ALERT_CONTENT = XP_DUPLICATE_ALERT_BASE + "//div[@id='simple-dialog']";
+        private const string XP_DUPLICATE_ALERT_CLOSE = XP_DUPLICATE_ALERT_BASE + "//div[@class='cluetip-close']/a";
+
         #endregion
 
         #region Settable properties and controls
@@ -389,11 +397,45 @@ namespace UIDriver.Pages.B2C
             if (!isMailingAddressSameAsComparison ||
                 (hasBeenRetrieved && Config.Get().IsUseAddressManagementApiEnabled))
             {
+                IWebElement changeAddressLink = null;
+                if (_driver.TryWaitForElementToBeVisible(By.XPath(XPR_CHANGE_SELECTED_ADDRESS), WaitTimes.T5SEC, out changeAddressLink))
+                {
+                    ClickControl(XPR_CHANGE_SELECTED_ADDRESS);
+                    Thread.Sleep(1000);
+                }
                 QASSearchForAddress($"{baseXPath}{XPR_MAILINGADDRESS}",
                                     $"{baseXPath}{XPR_ADDR_SUGGESTION}",
-                                    contactAddress.StreetSuburbState());
+                                    contactAddress.StreetSuburbState());  
             }
             Reporting.Log("End of SetMailingAddress section, taking screenshot.", _browser.Driver.TakeSnapshot());
         }
+
+        public void CloseDuplicateAlertDialog()
+        {
+            ClickControl(XP_DUPLICATE_ALERT_CLOSE);
+            Thread.Sleep(SleepTimes.T2SEC);
+        }
+
+        public bool IsDuplicateAlertVisible()
+        {
+            IWebElement dialogTitle = null;
+            return _driver.TryWaitForElementToBeVisible(By.XPath(XP_DUPLICATE_ALERT_TITLE), WaitTimes.T5SEC, out dialogTitle);
+        }
+
+        public bool IsDuplicateAlertDisplayed()
+        {
+            return _driver.TryFindElement(By.XPath(XP_DUPLICATE_ALERT_TITLE), out _);
+        }
+
+        public string GetDuplicateAlertTitle()
+        {
+            return GetInnerText(XP_DUPLICATE_ALERT_TITLE);
+        }
+
+        public string GetDuplicateAlertContent()
+        {
+            return GetInnerText(XP_DUPLICATE_ALERT_CONTENT);
+        }
+
     }
 }

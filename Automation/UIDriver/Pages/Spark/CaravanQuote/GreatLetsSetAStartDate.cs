@@ -120,9 +120,6 @@ namespace UIDriver.Pages.Spark.CaravanQuote
         /// Ignore CSS from visual testing
         /// </summary>
         public List<string> GetPercyIgnoreCSS() =>
-          new List<string>()
-          {
-              "#policyStartDate"
-          };
+          new List<string>() {};
     }
 }

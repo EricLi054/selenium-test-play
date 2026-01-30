@@ -169,17 +169,12 @@ namespace Spark.EFT
                 return;
             }
 
-            // If we don't have OTP Bypass on, then we need to make sure
-            // that the member's mobile is in a valid segment.
-            if (!_testConfig.IsBypassOTPEnabled())
+            _modifiedContacts.Add(new ContactAndMobile()
             {
-                _modifiedContacts.Add(new ContactAndMobile()
-                {
-                    ContactId = contactId,
-                    OriginalMobile = getPersonResponse.MobilePhone
-                });
-                Task.Run(() => MemberCentral.GetInstance().PUT_UpdateMemberMobile(getPersonResponse, Constants.EFT.SafeTestMobileNumber)).GetAwaiter().GetResult();
-            }
+                ContactId = contactId,
+                OriginalMobile = getPersonResponse.MobilePhone
+            });
+            Task.Run(() => MemberCentral.GetInstance().PUT_UpdateMemberMobile(getPersonResponse, Constants.EFT.SafeTestMobileNumber)).GetAwaiter().GetResult();
 
             Task.Run(() => MemberCentral.GetInstance().PUT_UpdateMemberEmailAddress(getPersonResponse, email)).GetAwaiter().GetResult();
 

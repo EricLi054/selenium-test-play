@@ -110,7 +110,7 @@ namespace UIDriver.Pages.Spark.Claim.Motor.Glass
         {            
             Reporting.AreEqual(CarMakeAndModel, $"{claim.Policy.Vehicle.Year} {claim.Policy.Vehicle.Make}", "Car Make and Model");
             
-            if (claim.Policy.Vehicle.Registration != null)
+            if (DataHelper.IsRegistrationNumberConsideredValid(claim.Policy.Vehicle.Registration))
             {
                 Reporting.AreEqual(claim.Policy.Vehicle.Registration, CarRego, "Car Registration Number");
             }                
@@ -153,16 +153,7 @@ namespace UIDriver.Pages.Spark.Claim.Motor.Glass
         }
 
         private List<string> GetPercyIgnoreCSS() =>
-          new List<string>()
-          {
-               "#claimNumberDisplay span",
-               "#policy-card-content-policy-details-header-title-summary",
-               "#policy-card-content-policy-details-header-subtitle-summary",
-               "#policy-card-content-policy-details-property-0-policy-number-summary",
-               "#claim-summary-date-of-damage-text",
-               "#claim-summary-glass-repair-text",
-               "#claim-summary-glass-damage-text-0"
-          };
+          new List<string>() {};
 
 
     }

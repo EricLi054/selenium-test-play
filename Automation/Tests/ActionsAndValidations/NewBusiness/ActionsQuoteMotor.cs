@@ -1,4 +1,5 @@
 ﻿using Rac.TestAutomation.Common;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using UIDriver.Helpers;
 using UIDriver.Pages;
@@ -182,6 +183,86 @@ namespace Tests.ActionsAndValidations
             }
 
             return quoteNumber;
+        }
+
+        /// <summary>
+        /// Completes Page 3 details for PPQ (PrePopulated Quote) scenario with Reporting and spinner wait.
+        /// Main driver details are pre-populated.
+        /// </summary>
+        /// <param name="browser">The browser instance</param>
+        /// <param name="vehicleQuote">The quote data</param>
+        public static void CompletePage3DetailsForPPQ(Browser browser, QuoteCar vehicleQuote)
+        {
+            using (var quotePage3 = new MotorQuote3Policy(browser))
+            using (var spinner = new RACSpinner(browser))
+            {
+                quotePage3.WaitForPage();
+                quotePage3.FillInAddedVehicleDetails(vehicleQuote);
+                quotePage3.ClickCarDetailsContinueButton();
+
+                // Main driver is pre-populated, only needs verification
+                var isMainDriverValid = quotePage3.VerifyPPQPrePopulatedMainDriverDetails(vehicleQuote.Drivers[0]);
+                Reporting.IsTrue(isMainDriverValid, "Main driver details were populated as expected.");
+                Reporting.Log("Capturing image of Main Driver Details immediately before Continue button is selected.", browser.Driver.TakeSnapshot());
+                quotePage3.ClickDriverContinueButton(0);
+
+                // Fill in additional drivers
+                var workingDriversList = new List<Driver>(vehicleQuote.Drivers);
+                for (int i = 1; i < vehicleQuote.Drivers.Count; i++)
+                {
+                    quotePage3.WaitForDriverDetails(i);
+                    quotePage3.FillInDriverDetails(i, workingDriversList, vehicleQuote.ParkingAddress, browser);
+                    quotePage3.ClickDriverContinueButton(i);
+                }
+                spinner.WaitForSpinnerToFinish();
+
+            }
+        }
+
+        /// <summary>
+        /// Handles the duplicate policy alert by closing it, changing the registration number,
+        /// and continuing the flow to complete Page 3.
+        /// In PPQ scenario, only rego changes; driver details remain pre-populated.
+        /// </summary>
+        /// <param name="browser">The browser instance</param>
+        /// <param name="vehicleQuote">The quote data to update with new rego</param>
+        public static void HandleDuplicateAlertAndContinueWithNewRego(Browser browser, QuoteCar vehicleQuote)
+        {
+            using (var quotePage3 = new MotorQuote3Policy(browser))
+            using (var quoteSummary = new MotorQuote3Summary(browser))
+            using (var spinner = new RACSpinner(browser))
+            {
+                quotePage3.CloseDuplicateAlertDialog();
+                quotePage3.OpenCarDetailsAccordion();
+
+                var newRego = DataHelper.RandomAlphanumerics(5, 10);
+                while (newRego == vehicleQuote.Registration)
+                {
+                    newRego = DataHelper.RandomAlphanumerics(5, 10);
+                }
+
+                vehicleQuote.Registration = newRego;
+                quotePage3.VehicleRegistration = newRego;
+                System.Threading.Thread.Sleep(1000);
+
+                quotePage3.ClickCarDetailsContinueButton();
+
+                // Driver details remain pre-populated after rego change, so we only need to verify and continue
+                for (int i = 0; i < vehicleQuote.Drivers.Count; i++)
+                {
+                    if (i == 0)
+                    {
+                        quotePage3.VerifyPPQPrePopulatedMainDriverDetails(vehicleQuote.Drivers[0]);
+                    }
+                    else
+                    {
+                        quotePage3.WaitForDriverDetails(i);
+                    }
+                    quotePage3.ClickDriverContinueButton(i);
+                }
+
+                spinner.WaitForSpinnerToFinish(nextPage: quoteSummary);
+            }
         }
 
         /// <summary>

@@ -36,4 +36,5 @@ WHERE ph.product_id             = @productId -- 1000000:  Motor Policy
        FROM AC_INSTALLMENT ai2
        WHERE ai2.POLICY_ID = ph.ACTIVE_POLICY_ID
        AND ai2.INSTALLMENT_STATUS NOT in (1,3)) = 0 
+  AND ((cnr.WESTPAC_CUSTOMER_ID is null) OR (cnr.WESTPAC_CUSTOMER_ID = cnr.ID))
 ORDER BY newid();

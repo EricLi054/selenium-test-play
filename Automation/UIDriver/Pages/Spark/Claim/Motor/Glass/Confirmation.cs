@@ -185,26 +185,15 @@ namespace UIDriver.Pages.Spark.Claim.Motor.Glass
         private List<string> GetPercyIgnoreCSSRepairsAllocated() =>
           new List<string>()
           {
-               "#claimNumberDisplay span",
-               "#repairer-card-title",
-               "div[data-testid='repairer-card'] img",
-               "a[data-testid='repairer-card-phone-number-link']",
+               "div[data-testid='repairer-card'] div:has(> img)",
                "#repairer-card-body"
           };
 
         private List<string> GetPercyIgnoreCSSRepairsOtherOptions() =>
-          new List<string>()
-          {
-              "#confirmation-header-title",
-              "#claimNumberDisplay span"
-
-          };
+          new List<string>() {};
 
           private List<string> GetPercyIgnoreCSSPaymentBlock() =>
-          new List<string>()
-          {              
-              "#claimNumberDisplay span"
-          };
+          new List<string>() {};
 
     }
 }

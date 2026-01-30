@@ -55,8 +55,7 @@ namespace Rac.TestAutomation.Common.TestData.Claim
 
             var config = Config.Get();
 
-            if (config.IsMyRACLoginEnabled() &&
-                   (config.Shield.Environment != "shieldint2" || config.Shield.Environment != "shielduat6"))
+            if (config.IsMyRACLoginEnabled() && !config.IsMCMockEnabled())
             {
                 if (string.IsNullOrEmpty(contact.PrivateEmail?.Address))
                 {

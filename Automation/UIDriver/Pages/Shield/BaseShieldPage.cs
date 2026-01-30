@@ -22,7 +22,7 @@ namespace UIDriver.Pages
         private const string XP_CONTEXT_BAR                 = "id('contextBar')/ul[@class='idit-breadcrumbs']";
 
         private const string XP_TEXT_ENVIRONMENT            = "id('distinguishingBadge')/div";
-        private const string XP_INPUT_QUICKSEARCH           = "//div[@id='QuickSearchTextGoogleLikeDiv']//input[@type='text' and @id='additionalInfo(quickSearchTextGoogleLike_autocompleteSelectInputId)']";
+        private const string XP_INPUT_QUICKSEARCH           = "id('quickSearchText')";
         private const string XP_BUTTON_QUICKSEARCH_SELECTOR = "id('QuickSearchButton')";
         private const string XP_LIST_QUICKSEARCH_OPTIONS    = "id('QuickSearchButton')/../ul/li";
 

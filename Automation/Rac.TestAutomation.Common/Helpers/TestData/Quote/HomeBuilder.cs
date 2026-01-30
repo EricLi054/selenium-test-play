@@ -316,9 +316,14 @@ namespace Rac.TestAutomation.Common.TestData.Quote
             return this;
         }
 
+        /// <summary>
+        /// B2C presents all financiers in uppercase so any value
+        /// provided will be forced to upper case.
+        /// </summary>
         public HomeBuilder WithFinancier(string financier)
         {
-            Set(x => x.Financier, financier);
+            var uppercaseFinancier = string.IsNullOrEmpty(financier) ? null : financier.ToUpperInvariant();
+            Set(x => x.Financier, uppercaseFinancier);
             return this;
         }
 

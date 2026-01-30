@@ -20,10 +20,6 @@
         "Value": true
       },
       {
-        "Key": "MotorRiskAddress",
-        "Value": true
-      },
-      {
         "Key": "RefundToOrigin",
         "Value": true
       },
@@ -143,14 +139,10 @@
       "APIKey": ""
     },
     "StorageMotorClaims": {
-      "URI": "https://racwadccstanpetestautm.table.core.windows.net",
-      "AccountName": "racwadccstanpetestautm",
-      "AccountKey": ""
+      "URI": "https://racwadccstanpetestautm.table.core.windows.net"
     },
     "StorageMemberRefund": {
-      "URI": "https://racwadcdstasitmrorefunds.table.core.windows.net",
-      "AccountName": "racwadcdstasitmrorefunds",
-      "AccountKey": ""
+      "URI": "https://racwadcdstasitmrorefunds.table.core.windows.net"
     }
   },
   "Email": {

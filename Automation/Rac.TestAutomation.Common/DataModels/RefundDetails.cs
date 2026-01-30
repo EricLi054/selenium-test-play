@@ -8,6 +8,7 @@ namespace Rac.TestAutomation.Common.DataModels
 {
     public class RefundDetails
     {
+        public string ContactId { get; set; }
         public string RefundID { get; set; }
         public DateTime Dob { get; set; }
         public string LastName { get; set; }
@@ -20,6 +21,7 @@ namespace Rac.TestAutomation.Common.DataModels
 
             formattedString.AppendLine(Reporting.SEPARATOR_BAR);
             formattedString.AppendLine($"--- Refund data:{Reporting.HTML_NEWLINE}");
+            formattedString.AppendLine($"   Contact ID:  {ContactId}{Reporting.HTML_NEWLINE}");
             formattedString.AppendLine($"   Refund ID:  {RefundID}{Reporting.HTML_NEWLINE}");
             formattedString.AppendLine($"   What is your date of birth?:  {Dob}{Reporting.HTML_NEWLINE}");
             formattedString.AppendLine($"   Last name:  {LastName}{Reporting.HTML_NEWLINE}");

@@ -83,11 +83,6 @@ namespace UIDriver.Pages.Spark.CaravanQuote
         /// Ignore CSS from visual testing
         /// </summary>
         public List<string> GetPercyIgnoreCSS() =>
-          new List<string>()
-          {
-              "#header",  // Header with member's name
-              "[data-testid='policyNumberLabel']", // Policy number
-              "[data-icon='thumbs-up'] path"       // Animated thumbs up
-          };
+          new List<string>() {};
     }
 }

@@ -177,18 +177,6 @@ namespace UIDriver.Pages.Claims
                 WaitForTextFieldAndEnterText(BaseXPath.Date.ConfirmBirth.Year, value.Year.ToString(), false);
             }
         }
-
-        public string Email
-        {
-            get => throw new NotImplementedException("Need to implement means to navigate shadow DOM to get this value.");
-            set => WaitForTextFieldAndEnterText(BaseXPath.Inputs.Email, value, false);
-        }
-
-        public string PhoneNumber
-        {
-            get => throw new NotImplementedException("Need to implement means to navigate shadow DOM to get this value.");
-            set => WaitForTextFieldAndEnterText(BaseXPath.Inputs.Phone, value, false);
-        }
         #endregion
 
         public BaseClaimsPrelimDetails(Browser browser) : base(browser)

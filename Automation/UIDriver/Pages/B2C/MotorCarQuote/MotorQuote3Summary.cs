@@ -177,19 +177,6 @@ namespace UIDriver.Pages.B2C
                 return false;
             }
 
-            if (!isPPQ && !Config.Get().IsMotorRiskAddressEnabled())
-            {
-                var expectedAddress = driver.Details.MailingAddress == null ? mainDriverAddress : driver.Details.MailingAddress;
-                field = GetElement(string.Format(BLOCK_X + XPR_ADDRESS, index));
-                var actualAddress = Address.ParseString(field.Text);
-
-                if (!expectedAddress.IsEqualIgnorePostcode(actualAddress))
-                {
-                    Reporting.Log($"Driver ({index}) address ({field.Text}) in policy summary was not as expected ({expectedAddress.StreetSuburbState()})");
-                    return false;
-                }
-            }
-
             // TODO: Resolve issue around Benang providing a different email
             if (driver.IsPolicyHolderDriver && !isPPQ)
             {

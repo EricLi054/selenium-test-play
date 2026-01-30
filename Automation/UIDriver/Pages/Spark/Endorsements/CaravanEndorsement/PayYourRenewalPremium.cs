@@ -397,7 +397,7 @@ namespace UIDriver.Pages.Spark.Endorsements
             Reporting.AreEqual(Constants.YourPolicySummary.TitleYourPremium, TitleYourPremium, $"title {Constants.YourPolicySummary.TitleYourPremium} is displayed");
 
             var excess = endorseCaravan.OriginalPolicyData.Covers.First().StandardExcess.ToString().Replace(".0", "").Trim();
-            Reporting.AreEqual($"{Constants.YourPolicySummary.BasicExcess}{DataHelper.ConvertIntToMonetaryString(Int32.Parse(excess))}", BasicExcess, "Basic Excess is displayed");
+            Reporting.AreEqual($"{Constants.YourPolicySummary.BasicExcess}{DataHelper.ConvertIntToMonetaryString(Int32.Parse(excess), applyThousandsSeparator: false)}", BasicExcess, "Basic Excess is displayed");
 
             var agreedValueExpected = endorseCaravan.ChangeMakeAndModel ? endorseCaravan.NewInsuredAsset.MarketValue : endorseCaravan.OriginalPolicyData.Covers.First().SumInsured;
             var cleanedAgreedValue = agreedValueExpected.ToString().Replace(".0", "").Trim();

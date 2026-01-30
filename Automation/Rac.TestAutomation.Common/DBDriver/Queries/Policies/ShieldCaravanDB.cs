@@ -294,14 +294,13 @@ namespace Rac.TestAutomation.Common.DatabaseCalls.Policies
             Reporting.IsNotNull(testData, "that a valid caravan policy was found to use for endorsement.");
             return testData;
         }
-
         /// <summary>
         /// Caravan Endorsements, including renewals, are blocked if:
         /// 1. the sum insured is more than +/- 30% market value
         /// 2. the contents SI is not rounded to thousands
         /// </summary>
         /// <returns>TRUE - if a condition prevents us from using it.</returns>
-        private static bool PolicyHasUnsupportedCriteria(string policyNumber)
+        public static bool PolicyHasUnsupportedCriteria(string policyNumber)
         {
             Reporting.Log($"Starting with {policyNumber}");
             var policyDetails = DataHelper.GetPolicyDetails(policyNumber);

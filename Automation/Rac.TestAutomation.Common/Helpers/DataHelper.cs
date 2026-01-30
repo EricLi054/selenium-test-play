@@ -923,6 +923,10 @@ namespace Rac.TestAutomation.Common
                 return true;
             }
         }
+        public static bool IsValidCaravanRegistration(string registration)
+        {
+            return !string.IsNullOrEmpty(registration) && !registration.Equals("TBA", StringComparison.OrdinalIgnoreCase);
+        }
 
         /// <summary>
         /// Removes the monetary notations used in strings such as
@@ -1966,7 +1970,7 @@ namespace Rac.TestAutomation.Common
                 Body = vehicleDetails.VehicleSubTypeDescription,
                 Transmission = vehicleDetails.TransmissionDescription,
                 Registration = rego,                
-                IsElectricVehicle = isEV,
+                IsElectricVehicle = isEV
             };
         }
 

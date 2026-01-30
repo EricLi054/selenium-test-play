@@ -1,18 +1,22 @@
 ﻿using Rac.TestAutomation.Common;
 using Rac.TestAutomation.Common.DatabaseCalls.Policies;
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using UIDriver.Pages.B2C;
-
+using static Rac.TestAutomation.Common.Constants.Contacts;
+using static Rac.TestAutomation.Common.Constants.General;
 using static Rac.TestAutomation.Common.Constants.PolicyGeneral;
 using static Rac.TestAutomation.Common.Constants.PolicyMotor;
-using static Rac.TestAutomation.Common.Constants.Contacts;
-using System.Linq;
 
 namespace Tests.ActionsAndValidations
 {
     public static class VerifyQuoteMotor
     {
+        // Constants
+        private const string DUPLICATE_ALERT_TITLE = "You may already be insured";
+        private const string DUPLICATE_ALERT_CONTENT = "Please call us on 13 17 03 so we can help you.";
+
         public static void VerifyMotorVehiclePolicyInShield(QuoteCar vehicleQuote, string policyNumber)
         {
             Reporting.LogTestShieldValidations("policy", policyNumber);
@@ -174,7 +178,13 @@ namespace Tests.ActionsAndValidations
             using (var quotePage3  = new MotorQuote3Summary(browser))
             using (var paymentPage = new QuotePayments(browser))
             using (var spinner = new RACSpinner(browser))
+            using (var quotePage3Policy = new MotorQuote3Policy(browser))
             {
+                if (quotePage3Policy.IsDuplicateAlertVisible())
+                {
+                    VerifyDuplicatePolicyAlert(browser);
+                    return;
+                }
                 Reporting.Log("Begin verify policy vehicle details", browser.Driver.TakeSnapshot());
                 Reporting.IsTrue(quotePage3.InsuredVehicle.Contains(insuredVehicle), "quote summary is displaying expected vehicle");
                 Reporting.AreEqual(vehicleQuote.CoverType, quotePage3.CoverType, "requested motor vehicle cover type (enum) is as expected on summary page.");
@@ -356,6 +366,19 @@ namespace Tests.ActionsAndValidations
                     Reporting.AreEqual(expectedAddr.SuburbAndCode(), contact.MailingAddress.SuburbAndCode(), true, "Mailing address");
                 }
                 VerifyContactTelephoneNumber(expectedDriver, contact);
+            }
+        }
+
+        public static void VerifyDuplicatePolicyAlert(Browser browser)
+        {
+            using (var quotePage3 = new MotorQuote3Policy(browser))
+            {
+                if (quotePage3.IsDuplicateAlertVisible())
+                {
+                    Reporting.IsTrue(quotePage3.IsDuplicateAlertVisible(), "Duplicate policy alert dialog should be visible");
+                    Reporting.AreEqual(DUPLICATE_ALERT_TITLE, quotePage3.GetDuplicateAlertTitle(), "Duplicate alert title should match expected text");
+                    Reporting.AreEqual(DUPLICATE_ALERT_CONTENT, quotePage3.GetDuplicateAlertContent(), "Duplicate alert content should match expected text");
+                }    
             }
         }
     }

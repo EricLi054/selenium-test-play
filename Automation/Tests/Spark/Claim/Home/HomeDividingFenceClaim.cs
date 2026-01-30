@@ -416,6 +416,8 @@ namespace Spark.Claim.Home
                 if (!ClaimHome.PolicyHasAppropriateCoversForClaimScenario(policyToUse, includedCoversOnPolicy))
                 { continue; }
 
+                
+
                 if (!policyToUse.PolicyHolders.Any(ContactRole => ContactRole.ContactRoles.Contains(contactRole)))
                 {
                     Reporting.Log($"Policy {candidate} doesn't have a contact with the role '{contactRole}' to act as the informant so we're " +

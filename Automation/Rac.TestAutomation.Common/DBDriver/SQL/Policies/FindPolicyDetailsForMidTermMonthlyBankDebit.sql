@@ -21,6 +21,7 @@ FROM p_policy p
   JOIN cn_contact c                       ON c.id = ppc.contact_id
   JOIN p_policy_lob ppl                   ON PH.ACTIVE_POLICY_ID = ppl.policy_id
   JOIN cn_contact_bank_account ccba       ON ccba.id = p.POLICY_OWNER_BANK_ACCOUNT_ID 
+  JOIN CN_CONTACT_RACI cnr                ON cnr.ID = c.ID
 WHERE ph.product_id             = @productId -- 1000001:  Home Policy
   AND ph.policy_end_date        between DATEADD(day, 32, convert(date, GETDATE())) and DATEADD(day, 336, convert(date, GETDATE()))
   AND (SELECT count(*) FROM CN_CONTACT_BANK_ACCOUNT ccba2 WHERE ccba2.CONTACT_ID = ccba.CONTACT_ID
@@ -34,4 +35,5 @@ WHERE ph.product_id             = @productId -- 1000001:  Home Policy
        FROM AC_INSTALLMENT ai2
        WHERE ai2.POLICY_ID = ph.ACTIVE_POLICY_ID
        AND ai2.INSTALLMENT_STATUS NOT in (1,3)) = 0 
+  AND ((cnr.WESTPAC_CUSTOMER_ID is null) OR (cnr.WESTPAC_CUSTOMER_ID = cnr.ID))
 ORDER BY newid();

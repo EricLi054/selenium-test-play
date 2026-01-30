@@ -261,12 +261,7 @@ namespace UIDriver.Pages.Spark.CaravanQuote
         public List<string> GetPercyIgnoreCSS() =>
           new List<string>()
           {
-              "p[data-testid='policySummary-caravanDetails-caravanInformation']", // make and model
-              "p[data-testid='policySummary-caravanDetails-agreedValue']",   // SI
-              "p[data-testid='policySummary-caravanDetails-basicExcess']",   // excess
-              "p[data-testid='policySummary-caravanDetails-contentsCover']", // SI Contents
-              "[data-testid='label-payment-amount']", // premium
-              "div[class*='css-dsartl']"              // "paying annually is cheaper..." text
+              "p[data-testid='policySummary-caravanDetails-caravanInformation']" // make and model
           };
     }
 }

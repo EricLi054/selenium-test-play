@@ -118,8 +118,18 @@ namespace Spark.NewBusiness
                                 .WithClaimsHistory(0); //While claim disclosure remains out of scope for automation
 
             // Force sailboat to ensure we get racing extension on "Your Quote" for Percy test
-            if (Config.Get().IsVisualTestingEnabled)
-            { builder.WithType(SparkBoatTypeExternalCode.L); }
+            // Forcing a specific make and material to avoid long names that can trigger line wrap issues.
+            // Force bank account payment to capture the same payment prompts.
+            // Force a shorter given name for the confirmation page in mobile view
+            if (_testConfig.IsVisualTestingEnabled)
+            {
+                candidatePolicyHolder.FirstName = DataHelper.RandomLetters(4);
+                var bankPayment = new Payment(candidatePolicyHolder).BankAccount().Annual();
+                builder.WithType(SparkBoatTypeExternalCode.L)
+                       .WithBoatHullMaterial(BoatHullMaterial.L) // Steel
+                       .WithMake(BoatMake.Barracuda)
+                       .WithPaymentMethod(bankPayment);
+            }
             var boat = builder.Build();
 
             Reporting.LogTestData(TestContext.CurrentContext.Test.Name, boat.ToString());

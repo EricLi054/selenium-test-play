@@ -58,6 +58,7 @@ namespace Rac.TestAutomation.Common
                 public const string SparkB2CRegressionForMemberCentralReleases = nameof(SparkB2CRegressionForMemberCentralReleases);
                 public const string MultiFactorAuthentication = nameof(MultiFactorAuthentication);
                 public const string CheckAutomationUsers = nameof(CheckAutomationUsers);
+                public const string MRO = nameof(MRO);
             };
 
             public enum ENV
@@ -91,8 +92,6 @@ namespace Rac.TestAutomation.Common
                 SparkPolicyCancellations,
                 [Description("UseAddressManagementApi")]
                 UseAddressManagementApi,
-                [Description("MotorRiskAddress")]
-                MotorRiskAddress,
                 [Description("CycloneReInsurance")]
                 CycloneReInsurance,
                 [Description("UseCxOneAgentForClaimsWebChat")]

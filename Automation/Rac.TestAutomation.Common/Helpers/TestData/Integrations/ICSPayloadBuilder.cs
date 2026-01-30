@@ -8,8 +8,9 @@ namespace Rac.TestAutomation.Common
 {
     public class ICSPayloadBuilder : EntityBuilder<ICSContactPayload, ICSPayloadBuilder>
     {
+        public static string AnonymousPrefix = "_B2C";
+
         private Config _config;
-        private static string _AnonymousPrefix = "_B2C_";
 
         public ICSPayloadBuilder()
         {
@@ -18,8 +19,14 @@ namespace Rac.TestAutomation.Common
 
         public ICSPayloadBuilder InitialiseWithRandomInidividual()
         {
-            var icsBuilder = new ICSPayloadBuilder()
-                .WithRandomDateOfBirth(18, 80)
+            return InitialiseWithRandomInidividualNoFinancials()
+                .WithRandomBankAccount()
+                .WithRandomCreditCard();
+        }
+
+        public ICSPayloadBuilder InitialiseWithRandomInidividualNoFinancials()
+        {
+            return WithRandomDateOfBirth(18, 80)
                 .WithRandomGender()
                 .WithRandomTitleFromGender()
                 .WithRandomFirstName()
@@ -27,31 +34,24 @@ namespace Rac.TestAutomation.Common
                 .WithRandomSurname()
                 .WithRandomMobileNumber()
                 .WithEmailAddressFromName()
-                .WithRandomMailingAddress()
-                .WithRandomBankAccount()
-                .WithRandomCreditCard();
-
-            return icsBuilder;
+                .WithRandomMailingAddress();
         }
 
         public ICSPayloadBuilder InitialiseWithMinimalFields()
         {
-            var icsBuilder = new ICSPayloadBuilder()
-                .WithRandomDateOfBirth(18, 80)
+            return WithRandomDateOfBirth(18, 80)
                 .WithRandomFirstName()
                 .WithRandomSurname()
                 .WithMinimumMailingAddress();
-
-            return icsBuilder;
         }
 
-        public ICSPayloadBuilder WithMembershipTier(MembershipTier tier)
+        public ICSPayloadBuilder InitialiseWithBasicProspectContact()
         {
-            var membership = GetOrDefault(x => x.Membership) ?? new ContactServiceMembership();
-
-            membership.Tier = tier.GetDescription();
-            Set(x => x.Membership, membership);
-            return this;
+            return WithRandomDateOfBirth(18, 80)
+                .WithFirstName(AnonymousPrefix)
+                .WithSurname("_Anon_Motorcycle_Prospect")
+                .WithMinimumMailingAddress()
+                .WithGender(Gender.Female);
         }
 
         public ICSPayloadBuilder WithMembershipNumber(string number)
@@ -63,21 +63,33 @@ namespace Rac.TestAutomation.Common
             return this;
         }
 
-        public ICSPayloadBuilder WithMembership(MembershipTier tier, string number)
-        {
-            return WithMembershipTier(tier)
-                .WithMembershipNumber(number);
-        }
-
         public ICSPayloadBuilder WithoutMembershipTier()
         {
             Set(x => x.Membership, null);
             return this;
         }
 
-        public ICSPayloadBuilder WithRandomMembershipTier()
+        public ICSPayloadBuilder WithRandomMembership()
         {
-            return WithMembershipTier((MembershipTier)Randomiser.Get.Next((Enum.GetValues(typeof(MembershipTier))).Length));
+            var membership            = GetOrDefault(x => x.Membership) ?? new ContactServiceMembership();
+            var tierValues            = Enum.GetValues(typeof(MembershipTier));
+            MembershipTier randomTier = (MembershipTier)tierValues.GetValue(Randomiser.Get.Next(tierValues.Length));
+            
+            if (DateTime.TryParse(GetOrDefault(x => x.DateOfBirth), out DateTime dob) && randomTier != MembershipTier.None)
+            {
+                membership.Tier = randomTier.GetDescription();
+                membership.Number = randomTier == MembershipTier.None ? null : DataHelper.RandomNumbersAsString(minLength: 7, maxLength: 8);
+                membership.Tenure = randomTier == MembershipTier.None ? null : DataHelper.RandomNumber(minValue: 1, maxValue: DateTime.Now.Year - dob.Year - 16);
+            }
+            else
+            {
+                Reporting.Log("Either due to the date of birth not being set or invalid, OR a random of tier of None, membership will not be set.");
+                membership.Tier = MembershipTier.None.GetDescription();
+                membership.Number = null;
+                membership.Tenure = null;
+            }
+            Set(x => x.Membership, membership);
+            return this;
         }
 
         public ICSPayloadBuilder WithoutMembershipNumber()
@@ -111,6 +123,12 @@ namespace Rac.TestAutomation.Common
         public ICSPayloadBuilder WithFirstName(string firstName)
         {
             Set(x => x.FirstName, firstName);
+            return this;
+        }
+
+        public ICSPayloadBuilder WithoutFirstName()
+        {
+            Set(x => x.FirstName, null);
             return this;
         }
 
@@ -157,15 +175,15 @@ namespace Rac.TestAutomation.Common
             var firstName = GetOrDefault(x => x.FirstName);
             if (string.IsNullOrEmpty(firstName)) { WithRandomFirstName(); }
 
-            if (!firstName.StartsWith(_AnonymousPrefix))
+            if (!firstName.StartsWith(AnonymousPrefix))
             { 
-                firstName = $"{_AnonymousPrefix}{firstName}";
+                firstName = $"{AnonymousPrefix}_{firstName}";
             }
 
             var surname = GetOrDefault(x => x.Surname) ?? DataHelper.RandomShieldWhiteListedCharacters(4, 50).FirstCharToUpper();
-            if (!surname.StartsWith(_AnonymousPrefix))
+            if (!surname.StartsWith(AnonymousPrefix))
             {
-                surname = $"{_AnonymousPrefix}{surname}";
+                surname = $"{AnonymousPrefix}_{surname}";
             }
 
             WithFirstName(firstName);
@@ -253,7 +271,7 @@ namespace Rac.TestAutomation.Common
 
         public ICSPayloadBuilder WithEmail(string email)
         {
-            Set(x => x.Email, email);
+            Set(x => x.Email, email?.ToLower());
             return this;
         }
 
@@ -275,9 +293,8 @@ namespace Rac.TestAutomation.Common
 
         public ICSPayloadBuilder WithRandomMailingAddress()
         {
-            // TODO: need to do some translation thing here.
-            var mailingAddress = new AddressBuilder().InitialiseRandomMailingAddress().Build();
-            //return WithMailingAddress(mailingAddress);
+            var shieldRandomMailingAddress = new AddressBuilder().InitialiseRandomMailingAddress().Build();
+            Set(x => x.PostalAddress, new ContactServicePostalAddress(shieldRandomMailingAddress));
             return this;
         }
 

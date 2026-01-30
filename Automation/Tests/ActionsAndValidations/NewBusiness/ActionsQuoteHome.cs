@@ -97,7 +97,7 @@ namespace Tests.ActionsAndValidations
 
                     quotePage3.ClearHomeDetailsDisclosureAndSubmitPage(quoteDetails);
                 }
-                spinner.WaitForSpinnerToFinish(nextPage: quoteSummary);
+                spinner.WaitForSpinnerToFinish();
             }
         }
 
@@ -410,5 +410,30 @@ namespace Tests.ActionsAndValidations
                 }
             }
         }
+
+        /// <summary>
+        /// Handles the duplicate policy alert by closing it, navigating back to Page 1,
+        /// and changing the address to a new random address.
+        /// </summary>
+        /// <param name="browser">The browser instance</param>
+        /// <param name="quoteDetails">The quote data to update with new address</param>
+        public static void HandleDuplicateAlertAndChangeAddress(Browser browser, QuoteHome quoteDetails)
+        {
+            using (var quotePage3 = new HomeQuote3Policy(browser))
+            using (var quotePage2 = new HomeQuote2Quote(browser))
+            {
+                quotePage3.CloseDuplicateAlertDialog();
+                browser.Driver.Navigate().Back();
+                quotePage2.WaitForPage();
+                browser.Driver.Navigate().Back();
+            }
+
+            // Generate a new random address to avoid duplicate
+            var newAddress = new AddressBuilder().InitialiseRandomMailingAddress().Build();
+            quoteDetails.PropertyAddress = newAddress;
+
+            SubmitInitialHomeQuoteRatingValues(browser, quoteDetails);
+        }
+
     }
 }

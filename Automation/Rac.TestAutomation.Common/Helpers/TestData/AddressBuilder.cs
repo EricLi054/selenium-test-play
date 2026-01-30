@@ -155,7 +155,7 @@ namespace Rac.TestAutomation.Common
                 new Address(){StreetNumber="2a",StreetOrPOBox="Tyson Pl",Suburb="QUINNS ROCKS",PostCode="6030"},
                 new Address(){StreetNumber="11",StreetOrPOBox="Kimber Pl",Suburb="MOUNT HELENA",PostCode="6082"},
                 new Address(){StreetNumber="11",StreetOrPOBox="Protea Ct",Suburb="STONEVILLE",PostCode="6081"},
-                new Address(){StreetNumber="220",StreetOrPOBox="Loftus St",Suburb="North Perth",PostCode="6006"},
+                new Address(){StreetNumber="220",StreetOrPOBox="Loftus St",Suburb="NORTH PERTH",PostCode="6006"},
                 new Address(){StreetNumber="9",StreetOrPOBox="Winnipeg Ct",Suburb="GREENFIELDS",PostCode="6210"},
                 new Address(){StreetNumber="28a",StreetOrPOBox="Badrick St",Suburb="WARWICK",PostCode="6024"},
                 new Address(){StreetNumber="17",StreetOrPOBox="Otway St",Suburb="SWANBOURNE",PostCode="6010"},

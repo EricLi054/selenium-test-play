@@ -429,6 +429,33 @@ namespace Rac.TestAutomation.Common.DatabaseCalls.Policies
             {
                 if (ShieldPolicyDB.IsPolicySuitableForEndorsements(candidate.PolicyNumber))
                 {
+                    var policyDetails = DataHelper.GetPolicyDetails(candidate.PolicyNumber);
+                    var currentInsuredVehicle = DataHelper.GetVehicleDetails(policyDetails.MotorAsset.VehicleId);
+                    var currentInsuredVehicleMarketvalue = currentInsuredVehicle == null || currentInsuredVehicle.Vehicles.Count < 1 ?
+                                                           0 : currentInsuredVehicle.Vehicles[0].Price;
+                    // Check the Market value of the insured asset as Spark MEO will
+                    // block endorsements if they exceed the max market value.
+                    switch (candidate.CoverType)
+                    {
+                        case MotorCovers.MFCO:
+                            if (currentInsuredVehicleMarketvalue > Constants.PolicyMotor.MOTOR_COVER_MAX_INSURABLE_VALUE)
+                            {
+                                Reporting.Log($"Skipping {candidate.PolicyNumber} because vehicle's market value ${currentInsuredVehicleMarketvalue} is higher than allowable for MFCO.");
+                                continue; 
+                            }
+                            break;
+                        case MotorCovers.TFT:
+                            if (currentInsuredVehicleMarketvalue > Constants.PolicyMotor.MOTOR_COVER_TFT_MAXVALUE)
+                            {
+                                Reporting.Log($"Skipping {candidate.PolicyNumber} because vehicle's market value ${currentInsuredVehicleMarketvalue} is higher than allowable for MTFT.");
+                                continue; 
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+
+
                     // Some contacts and policies have odd data. e.g.: Unknown Gender, etc
                     // Rather than wrestling with those, we'll skip them.
                     try

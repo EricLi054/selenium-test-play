@@ -63,11 +63,6 @@ namespace UIDriver.Pages.Spark.Claim.Motor.Glass
         }
 
         private List<string> GetPercyIgnoreCSS() =>
-          new List<string>()
-          {
-               "[id^='policy-card-content-policy-details-header-title-']",
-               "[id^='policy-card-content-policy-details-header-subtitle-']",
-               "[id^='policy-card-content-policy-details-property-0-policy-number-']"
-          };
+          new List<string>() {};
     }
 }

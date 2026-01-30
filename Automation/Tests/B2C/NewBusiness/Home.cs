@@ -1,10 +1,11 @@
 ﻿using NUnit.Framework;
 using Rac.TestAutomation.Common;
+using Rac.TestAutomation.Common.DatabaseCalls.Policies;
 using Rac.TestAutomation.Common.TestData.Quote;
-using Tests.ActionsAndValidations;
 using System;
 using System.Collections.Generic;
-
+using System.Linq;
+using Tests.ActionsAndValidations;
 using static Rac.TestAutomation.Common.Constants.Contacts;
 using static Rac.TestAutomation.Common.Constants.General;
 using static Rac.TestAutomation.Common.Constants.PolicyGeneral;
@@ -168,6 +169,56 @@ namespace B2C.NewBusiness
 
             return testData;
         }
+
+        /// <summary>
+        /// Anonymous attempt to purchase landlord building cover using a known landlord property address.
+        /// Duplicate alert should appear on page 3.
+        /// </summary>
+        [Test, Category(TestCategory.Regression), Category(TestCategory.New_Business), Category(TestCategory.Home),
+            Category(TestCategory.B2CPCM)]
+        public void INSU_T825_LandlordAttemptToDuplicate_Building()
+        {
+            var testData = BuildTestDataDuplicateLandlordBuildingWithKnownAddress();
+
+            ActionsQuoteHome.GetNewHomeQuote(_browser, testData, out _);
+            ActionsQuoteHome.HomeQuoteClickBuyPage2(_browser);
+            ActionsQuoteHome.HomeQuoteAddedDetailsPage3(_browser, testData);
+
+            VerifyQuoteHome.VerifyDuplicatePolicyAlert(_browser);
+
+            ActionsQuoteHome.HandleDuplicateAlertAndChangeAddress(_browser, testData);
+           
+            // Continue with Page 2 and Page 3 after address change
+            ActionsQuoteHome.HomeQuoteClickBuyPage2(_browser);
+            ActionsQuoteHome.HomeQuoteAddedDetailsPage3(_browser, testData);
+           
+            VerifyQuoteHome.VerifyQuoteSummaryPage(_browser, testData);
+        }
+        private QuoteHome BuildTestDataDuplicateLandlordBuildingWithKnownAddress()
+        {
+            var (duplicateAddress, policyholderContact) = ShieldHomeDB.FindLandlordPolicyWithAddressAndPolicyholder();
+
+            var firstPolicyHolder = new ContactBuilder(policyholderContact).Build();
+
+            // Create Owner Occupied policy (not Landlord) with same address and policyholder
+            var testData = new HomeBuilder().InitialiseHomeWithRandomData(HomeOccupancy.OwnerOccupied,
+                                                                          new List<Contact>() { firstPolicyHolder })
+                                            .WithPropertyAddress(duplicateAddress)
+                                            .WithAlarmSystem(Alarm.NonMonitoredAlarm)
+                                            .WithAreDoorsSecured(true)
+                                            .WithAreWindowsSecured(false)
+                                            .WithRandomBuildingSumInsured(200000, 1000000)
+                                            .WithoutContentsSumInsured()
+                                            .WithInsuranceHistory(HomePreviousInsuranceTime.LessThan1, null)
+                                            .WithoutFinancier()
+                                            .WithPaymentMethod(new Payment(firstPolicyHolder).BankAccount().Annual())
+                                            .Build();
+
+            Reporting.LogTestData(TestContext.CurrentContext.Test.Name, testData.ToString());
+
+            return testData;
+        }
+        
         /// <summary>
         /// Creating home quote case for a cyclone risk address.
         /// Address is hard coded.

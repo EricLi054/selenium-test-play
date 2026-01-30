@@ -83,6 +83,9 @@ namespace Rac.TestAutomation.Common.API
 
         public Contact ConvertToShieldContactRecord()
         {
+            // Member Central may use either the UnitNumber or SubBuildingNumber. So we check both.
+            string unitNumber = string.IsNullOrEmpty(PostalAddress.UnitNumber) ? PostalAddress.SubBuildingNumber : PostalAddress.UnitNumber;
+
             Contact mcContact = null;
             if (!string.IsNullOrEmpty(DateOfBirth))
             {
@@ -104,9 +107,9 @@ namespace Rac.TestAutomation.Common.API
 
                 mcContact.MailingAddress = new Address()
                 {
-                    StreetNumber = string.IsNullOrEmpty(PostalAddress.UnitNumber) ?
+                    StreetNumber = string.IsNullOrEmpty(unitNumber) ?
                                            PostalAddress.HouseNumber : 
-                                           $"{PostalAddress.UnitNumber}/{PostalAddress.HouseNumber}",
+                                           $"{unitNumber}/{PostalAddress.HouseNumber}",
                     StreetOrPOBox = string.IsNullOrEmpty(PostalAddress.StreetName) ?
                                            PostalAddress.POBox : 
                                            PostalAddress.StreetName,

@@ -65,13 +65,13 @@ namespace UIDriver.Pages.Spark.Endorsements
             {
                 public const string Email = "//label[@for='email']";
                 public const string CarCardPolicyCover     = "id('policy-card-content-policy-details-header-subtitle-policy-details')";
-                public const string CarCardModel           = "id('policy-card-content-policy-details-property-0-model-policy-details')";
-                public const string CarCardCarRegistration = "id('policy-card-content-policy-details-property-1-registration-policy-details')";
-                public const string CarCardPolicyNumber    = "id('policy-card-content-policy-details-property-2-policy-number-policy-details')";
-                public const string PolicyStateDate = "id('start-date-value')";
-                public const string RefundAmount   = "id('refund-amount-value')";
-                public const string Amount = "id('payment-amount-label')";
-                public const string IncreaseAmount = "id('payment-amount-value')";
+                public const string CarCardModel           = "//p[contains(@id,'policy-card-content-policy-details') and contains(@id,'model-policy-details')]";
+                public const string CarCardCarRegistration = "//p[contains(@id,'policy-card-content-policy-details') and contains(@id,'registration-policy-details')]";
+                public const string CarCardPolicyNumber    = "//p[contains(@id,'policy-card-content-policy-details') and contains(@id,'policy-number-policy-details')]";
+                public const string PolicyStateDate        = "id('start-date-value')";
+                public const string RefundAmount           = "id('refund-amount-value')";
+                public const string Amount                 = "id('payment-amount-label')";
+                public const string IncreaseAmount         = "id('payment-amount-value')";
                 public const string MonthlyInstallmentAmount = "id('instalment-amount-value')";
             }
 

@@ -1,3 +1,4 @@
+using System;
 using static Rac.TestAutomation.Common.Constants.PolicyGeneral;
 
 namespace Rac.TestAutomation.Common.TestData.Endorsements
@@ -84,7 +85,9 @@ namespace Rac.TestAutomation.Common.TestData.Endorsements
 
         /// <summary>
         /// To support "Update How I Pay" tests, by setting the next instalment
-        /// date relative to the current next instalment.
+        /// date relative to the current next instalment. If the next pending
+        /// collection date, with added days, is in the past, we force it to today
+        /// as we can't set new dates in the past.
         /// </summary>
         /// <param name="days">integer of how many days (relative to current next instalment) to use in test</param>
         public BoatEndorsementBuilder WithNextPaymentDate(int days)
@@ -94,7 +97,9 @@ namespace Rac.TestAutomation.Common.TestData.Endorsements
             var currentPolicy = Get(x => x.OriginalPolicyData);
             if (currentPolicy.NextPendingInstallment() != null)
             {
-                Set(x => x.NextPaymentDate, currentPolicy.NextPendingInstallment().CollectionDate.AddDays(days));
+                var nextPendingDate = currentPolicy.NextPendingInstallment().CollectionDate.AddDays(days);
+                if (nextPendingDate < DateTime.Today) { nextPendingDate = DateTime.Today; }
+                Set(x => x.NextPaymentDate, nextPendingDate);
             }
             return this;
         }

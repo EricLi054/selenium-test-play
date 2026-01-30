@@ -1,11 +1,7 @@
 ﻿using Rac.TestAutomation.Common;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using UIDriver.Helpers;
 using UIDriver.Pages;
-using UIDriver.Pages.Spark;
+using UIDriver.Pages.Shield;
 using UIDriver.Pages.Spark.Endorsements.MakePayment;
 using static Rac.TestAutomation.Common.Constants;
 using static Rac.TestAutomation.Common.Constants.General;
@@ -24,6 +20,36 @@ namespace Tests.ActionsAndValidations.Endorsements
             LaunchPage.OpenMakeAPaymentByURL(browser, testData);
             PerformPaymentAndVerify(browser, testData, detailUICheck, isFailedPayment);
             VerifyPaymentConfirmation(browser, testData, detailUICheck,isFailedPayment);
+        }
+
+        /// <summary>
+        /// Logs into Shield, opens the accounts view for a policy
+        /// and rejects the most recent PAID instalment within the
+        /// past month (default Shield time view).
+        /// </summary>
+        public static void ForceRejectedInstalmentOnPolicyInShield(Browser browser, string policyNumber)
+        {
+            browser.OpenShieldAndLogin();
+
+            using (var pageHome = new ShieldSearchPage(browser))
+            using (var pagePolicyDetails = new ShieldPolicyDetailsPage(browser))
+            using (var pageAccountDetails = new ShieldAccountsPage(browser))
+            {
+                pageHome.QuickSearch(BaseShieldPage.QuickSearchType.PolicyByPolicyNumber, policyNumber);
+
+                pagePolicyDetails.WaitForPage();
+                if (!pagePolicyDetails.IsDisplayingDesiredPolicy(policyNumber))
+                {
+                    Reporting.Error($"Fault occurred in attempting to load policy {policyNumber}");
+                }
+
+                pagePolicyDetails.SelectPolicyPaymentAccountFromSidebar(policyNumber);
+                pageAccountDetails.WaitForPage();
+
+                pageAccountDetails.RejectFirstPaidPayment();
+            }
+            Reporting.Log($"Capturing state before logging out of Shield and closing browser", browser.Driver.TakeSnapshot());
+            browser.LogoutShieldAndCloseBrowser();
         }
 
         /// <summary>

@@ -933,7 +933,7 @@ namespace UIDriver.Pages.PCM
                 match &= CheckPrefillStrings(expectedAddress.Trim(), XPath.NewQuote.QuoteMemberDetailsDialog.PrefillAddressAnswer, errorMessage, stripAddressDelimiters: true);
 
                 errorMessage = "Membership Info";
-                if (member.IsRACMember)
+                if (member.HasRSAMembership)
                     {
                         var expectedMembership = $"{member.MembershipNumber} - {member.MembershipTier}";
                         match &= CheckPrefillStrings(expectedMembership, XPath.NewQuote.QuoteMemberDetailsDialog.PrefillMemberAnswer, errorMessage);

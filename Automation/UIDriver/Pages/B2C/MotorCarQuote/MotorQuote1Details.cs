@@ -381,17 +381,10 @@ namespace UIDriver.Pages.B2C
             }
 
             AnnualKm = quoteDetails.AnnualKm;
-            if (Config.Get().IsMotorRiskAddressEnabled()) // TODO: B2C-4561 Remove toggle and old Risk Suburb references as appropriate when removing toggle from B2C/PCM Functional code
+            // If PPQ, this will be populated, but if not then we'll need to fill this field.
+            if (!isPPQ)
             {
-                // If PPQ, this will be populated, but if not then we'll need to fill this field.
-                if (!isPPQ)
-                {
-                    RiskAddress = quoteDetails.ParkingAddress.StreetSuburbState();
-                }
-            }
-            else
-            {
-                ParkedSuburb = quoteDetails.ParkingAddress.SuburbAndCode();
+                RiskAddress = quoteDetails.ParkingAddress.StreetSuburbState();
             }
             CarFinance = quoteDetails.IsFinanced;
             Reporting.Log("Completed vehicle rating details accordion", _driver.TakeSnapshot());
@@ -486,7 +479,7 @@ namespace UIDriver.Pages.B2C
 
                 errorMessage = "RAC Membership";
                 IWebElement membershipCheckbox = null;
-                if (quoteDetails.Drivers[0].Details.IsRACMember)
+                if (quoteDetails.Drivers[0].Details.HasRSAMembership)
                 {
                     membershipCheckbox = GetElement($"{xp_base}{MEMBER_YN}{XPR_YES}/input");
                     if (membershipCheckbox.GetAttribute("checked") != "true" ||
@@ -691,6 +684,17 @@ namespace UIDriver.Pages.B2C
                 }
             }
 
+            if (!details.Details.HasRSAMembership)
+            {
+                // Set RAC membership status
+                ClickBinaryToggle($"{xp_base}{MEMBER_YN}", XPR_YES, XPR_NO, details.Details.IsRACMember);
+
+                if (details.Details.IsRACMember)
+                {
+                    WaitForSelectableAndPickByTyping(xp_base + MEMBERSHIP_LEVEL, MembershipTierText[details.Details.MembershipTier]);
+                }
+            }
+
             if (details.HistoricalAccidents == null || details.HistoricalAccidents.Count == 0)
             {
                 ClickControl($"{xp_base}{PAST_CRASHES_NO}");
@@ -807,7 +811,7 @@ namespace UIDriver.Pages.B2C
             
             Reporting.Log("Looking to match the cover declined dialog text");
             var dialogText = GetInnerText(XP_DECLINED_NOTICE_TEXT).StripLineFeedAndCarriageReturns();
-            Regex declineDialogRegEx = new Regex(FixedTextRegex.QUOTE_COVER_DECLINED_TEXT);
+            Regex declineDialogRegEx = new Regex(FixedTextRegex.QUOTE_MOTOR_COVER_DECLINED_TEXT);
             Match match = declineDialogRegEx.Match(dialogText);
             Reporting.IsTrue(match.Success, $"the cover declined dialog text matches.");
             

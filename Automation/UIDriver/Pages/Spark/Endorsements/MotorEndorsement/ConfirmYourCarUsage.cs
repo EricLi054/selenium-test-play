@@ -200,7 +200,7 @@ namespace UIDriver.Pages.Spark.Endorsements
             if (expectedTestData.MotorAsset.Address != null && !string.IsNullOrEmpty(expectedTestData.MotorAsset.Address.GnafPid))
             {
                 // Only addresses with a GNAF will pre-populate.
-                Reporting.IsTrue(expectedTestData.MotorAsset.Address.IsEqualToString(RiskAddress), "Verifying Risk Address");
+                Reporting.IsTrue(expectedTestData.MotorAsset.Address.IsEqualToString(RiskAddress), "Verifying Risk Address. Failures here are commonly caused by the risk address being a retirement village, see prefixes.");
             }
             Reporting.AreEqual(expectedTestData.MotorAsset.GetAnnualKms, KmDrivenAnnually, $"expected Annual KMs Driven vs actual value");
             Reporting.Log($"Page 1: Capture screenshot after confirming page state.", _browser.Driver.TakeSnapshot());

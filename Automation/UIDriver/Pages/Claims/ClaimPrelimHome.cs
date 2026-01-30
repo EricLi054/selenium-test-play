@@ -1,7 +1,6 @@
-﻿using Rac.TestAutomation.Common;
+﻿using OpenQA.Selenium;
+using Rac.TestAutomation.Common;
 using System;
-using OpenQA.Selenium;
-
 using static Rac.TestAutomation.Common.Constants.ClaimsHome;
 using static Rac.TestAutomation.Common.Constants.General;
 
@@ -27,7 +26,21 @@ namespace UIDriver.Pages.Claims
                 public const string BirthDate = "//span[contains(text(),'Please enter a valid Date of birth.')]";
                 public const string Surname   = "//span[contains(text(),'Surname must be entered.')]";
             }
+
+            public class Infobox
+            {
+                public const string ContactUpdating = "//div[contains(text(),'your contact details need updating')]";
+            }
         }
+
+        private class Constant
+        {
+            public class Infobox
+            {
+                public const string ContactUpdating = "If your contact details need updating, please log in to myRAC and update them under your ‘Profile’ or call us on 13 17 03.";
+            }
+        }
+
         #region XPATHS
         // Find my policy
         private const string XP_HOME_ADDRESS = "id('PrelimDetails_PolicyDetails_InsuredAddress_qasautocomplete')";
@@ -64,12 +77,13 @@ namespace UIDriver.Pages.Claims
                     PolicyNumber = claimData.PolicyDetails.PolicyNumber;
                 }
                 else
-                {
-                    FindPolicySurname = claimData.Claimant.Surname;
-                    FindPolicyDateOfBirth = claimData.Claimant.DateOfBirth;
+                {                 
                     QASSearchForAddress(XP_HOME_ADDRESS, XP_ADDRESS_QAS_OPTIONS,
                                         claimData.PolicyDetails.HomeAsset.Address.StreetSuburbState());
                 }
+
+                FindPolicySurname = claimData.Claimant.Surname;
+                FindPolicyDateOfBirth = claimData.Claimant.DateOfBirth;
             }
             
             EventDate = claimData.EventDateTime;
@@ -106,18 +120,15 @@ namespace UIDriver.Pages.Claims
                 ConfirmSurname     = claimData.Claimant.Surname;
                 ConfirmDateOfBirth = claimData.Claimant.DateOfBirth;
             }
-            if (string.IsNullOrEmpty(claimData.Claimant.GetEmail()) ||
-                !claimData.Claimant.GetEmail().EndsWith(Config.Get().Email.Domain))
-            {
-                claimData.Claimant.PrivateEmail = DataHelper.RandomEmail(firstName: claimData.Claimant.FirstName, 
-                                                                            surname: claimData.Claimant.Surname, 
-                                                                            domain: Config.Get().Email.Domain);
-                Reporting.Log($"As existing email address on record was not a @{Config.Get().Email.Domain} address " +
-                    $"have generated a new email address: {claimData.Claimant.PrivateEmail.Address}");
-            }
-            Email = claimData.Claimant.GetEmail();
-           
-            PhoneNumber = claimData.Claimant.GetPhone() ?? $"04{DataHelper.RandomNumbersAsString(8)}";
+
+            Reporting.IsTrue(Boolean.Parse(GetAttribute(BaseXPath.Inputs.Email, "readonly")), "Email address field".IsDisabled());
+            Reporting.IsTrue(Boolean.Parse(GetAttribute(BaseXPath.Inputs.Phone, "readonly")), "Telephone number (include area code) field".IsDisabled());
+
+            Reporting.AreEqual(DataHelper.MaskPhoneNumber(claimData.Claimant.MobilePhoneNumber), GetValue(BaseXPath.Inputs.Phone));
+            Reporting.AreEqual(DataHelper.MaskEmailAddress(claimData.Claimant.PrivateEmail.Address), GetValue(BaseXPath.Inputs.Email), ignoreCase: true);
+
+            Reporting.AreEqual(Constant.Infobox.ContactUpdating, GetInnerText(XPath.Infobox.ContactUpdating));
+
             if (claimData.DamageType == HomeClaimDamageType.Theft ||
                 claimData.DamageType == HomeClaimDamageType.MaliciousDamage ||
                 claimData.DamageType == HomeClaimDamageType.ImpactOfVehicle ||

@@ -357,7 +357,7 @@ namespace Tests.ActionsAndValidations.Claims
                 spinner.WaitForSpinnerToFinish(nextPage: contactDetailsPage);
                 Reporting.Log($"Capturing contact details state on arrival", browser.Driver.TakeSnapshot());
 
-                if ((shieldEnvironment == "shieldint2" || shieldEnvironment == "shielduat6")) 
+                if (!Config.Get().IsMCMockEnabled()) 
                 {
                     //TODO: DED-958 - update this logging to state that we can test this when DED-958 is resolved and remove reference to that story.
                     Reporting.LogMinorSectionHeading($"Full Multi-factor Authentication changes to contact details won't be tested in this run against " +
@@ -414,8 +414,7 @@ namespace Tests.ActionsAndValidations.Claims
                 contactDetailsSpark.HandleTelephoneNumberWarningDialog();
                 spinner.WaitForSpinnerToFinish();
 
-                if (useMyRACLogin &&
-                   (shieldEnvironment == "shieldint2" || shieldEnvironment == "shielduat6"))
+                if (useMyRACLogin && !Config.Get().IsMCMockEnabled())
                 {
                     SparkUpdateContactViaMyRac(browser, claim);
                     ConfirmContactDetails(browser, claim);

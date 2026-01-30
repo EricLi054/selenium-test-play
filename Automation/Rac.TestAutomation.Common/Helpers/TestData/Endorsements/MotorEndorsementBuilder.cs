@@ -70,8 +70,8 @@ namespace Rac.TestAutomation.Common.TestData.Endorsements
         /// <returns></returns>
         public MotorEndorsementBuilder WithVehicleParkingAddress(Address address)
         {
-            if (_config.IsMotorRiskAddressEnabled() &&
-                (address.QASStreetAddress().ToLower().Contains("po box") || address.QASStreetAddress().ToLower().Contains("locked bag")))
+            if (address.QASStreetAddress().Contains("po box", StringComparison.OrdinalIgnoreCase) ||
+                address.QASStreetAddress().Contains("locked bag", StringComparison.OrdinalIgnoreCase))
             {
                 Set(x => x.ParkingAddress, MotorRiskAddress.Generic);
             }
@@ -238,11 +238,6 @@ namespace Rac.TestAutomation.Common.TestData.Endorsements
             return this;
         }
 
-        public MotorEndorsementBuilder WithRandomNewCarFinancier()
-        {
-            return WithFinancier(FinancierOptions.OrderBy(t => Guid.NewGuid()).First());
-        }
-
         public MotorEndorsementBuilder WithoutVehicle()
         {
             Set(x => x.InsuredAsset, new Car());
@@ -321,7 +316,9 @@ namespace Rac.TestAutomation.Common.TestData.Endorsements
 
         /// <summary>
         /// To support "Update How I Pay" tests, by setting the next instalment
-        /// date relative to the current next instalment.
+        /// date relative to the current next instalment. If the next pending
+        /// collection date, with added days, is in the past, we force it to today
+        /// as we can't set new dates in the past.
         /// </summary>
         /// <param name="days">integer of how many days (relative to current next instalment) to use in test</param>
         public MotorEndorsementBuilder WithNextPaymentDate(int days)
@@ -331,7 +328,9 @@ namespace Rac.TestAutomation.Common.TestData.Endorsements
             var currentPolicy = Get(x => x.OriginalPolicyData);
             if (currentPolicy.NextPendingInstallment() != null)
             {
-                Set(x => x.NextPaymentDate, currentPolicy.NextPendingInstallment().CollectionDate.AddDays(days));
+                var nextPendingDate = currentPolicy.NextPendingInstallment().CollectionDate.AddDays(days);
+                nextPendingDate = nextPendingDate < DateTime.Now.Date ? DateTime.Now.Date : nextPendingDate;
+                Set(x => x.NextPaymentDate, nextPendingDate);
             }
             return this;
         }

@@ -1,16 +1,14 @@
 ﻿using NUnit.Framework;
 using Rac.TestAutomation.Common;
 using Rac.TestAutomation.Common.TestData.Quote;
-using Tests.ActionsAndValidations;
-using System.Collections.Generic;
-using UIDriver.Pages.Spark.CaravanQuote;
 using System;
-
+using System.Collections.Generic;
+using Tests.ActionsAndValidations;
+using UIDriver.Pages.Spark.CaravanQuote;
 using static Rac.TestAutomation.Common.Constants.Contacts;
 using static Rac.TestAutomation.Common.Constants.General;
-using static Rac.TestAutomation.Common.Constants.PolicyGeneral;
 using static Rac.TestAutomation.Common.Constants.PolicyCaravan;
-using System.Linq;
+using static Rac.TestAutomation.Common.Constants.PolicyGeneral;
 
 namespace Spark.NewBusiness
 {
@@ -199,7 +197,7 @@ namespace Spark.NewBusiness
             var mainPH = new ContactBuilder().InitialiseRandomIndividual().WithoutDeclaringMembership(true)
                                 .WithDateOfBirth(DateTime.Now.AddYears(-PremiumChangePopup.DRIVER_AGE_FACTOR_RATE_GROUP2_MIN_AGE).AddDays(1)) //To trigger the Positive Premium change pop-up (based on the driver age factor), when the Policy start date is set to the next day.
                                 .Build();
-            var caravan = new CaravanBuilder().InitialiseCaravanWithRandomData(new List<Contact>() { mainPH })
+            var caravanBuilder = new CaravanBuilder().InitialiseCaravanWithRandomData(new List<Contact>() { mainPH })
                                 .WithRandomCaravan(20000) //Increasing the minimum caravan value to a significant value, so that we can expect a premium change
                                 .WithPaymentMethod(new Payment(mainPH).CreditCard().Monthly())
                                 //In Shield, On-Site caravans have different rate groups compared to 'Trailed' caravans.
@@ -208,9 +206,17 @@ namespace Spark.NewBusiness
                                 .WithExcess(CARAVAN_MIN_EXCESS_VALUE)
                                 .WithInsuredVariance(ActionsQuoteCaravan.MAX_SUM_INSURED_PERCENTAGE)
                                 .WithContentsCoverValue(MAX_CONTENT_INSURANCE_VALUE) //To makesure the premium is high enough, to trigger an age based rate change.
-                                .WithPolicyStartDate(DateTime.Now.AddDays(1)) //To trigger the Positive Premium change pop-up, based on the driver age factor
-                                .Build();
+                                .WithPolicyStartDate(DateTime.Now.AddDays(1)); //To trigger the Positive Premium change pop-up, based on the driver age factor
 
+            // Force a specific caravan for Visual UI testing to avoid random line wrapping.
+            // Force a shorter given name for the confirmation page in mobile view
+            if (_testConfig.IsVisualTestingEnabled)
+            {
+                mainPH.FirstName = DataHelper.RandomLetters(4);
+                caravanBuilder.WithCaravan(vehicleid: "5317326"); 
+            }
+
+            var caravan = caravanBuilder.Build();
             Reporting.LogTestData(TestContext.CurrentContext.Test.Name, caravan.ToString());
 
             return caravan;

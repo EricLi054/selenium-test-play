@@ -33,7 +33,7 @@ namespace Spark.Claim.Motor
             ExtentTestManager.CreateParentTest(this.GetType().Name, "Motor Glass claim");
             _motorPoliciesForClaims = DataHelper.AzureTableGetAllRecords(_azureTableName)
                                                     .FindAll(x => (x.CoverType == DataHelper.GetDescription(MotorCovers.MFCO)) &&
-                                                                                  (!x.IsEV)).PickRandom(25);
+                                                                                  (!x.IsEV)).PickRandom(60);
         }
 
         #region Test Cases
@@ -191,7 +191,7 @@ namespace Spark.Claim.Motor
                 if (policy == null) { continue; }
 
                 // Check policy has desired role.
-                var claimant = policy.PolicyHolders.Find(x => x.ContactRoles.Contains(contactRole));
+                var claimant = policy.PolicyHolders.Where(x => x.ContactRoles !=null).FirstOrDefault(x => x.ContactRoles.Contains(contactRole));
                 if (claimant == null) { continue; }
 
                 claimant.UpdateEmailIfNotDefined();
@@ -201,10 +201,20 @@ namespace Spark.Claim.Motor
 
                 var linkedMotorPolicies = DataHelper.GetAllPoliciesOfTypeForPolicyHolder(claimant.Id, "Motor");
 
-                //For Percy screencheck we need policies where the claimant has exactly 2 linked motor policies
-                //this is to make sure we have a similar comparison against the base run 
-                if (_testConfig.IsVisualTestingEnabled && linkedMotorPolicies.Count() != 2)
-                { continue; }
+                if (_testConfig.IsVisualTestingEnabled)
+                {
+                    //For Percy screencheck we apply some restrictions to ensure that the
+                    // UI masks can cope.
+                    // 1: we need policies where the claimant has exactly 2 linked motor policies
+                    //    this is to make sure we have a similar comparison against the base run.
+                    // 2: we restrict the length of the first name, to avoid line wrapping
+                    // 3: some fields display the vehicle's manufacturer and we also limit
+                    //    the length to avoid line wrapping.
+                    if (linkedMotorPolicies.Count() != 2 &&
+                        claimant.FirstName.Length > 6 &&
+                        policy.Vehicle.Make.Length > 6)
+                    { continue; }
+                }
 
                 claimPolicy.motorPolicy = policy;
                 claimPolicy.claimant = claimant;

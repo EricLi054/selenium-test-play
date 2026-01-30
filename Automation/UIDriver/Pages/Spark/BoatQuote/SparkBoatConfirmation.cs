@@ -313,10 +313,5 @@ public class SparkBoatConfirmation : SparkBasePage
     /// Ignore CSS for dynamic fields in visual testing
     /// </summary>
     public List<string> GetPercyIgnoreCSS() =>
-      new List<string>()
-      {
-              "#header",
-              "[data-testid='policyNumberLabel']",
-              "[data-icon='thumbs-up'] path"
-      };
+      new List<string>() {};
 }

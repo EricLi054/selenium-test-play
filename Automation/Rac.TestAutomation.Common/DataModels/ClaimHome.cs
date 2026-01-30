@@ -11,6 +11,11 @@ namespace Rac.TestAutomation.Common
 {
     public class ClaimHome
     {
+        // The excess threshold is a slightly arbitrary value, but an attempt to reduce false failures
+        // in fence only tests. If a policy has a high excess, it likely won't get online settlement
+        // and thus break the test's expectations.
+        private const int FENCE_ONLY_EXCESS_THRESHOLD = 1000;
+
         // Shield scenario name constants
         private const string SCENARIO_THEFT_ITEMS_OUTSIDE   = "Theft of items outside the House";
         private const string SCENARIO_THEFT_ITEMS_INSIDE    = "Theft of items inside the House";
@@ -186,8 +191,7 @@ namespace Rac.TestAutomation.Common
             formattedString.AppendLine(string.Empty);
             formattedString.AppendLine($"Counted a total of {LinkedHomePolicies.Count} Home policies which qualify for a Storm claim and are related to the claimant {Claimant.Id}.{Reporting.HTML_NEWLINE}");
             formattedString.AppendLine(Reporting.SEPARATOR_BAR);
-            if (config.IsMyRACLoginEnabled() &&
-                (config.Shield.Environment != "shieldint2" || config.Shield.Environment != "shielduat6"))
+            if (config.IsMyRACLoginEnabled() && !config.IsMCMockEnabled())
             {
                 if (Claimant.NewMobilePhoneNumber != null || Claimant.PrivateEmail.NewAddress != null)
                 {
@@ -389,6 +393,9 @@ namespace Rac.TestAutomation.Common
 
         /// <summary>
         /// Evaluates whether the covers we wish to exist on this policy are included.
+        /// Intended only for FENCE ONLY home claims.
+        /// Checks that building excess is below threshold to ensure suitability
+        /// for online settlement.
         /// </summary>
         /// <param name="policyToUse">The candidate policy to examine</param>
         /// <param name="includedCoversOnPolicy">The covers we want to be included on the policy for this test scenario.</param>
@@ -396,6 +403,7 @@ namespace Rac.TestAutomation.Common
         public static bool PolicyHasAppropriateCoversForClaimScenario(HomePolicy policyToUse, AffectedCovers includedCoversOnPolicy)
         {
             bool result = false;
+
             if (includedCoversOnPolicy == AffectedCovers.BuildingAndContents)
             {
                 if ((policyToUse.Covers.Any(c => c.CoverCode == HomeCoverCodes.HB) || policyToUse.Covers.Any(c => c.CoverCode == HomeCoverCodes.LB))
@@ -415,6 +423,17 @@ namespace Rac.TestAutomation.Common
                 Reporting.Log($"This test only requires Building cover so we know all candidate policies will have that if they qualified for a Fence claim.");
                 result = true;
             }
+
+            if (result)
+            {
+                var buildingExcess = decimal.Parse(policyToUse.Covers.First(c => c.CoverCode.Equals(HomeCoverCodes.HB) || c.CoverCode.Equals(HomeCoverCodes.LB)).Excess);
+                result = buildingExcess <= FENCE_ONLY_EXCESS_THRESHOLD;
+                if (!result)
+                {
+                    Reporting.Log($"Building excess for {policyToUse.PolicyNumber} (${buildingExcess}) was greater than ${FENCE_ONLY_EXCESS_THRESHOLD}, cannot use for Fence Only tests.");
+                }
+            }
+
             return result;
         }
 

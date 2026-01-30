@@ -60,8 +60,8 @@ namespace Rac.TestAutomation.Common.TestData.Quote
         /// <returns></returns>
         public MotorCarBuilder WithParkingAddress(Address address)
         {
-            if (_config.IsMotorRiskAddressEnabled() &&
-                (address.QASStreetAddress().ToLower().Contains("po box") || address.QASStreetAddress().ToLower().Contains("locked bag")))
+            if (address.QASStreetAddress().ToLower().Contains("po box") || 
+                address.QASStreetAddress().ToLower().Contains("locked bag"))
             {
                 Set(x => x.ParkingAddress, MotorRiskAddress.Generic);
             }
@@ -95,9 +95,14 @@ namespace Rac.TestAutomation.Common.TestData.Quote
             return WithInsurer(GetRandomInsurer());
         }
 
+        /// <summary>
+        /// B2C presents all financiers in uppercase so any value
+        /// provided will be forced to upper case.
+        /// </summary>
         public MotorCarBuilder WithFinancier(string financier)
         {
-            Set(x => x.Financier, financier);
+            var uppercaseFinancier = string.IsNullOrEmpty(financier) ? financier : financier.ToUpperInvariant();
+            Set(x => x.Financier, uppercaseFinancier);
             return this;
         }
 

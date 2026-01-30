@@ -71,9 +71,7 @@ namespace Tests.ActionsAndValidations
             API_MemberCentralPersonV2Response response;
             
             response = MemberCentral.GetInstance().GET_PersonByPersonId(claimData.Claimant.PersonId).GetAwaiter().GetResult();
-            //TODO: DED-958 - restore the "shieldint2 OR shielduat6" condition for the list of environments where we can expected changed details.
-            if (useMyRACLogin &&
-                (shieldEnvironment == "NoSuchEnvironmentExistsForNow"))
+            if (useMyRACLogin && !Config.Get().IsMCMockEnabled())
             {
                 if (claimData.IsEmailAddressChanged)
                 {

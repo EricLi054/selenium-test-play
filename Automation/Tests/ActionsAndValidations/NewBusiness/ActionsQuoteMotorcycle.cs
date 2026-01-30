@@ -93,21 +93,8 @@ namespace Tests.ActionsAndValidations
         /// <returns></returns>
         public static string ProceedWithQuoteToPurchase(Browser browser, QuoteMotorcycle quote, bool detailUIChecking=false)
         {
-            /***********************************************************
-            * Select the cover type and proceed with the quote
-            ***********************************************************/
-            ActionsQuoteMotorcycle.AdjustQuoteParametersAndBeginPurchase(browser, quote);
-            Reporting.Log($"Capturing Screenshot when cover option selected", browser.Driver.TakeSnapshot());
-            /***********************************************************
-             * Select policy start date and driver details
-             ***********************************************************/
-            ActionsQuoteMotorcycle.LetsClarifyFewMoreDetails(browser, quote);
-            Reporting.Log($"Capturing Screenshot of Confirm Policy Details", browser.Driver.TakeSnapshot());
-            /***********************************************************
-            * Enter member details 
-            ***********************************************************/
-            ActionsQuoteMotorcycle.TellUsMoreAboutYou(browser, quote);
-            Reporting.Log($"Capturing Screenshot of Tell Us More About You", browser.Driver.TakeSnapshot());
+            UpdateQuoteParametersAndSupplementaryInformation(browser, quote);
+            VerifyQuoteMotorcycle.VerifyPremiumChangePopup(browser, quote);
 
             /***********************************************************
            * Enter payment details and purchase policy
@@ -287,16 +274,7 @@ namespace Tests.ActionsAndValidations
                                  $"Progress bar state, {progressBar.CurrentStepDuringPolicyStages()} to be {MotorcycleProgressBar.PAGE_POLICY.PersonalInformation}");
                 browser.PercyScreenCheck(MotorcycleNewBusiness.EnterMemberDetails);
                 tellUsMoreAboutYou.FillTellUsMoreAboutYou(quoteMotorcycle);
-
-                if (quoteMotorcycle.IsPremiumChangeExpected)
-                {
-                    VerifyAnyPremiumChangePopup(browser, quoteMotorcycle);
-                }
-                else
-                {
-                    tellUsMoreAboutYou.VerifyNoPremiumPopupIsDisplayed();
-                }
-            }            
+            }
         }
 
         public static string VerifyQuoteBreakdownTextAndGetQuoteNumber(Browser browser, QuoteMotorcycle quoteMotorcycle)
@@ -368,7 +346,7 @@ namespace Tests.ActionsAndValidations
             }
         }
 
-        private static string EnterPaymentDetailAndPurchasePolicy(Browser browser, QuoteMotorcycle quoteMotorcycle)
+        public static string EnterPaymentDetailAndPurchasePolicy(Browser browser, QuoteMotorcycle quoteMotorcycle)
         {
             string policyNumber = null;
             using (var paymentDetails = new PaymentDetails(browser))
@@ -399,21 +377,68 @@ namespace Tests.ActionsAndValidations
             return policyNumber;
         }
 
-        private static void VerifyAnyPremiumChangePopup(Browser browser, QuoteMotorcycle quoteMotorcycle)
+        /// <summary>
+        /// Handles the duplicate policy alert by closing it, navigating back to "Confirm policy details" step,
+        /// and changing the registration number.
+        /// </summary>
+        /// <param name="browser">The browser instance</param>
+        /// <param name="quoteMotorcycle">The quote data to update with new registration</param>
+        public static void HandleDuplicateAlertAndChangeRegistration(Browser browser, QuoteMotorcycle quoteMotorcycle)
         {
-            using (var premiumChangePopup = new PremiumChangePopup(browser))
+            using (var tellUsMoreAboutYou = new TellUsMoreAboutYou(browser))
+            using (var letsClarifyFewMoreDetails = new LetsClarifyFewMoreDetails(browser))
+            using (var spinner = new SparkSpinner(browser))
             {
-                try
+                tellUsMoreAboutYou.CloseDuplicateAlertDialog();
+
+                // Navigate back to "Confirm policy details" step
+                tellUsMoreAboutYou.ClickConfirmDetailsStep();
+                spinner.WaitForSpinnerToFinish(nextPage: letsClarifyFewMoreDetails);
+
+                // Update registration to a new random value
+                string newRego;
+                do
                 {
-                    premiumChangePopup.WaitForPage();
-                    premiumChangePopup.VerifyPopupContent(quoteMotorcycle);
-                    premiumChangePopup.VerifyPremiumChange(browser, quoteMotorcycle, SparkBasePage.QuoteStage.AFTER_PERSONAL_INFO);
-                }
-                catch
-                {
-                    Reporting.Error("Premium change pop up is expected on this scenario");
-                }
+                    newRego = DataHelper.RandomAlphanumerics(5, 8);
+                } while (newRego == quoteMotorcycle.Registration);
+
+                quoteMotorcycle.Registration = newRego;
+                letsClarifyFewMoreDetails.BikeRego = newRego;
+
+                Reporting.Log($"Changed motorcycle registration to: {newRego}", browser.Driver.TakeSnapshot());
+
+                // Navigate forward to complete the flow
+                letsClarifyFewMoreDetails.ClickNext();
+                spinner.WaitForSpinnerToFinish(nextPage: tellUsMoreAboutYou);
+
+                // Re-fill personal information
+                tellUsMoreAboutYou.FillTellUsMoreAboutYou(quoteMotorcycle);
             }
+
+            VerifyQuoteMotorcycle.VerifyPremiumChangePopup(browser, quoteMotorcycle);
+        }
+
+        /// <summary>
+        /// Processes quote with existing policy details that will trigger duplicate alert.
+        /// This includes adjusting quote parameters, confirming policy details, and providing personal information.
+        /// </summary>
+        public static void UpdateQuoteParametersAndSupplementaryInformation(Browser browser, QuoteMotorcycle quoteMotorcycle)
+        {
+            /***********************************************************
+            * Select the cover type and proceed with the quote
+            ***********************************************************/
+            ActionsQuoteMotorcycle.AdjustQuoteParametersAndBeginPurchase(browser, quoteMotorcycle);
+            Reporting.Log($"Capturing Screenshot when cover option selected", browser.Driver.TakeSnapshot());
+            /***********************************************************
+             * Select policy start date and driver details
+             ***********************************************************/
+            ActionsQuoteMotorcycle.LetsClarifyFewMoreDetails(browser, quoteMotorcycle);
+            Reporting.Log($"Capturing Screenshot of Confirm Policy Details", browser.Driver.TakeSnapshot());
+            /***********************************************************
+            * Enter member details 
+            ***********************************************************/
+            ActionsQuoteMotorcycle.TellUsMoreAboutYou(browser, quoteMotorcycle);
+            Reporting.Log($"Capturing Screenshot of Tell Us More About You", browser.Driver.TakeSnapshot());
         }
     }
 }

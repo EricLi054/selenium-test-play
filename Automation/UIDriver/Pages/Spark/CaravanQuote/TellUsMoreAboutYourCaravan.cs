@@ -46,6 +46,10 @@ namespace UIDriver.Pages.Spark.CaravanQuote
             {
                 public const string Next = FORM + "//button[@data-testid='submit']";
             }
+            public static class Registration
+            {
+                public const string Input = "id('input-registration-number')";
+            }
         }
 
         #endregion
@@ -105,6 +109,11 @@ namespace UIDriver.Pages.Spark.CaravanQuote
             get => GetInnerText(XPath.Overnight.Input);
             set => WaitForSelectableAndPickFromDropdown(XPath.Overnight.Input, XPath.Overnight.Options, value);
         }
+        public string Registration
+        {
+            get => GetValue(XPath.Registration.Input);
+            set => WaitForTextFieldAndEnterText(XPath.Registration.Input, value, false);
+        }
         #endregion
 
         /// <summary>
@@ -116,6 +125,11 @@ namespace UIDriver.Pages.Spark.CaravanQuote
         {
             VerifyHelpText();
             VerifyPageLabels(quoteCaravan);
+
+            if (!string.IsNullOrEmpty(quoteCaravan.Registration))
+            {
+                Registration = quoteCaravan.Registration;
+            }
 
             ParkedSuburb = quoteCaravan.ParkingAddress.SuburbAndCode();
 

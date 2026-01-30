@@ -200,6 +200,35 @@ namespace Rac.TestAutomation.Common.TestData.Quote
             Set(x => x.RetrieveQuote, retrieveQuoteType);
             return this;
         }
+        public CaravanBuilder WithRegistration(string registration)
+        {
+            Set(x => x.Registration, registration);
+            return this;
+        }
+
+        public CaravanBuilder WithMake(string make)
+        {
+            Set(x => x.Make, make);
+            return this;
+        }
+
+        public CaravanBuilder WithModel(string model)
+        {
+            Set(x => x.Model, model);
+            return this;
+        }
+
+        public CaravanBuilder WithYear(int year)
+        {
+            Set(x => x.Year, year);
+            return this;
+        }
+
+        public CaravanBuilder WithParkingAddress(Address address)
+        {
+            Set(x => x.ParkingAddress, address);
+            return this;
+        }
 
         protected override QuoteCaravan BuildEntity()
         {
@@ -208,6 +237,7 @@ namespace Rac.TestAutomation.Common.TestData.Quote
                 Type = GetOrDefault(x => x.Type),
                 Make = GetOrDefault(x => x.Make),
                 Year = GetOrDefault(x => x.Year),
+                Registration = GetOrDefault(x => x.Registration),
                 Model = GetOrDefault(x => x.Model),
                 MarketValue = GetOrDefault(x => x.MarketValue),
                 IsForBusinessOrCommercialUse = GetOrDefault(x => x.IsForBusinessOrCommercialUse),
@@ -237,6 +267,22 @@ namespace Rac.TestAutomation.Common.TestData.Quote
                                marketValue: caravan.MarketValue,
                                vehicleid: caravan.VehicleId);
         }
+
+        public CaravanBuilder WithCaravan(string vehicleid)
+        {
+            var caravan = DataHelper.GetVehicleDetails(vehicleid);
+            if (caravan == null || caravan.Vehicles.Count < 1)
+            { Reporting.Error($"Provided vehicle id '{vehicleid}' did not yield any matches."); }
+
+            var firstVan = caravan.Vehicles[0];
+            return WithCaravan(make:        firstVan.MakeDescription,
+                               year:        firstVan.ModelYear,
+                               model:       firstVan.ModelFamily,
+                               modelDescription: firstVan.ModelDescription,
+                               marketValue: firstVan.Price,
+                               vehicleid:   firstVan.VehicleId);
+        }
+
 
         public CaravanBuilder WithCaravan(string make, decimal year, string model, string modelDescription, int marketValue, string vehicleid)
         {

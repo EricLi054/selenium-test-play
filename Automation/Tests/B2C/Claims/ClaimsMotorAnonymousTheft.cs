@@ -1,12 +1,13 @@
 ﻿using NUnit.Framework;
 using Rac.TestAutomation.Common;
 using Rac.TestAutomation.Common.DatabaseCalls.Claims;
+using Rac.TestAutomation.Common.DatabaseCalls.Policies;
 using Rac.TestAutomation.Common.TestData.Claim;
-using Tests.ActionsAndValidations;
 using System;
+using System.Linq;
+using Tests.ActionsAndValidations;
 using static Rac.TestAutomation.Common.Constants.ClaimsMotor;
 using static Rac.TestAutomation.Common.Constants.General;
-using System.Linq;
 
 
 namespace B2C.Claims
@@ -59,6 +60,15 @@ namespace B2C.Claims
             {
                 var claimant = policyToUse.PolicyHolders.PickRandom();
                 claimant = DataHelper.MapPolicyContactWithPersonAPI(claimant.Id, claimant.ExternalContactNumber, claimant.ContactRoles.FirstOrDefault());
+
+                // Need to make sure a rego is defined as this test will use rego as part
+                // of identification in B2C anonymous claim lodgement entry.
+                var policyDetails = DataHelper.GetPolicyDetails(policyToUse.PolicyNumber);
+                if (string.IsNullOrEmpty(policyDetails.MotorAsset.RegistrationNumber))
+                { continue; }
+
+                if (!ShieldPolicyDB.IsPolicySuitableForClaims(policyToUse.PolicyNumber))
+                { continue; }
 
                 if (claimant != null)
                 {

@@ -1,4 +1,5 @@
 ﻿using Azure.Data.Tables;
+using Azure.Identity;
 using SharpCompress.Common;
 using System;
 using System.Collections.Generic;
@@ -12,18 +13,20 @@ namespace Rac.TestAutomation.Common.AzureStorage
         private readonly TableServiceClient _tableServiceClient;
         private readonly TableClient _tableClient;
 
-        public AzureTableOperation(string tableName)
-        {
-            _tableServiceClient = new TableServiceClient(new Uri(Config.Get().Azure.StorageMotorClaims.URI), new TableSharedKeyCredential(Config.Get().Azure.StorageMotorClaims.AccountName, Config.Get().Azure.StorageMotorClaims.AccountKey));
-            _tableServiceClient.CreateTableIfNotExists(tableName);
-            _tableClient = _tableServiceClient.GetTableClient(tableName);
-        }
+         public AzureTableOperation(string tableName) : this(Config.Get().Azure.StorageMotorClaims, tableName)
+        { }
 
         public AzureTableOperation(AzureTable storageConfig, string tableName)
         {
-            _tableServiceClient = new TableServiceClient(new Uri(storageConfig.URI), new TableSharedKeyCredential(storageConfig.AccountName, storageConfig.AccountKey));           
-            _tableServiceClient.CreateTableIfNotExists(tableName);
-            _tableClient = _tableServiceClient.GetTableClient(tableName);
+            try
+            {
+                _tableServiceClient = new TableServiceClient(new Uri(storageConfig.URI), new DefaultAzureCredential());
+                _tableServiceClient.CreateTableIfNotExists(tableName);
+                _tableClient = _tableServiceClient.GetTableClient(tableName);
+            } catch (CredentialUnavailableException cuex)
+            {
+                Reporting.Error($"You will need to 'Connect-AzAccount' your PA account, and then run `Set-AzContext -Subscription be5438b0-b55b-4b1b-b836-aa9878adc040` to have it reach the subscription that hosts the Storage resources.");
+            }
         }
 
         public enum DataType

@@ -28,7 +28,7 @@ namespace Tests.ActionsAndValidations.Endorsements
             ConfirmYourCarMakeAndModel(browser, endorseCar, detailUiChecking);
             if (endorseCar.ChangeMakeAndModel)
             {
-                UpdateYourNewCardDetails(browser, endorseCar, detailUiChecking);
+                UpdateYourNewCarDetails(browser, endorseCar, detailUiChecking);
             }
             ConfirmYourCarDetails(browser, endorseCar, detailUiChecking);
             ConfirmYourCarUsage(browser, endorseCar, detailUiChecking);
@@ -49,7 +49,7 @@ namespace Tests.ActionsAndValidations.Endorsements
             ConfirmYourCarMakeAndModel(browser, endorseCar, detailUiChecking);
             if (endorseCar.ChangeMakeAndModel)
             {
-                UpdateYourNewCardDetails(browser, endorseCar, detailUiChecking);
+                UpdateYourNewCarDetails(browser, endorseCar, detailUiChecking);
             }
             ConfirmYourCarDetails(browser, endorseCar, detailUiChecking);
             ConfirmYourCarUsage(browser, endorseCar,detailUiChecking);
@@ -85,7 +85,7 @@ namespace Tests.ActionsAndValidations.Endorsements
         /// Workflow to drive motor renewal flow on 'Update Your Car Details' Page
         /// </summary>
         /// <param name="detailUiChecking">Optional parameter, if set to true will investigate field validation errors etc</param>
-        public static void UpdateYourNewCardDetails(Browser browser, EndorseCar endorseCar, bool detailUiChecking = false)
+        public static void UpdateYourNewCarDetails(Browser browser, EndorseCar endorseCar, bool detailUiChecking = false)
         {
             using (var updateYourCar = new LetsUpdateYourCar(browser))
             using (var spinner = new SparkSpinner(browser))

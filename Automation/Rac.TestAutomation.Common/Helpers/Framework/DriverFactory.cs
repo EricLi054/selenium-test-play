@@ -204,8 +204,13 @@ namespace Rac.TestAutomation.Common
 
                 if (incognito)
                 {
-                    options.AddArguments("-inprivate");
+                    options.AddArguments("--inprivate");
                 }
+                // This is added to suppress the "Local Network Access Checks" that Edge introduced
+                // around November 2025. Chrome also introduced the same around July/August 2025, but
+                // that was suppressed via registry changes. For the Edge browser, we are using their
+                // supported command line switch.
+                options.AddArguments("--disable-features=LocalNetworkAccessChecks");
 
                 var edgeDriverSvc = EdgeDriverService.CreateDefaultService();
                 edgeDriverSvc.SuppressInitialDiagnosticInformation = HideWebDriverDiagnosticInfo;

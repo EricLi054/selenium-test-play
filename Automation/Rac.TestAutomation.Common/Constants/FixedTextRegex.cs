@@ -62,10 +62,15 @@ namespace Rac.TestAutomation.Common
 
         public const string QUOTE_HELP_DIALOGUE_BANNER_TEXT_OMTO = @"^\s*Offers some protection for your bike and damage to other people(’|')s property.\s*";
 
-        public const string QUOTE_COVER_DECLINED_TEXT = @"We.re sorry but we can.t provide you with an online quote due to you not meeting our eligibility requirements.\s*" +
-            @"You have the right to request the information relied upon in making this decision. You can do so by contacting us on 13 17 03.\s*" +
-            @"To help you find appropriate insurance cover, the Insurance Council of Australia \(ICA\) has compiled a list of insurance providers who offer general insurance products.\s*" +
-            @"The .Find an Insurer. service is available via www.findaninsurer.com.au.";
+        public const string QUOTE_HOME_COVER_DECLINED_TEXT = @"Thanks for considering us for your home insurance. Unfortunately, we can't give you a quote because of past claims or offences.\s*" +
+            @"You have the right to request the information we relied on in assessing your application. You may do so by contacting us on 13 17 03. " +
+            @"If you are unhappy with our decision, you may lodge a complaint.\s*" +
+            @"Visit www.findaninsurer.com.au for information about your options for alternative insurance.";
+
+        public const string QUOTE_MOTOR_COVER_DECLINED_TEXT = @"Thanks for considering us for your car insurance. Unfortunately, we can't give you a quote because of the age, past claims or driving history of a driver listed.\s*" +
+            @"You have the right to request the information we relied on in assessing your application. You may do so by contacting us on 13 17 03. " +
+            @"If you are unhappy with our decision, you may lodge a complaint.\s*" +
+            @"Visit www.findaninsurer.com.au for information about your options for alternative insurance.";
 
         public const string QUOTE_COVER_DECLINED_VEH_USAGE_TEXT = @"Unfortunately, we are unable to offer insurance for this type of vehicle usage.\s*" +
             @"You have the right to request the information relied upon in making this decision. You can do so by contacting us on 13 17 03.\s*" +

@@ -234,31 +234,31 @@ namespace Rac.TestAutomation.Common
             /// </summary>
             public readonly static string[] FinancierOptions = new[]
             {
-                "360 FINANCE PTY LTD",
-                "ACCESS FINANCE PARTNERS PTY LTD",
-                "B & E LTD",
-                "COLLIE MINERS CREDIT UNION LTD",
-                "DNISTER UKRAINIAN CREDIT CO-OPERATIVE LTD",
-                "ERINSTONE PTY LTD AS TRUSTEE FOR MACK SUPERANNUATION FUND",
-                "FINLEASE",
-                "G&C MUTUAL BANK",
-                "HUNTER UNITED EMPLOYEE CREDIT UNION LTD",
-                "INDUSTRY FUNDS MANAGEMENT (NOMINEES 2) PTY LTD",
-                "JACARANDA CO-OPERATIVE HOUSING SOCIETY LTD",
-                "KEYSTART & DEPARTMENT OF HOUSING",
-                "LOAN WA",
-                "ME BANK",
+                "360 Finance Pty Ltd",
+                "Access Finance Partners PTY LTD",
+                "B & E Ltd",
+                "Collie Miners Credit Union Ltd",
+                "Dnister Ukrainian Credit Co-operative Ltd",
+                "Erinstone Pty Ltd as Trustee for Mack Superannuation Fund",
+                "Finlease",
+                "G&C Mutual Bank",
+                "Hunter United Employee Credit Union Ltd",
+                "Industry Funds Management (Nominees 2) Pty Ltd",
+                "Jacaranda Co-operative Housing Society Ltd",
+                "Keystart & Department of Housing",
+                "Loan WA",
+                "ME Bank",
                 "NCO GROUP",
-                "P & N BANK",
+                "P & N Bank",
                 "QBANK",
-                "RESIDENTIAL MORTGAGE GROUP AUSTRALIA PTY LTD",
-                "SENIOR MASTER OF THE SUPREME COURT OF VICTORIA",
-                "TLC B/S AS AGENT FOR KEYSTART LOANS LTD",
-                "UBANK",
-                "VICTORIA TEACHERS MUTUAL BANK",
-                "W.H.S. AGENTS FOR KEYSTART LOANS",
-                "YES LOANS"
-        };
+                "Residential Mortgage Group Australia Pty Ltd",
+                "Senior Master Of The Supreme Court Of Victoria",
+                "TLC B/S as Agent for Keystart Loans Ltd",
+                "Ubank",
+                "Victoria Teachers Mutual Bank",
+                "W.H.S. Agents for Keystart Loans",
+                "Yes Loans"
+            };
 
             /// <summary>
             /// To handle different member 'Discount Toasts' shown as a result of

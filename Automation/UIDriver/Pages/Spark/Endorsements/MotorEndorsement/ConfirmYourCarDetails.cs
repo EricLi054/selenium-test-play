@@ -75,7 +75,8 @@ namespace UIDriver.Pages.Spark.Endorsements
                 public const string ButtonGroup = "id('car-finance-question')";
                 public const string Yes = "//button[@id='car-finance-question-true']";
                 public const string No = "//button[@id='car-finance-question-false']";
-                public const string Dropdown = "id('financier')";
+                public const string Field = "id('financier')";
+                public const string Dropdown = "id('financier-listbox')/li";
             }
 
             public class Modifications
@@ -151,15 +152,15 @@ namespace UIDriver.Pages.Spark.Endorsements
             get => GetBinaryToggleState(XPath.Modifications.ButtonGroup, XPath.Modifications.Yes, XPath.Modifications.No);
             set => ClickBinaryToggle(XPath.Modifications.ButtonGroup, XPath.Modifications.Yes, XPath.Modifications.No, value);
         }
-        public bool Finance
+        public bool IsFinanced
         {
             get => GetBinaryToggleState(XPath.Finance.ButtonGroup, XPath.Finance.Yes, XPath.Finance.No);
             set => ClickBinaryToggle(XPath.Finance.ButtonGroup, XPath.Finance.Yes, XPath.Finance.No, value);
         }
         public string Financier
         {
-            get => GetValue(XPath.Finance.Dropdown);
-            set => WaitForTextFieldAndEnterText(XPath.Finance.Dropdown, value);
+            get => GetValue(XPath.Finance.Field);
+            set => WaitForSelectableAndPickFromDropdown(XPath.Finance.Field, XPath.Finance.Dropdown, value);
         }
 
         #endregion
@@ -209,9 +210,9 @@ namespace UIDriver.Pages.Spark.Endorsements
                 Reporting.AreEqual("", CarRegistration, "car registration number left blank when registration considered temporary or otherwise invalid");
             }
             Reporting.AreEqual(endorseCar.OriginalPolicyData.MotorAsset.IsVehicleModified(), CarModification, "Modifications to your car that improve engine performance");
-            Reporting.AreEqual(endorseCar.OriginalPolicyData.MotorAsset.IsFinanced, Finance, "Finance on your car");
+            Reporting.AreEqual(endorseCar.OriginalPolicyData.MotorAsset.IsFinanced, IsFinanced, "Finance on your car");
 
-            if (Finance)
+            if (IsFinanced)
             {
                 Reporting.AreEqual(endorseCar.OriginalPolicyData.GetFinancierNameViaShieldAPI(), Financier, ignoreCase: true, $"Expected financier name against the actual name displayed");
             }
@@ -262,8 +263,8 @@ namespace UIDriver.Pages.Spark.Endorsements
             {
                 CarRegistration = endorseCar.NewInsuredAsset.Registration;
                 CarModification = endorseCar.NewInsuredAsset.IsModified;
-                Finance = endorseCar.NewInsuredAsset.IsFinanced;
-                if (Finance)
+                IsFinanced = endorseCar.NewInsuredAsset.IsFinanced;
+                if (IsFinanced)
                 {
                     using (var spinner = new SparkSpinner(_browser))
                     {
@@ -293,12 +294,12 @@ namespace UIDriver.Pages.Spark.Endorsements
                 Reporting.Log($"Page 3: Capture screenshot for warning message.", _browser.Driver.TakeSnapshot());
                 Reporting.AreEqual(Constants.WarningText.ModificationWarning, GetInnerText(XPath.WarningField.ModificationWarning), $"'Modifications to your car that improve engine performance' warning message against display");
                 Reporting.AreEqual(Constants.WarningText.FinanceWarning, GetInnerText(XPath.WarningField.FinanceWarning), $"'Finance on your car' warning message against display");
-                Finance = true;//Setting the Is Finance to Yes to check the warning 
+                IsFinanced = true;//Setting the Is Finance to Yes to check the warning 
                 spinner.WaitForSpinnerToFinish();
                 ClickNext();
                 Reporting.Log($"Page 3: Capture screenshot for warning message.", _browser.Driver.TakeSnapshot());
                 Reporting.AreEqual(Constants.WarningText.FinancierWarning, GetInnerText(XPath.WarningField.FinancierWarning), $"'Who your car is financed with' warning message against display");
-                Finance = false;//Resetting the Is Finance to default state
+                IsFinanced = false;//Resetting the Is Finance to default state
             }
         }
     }

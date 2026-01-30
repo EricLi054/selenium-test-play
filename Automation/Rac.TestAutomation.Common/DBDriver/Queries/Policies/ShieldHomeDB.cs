@@ -1,14 +1,15 @@
-﻿using Rac.TestAutomation.Common.DatabaseCalls.Claims;
+﻿using Newtonsoft.Json;
+using Rac.TestAutomation.Common.DatabaseCalls.Claims;
+using Rac.TestAutomation.Common.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-
+using static Rac.TestAutomation.Common.Constants.Contacts;
 using static Rac.TestAutomation.Common.Constants.PolicyGeneral;
 using static Rac.TestAutomation.Common.Constants.PolicyHome;
-using static Rac.TestAutomation.Common.Constants.Contacts;
 
 namespace Rac.TestAutomation.Common.DatabaseCalls.Policies
 {
@@ -82,6 +83,47 @@ namespace Rac.TestAutomation.Common.DatabaseCalls.Policies
         }
 
         /// <summary>
+        /// Find a Landlord or Homeowner Building Policy with valid address and policyholder contact
+        /// for duplicate alert test scenarios. Returns the first suitable policy found.
+        /// </summary>
+        public static (Address address, Contact policyholder) FindLandlordPolicyWithAddressAndPolicyholder()
+        {
+            var candidatePolicies = FindListOfHomePolicyNumbersLandlordAndHomeownerBuilding();
+
+            foreach (var policyNumber in candidatePolicies)
+            {
+                try
+                {
+                    var apiPolicyDetails = DataHelper.GetPolicyDetails(policyNumber);
+
+                    var address = apiPolicyDetails?.HomeAsset?.Address;
+
+                    if ((address == null) ||
+                        string.IsNullOrEmpty(address.StreetOrPOBox) ||
+                        string.IsNullOrEmpty(address.Suburb))
+                    {
+                        continue;
+                    }
+
+                    var policyholder = DataHelper.MapContactWithPersonAPI(apiPolicyDetails.Policyholder.Id.ToString());
+                    if (policyholder == null)
+                    {
+                        continue;
+                    }
+
+                    return (address, policyholder);
+                }
+                catch (Exception ex) when (ex is ShieldApiException || ex is JsonException || ex is NullReferenceException || ex is ArgumentNullException)
+                {
+                    continue;
+                }
+            }
+
+            Reporting.Error("Unable to locate a landlord property policy with a valid address and policyholder for duplicate alert scenario.");
+            return (null, null);
+        }
+
+        /// <summary>
         /// Fetch information about an existing Home Policy details
         /// restricted to only policy number, cover types and policy holder
         /// to verify our assertions against.
@@ -98,7 +140,8 @@ namespace Rac.TestAutomation.Common.DatabaseCalls.Policies
             {
                 var cover = new PolicyCoverDetails();
                 cover.CoverDescription = item.CoverTypeDescription;
-                cover.CoverCode = DataHelper.GetValueFromDescription<HomeCoverCodes>(item.CoverType);                
+                cover.CoverCode = DataHelper.GetValueFromDescription<HomeCoverCodes>(item.CoverType);
+                cover.Excess = ((int)item.StandardExcess).ToString();
                 result.Covers.Add(cover);
             }
             var policyHolders = new List<PolicyContactDB>();

@@ -58,7 +58,6 @@ namespace Spark.Claim.Home
 
             ActionsClaimHome.TriageHomeClaim(_browser, claim);
             ActionSparkClaimHomeStorm.ReportSparkClaimHomeStorm(_browser, claim, retryOTP: false, detailedUiChecking: true);
-
         }
 
         /// <summary>
@@ -463,6 +462,24 @@ namespace Spark.Claim.Home
 
                 if (!ClaimHome.PolicyHasAppropriateCoversForClaimScenario(policyToUse, includedCoversOnPolicy))
                 { continue; }
+
+                if (_testConfig.IsVisualTestingEnabled)
+                {
+                    // For Visual UI testing for Fence Only claims, we deal with
+                    // prompt for account for payment. This gets complicated for
+                    // policies paid by DD. As such, to simplify things, we'll
+                    // have Percy just work with Annual Credit Card only.
+                    var policyDetailsViaApi = DataHelper.GetPolicyDetails(candidate);
+                    if (policyDetailsViaApi.IsPaidByBankAccount() || 
+                        policyDetailsViaApi.GetPaymentFrequency() != Constants.PolicyGeneral.PaymentFrequency.Annual)
+                    { continue; }
+
+                    // We only want the one current home policy, to avoid added "Your Policy"
+                    // screen which impacts the progress sidebar in Visual UI testing.
+                    var allPoliciesForMember = DataHelper.GetAllPoliciesOfTypeForPolicyHolder(policyDetailsViaApi.Policyholder.Id.ToString(), "Home");
+                    if (allPoliciesForMember.Count() > 1)
+                    { continue; }
+                }
 
                 if (!policyToUse.PolicyHolders.Any(ContactRole => ContactRole.ContactRoles.Contains(contactRole)))
                 {

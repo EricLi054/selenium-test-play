@@ -1,10 +1,8 @@
-﻿using Rac.TestAutomation.Common;
+﻿using OpenQA.Selenium;
+using Rac.TestAutomation.Common;
 using System;
-using OpenQA.Selenium;
-
 using static Rac.TestAutomation.Common.Constants.ClaimsMotor;
 using static Rac.TestAutomation.Common.Constants.General;
-using static Rac.TestAutomation.Common.Constants.Contacts;
 
 namespace UIDriver.Pages.Claims
 {
@@ -17,6 +15,19 @@ namespace UIDriver.Pages.Claims
             {
                 public const string FindByRego = "id('PrelimDetails_PolicyDetails_LicensePlate')";
                 public const string EventLocation = "id('PrelimDetails_ContactDetails_AccidentLocation')";
+            }
+
+            public class Infobox
+            {
+                public const string ContactUpdating = "//div[contains(text(),'your contact details need updating')]";
+            }
+        }
+
+        private class Constant
+        {
+            public class Infobox
+            {
+                public const string ContactUpdating = "If your contact details need updating, please log in to myRAC and update them under your ‘Profile’ or call us on 13 17 03.";
             }
         }
 
@@ -64,11 +75,12 @@ namespace UIDriver.Pages.Claims
                     PolicyNumber = claimData.Policy.PolicyNumber;
                 }
                 else
-                {
-                    FindPolicySurname = claimData.Claimant.Surname;
-                    FindPolicyDateOfBirth = claimData.Claimant.DateOfBirth;
+                {  
                     VehicleRego = claimData.Policy.Vehicle.Registration;
                 }
+
+                FindPolicySurname = claimData.Claimant.Surname;
+                FindPolicyDateOfBirth = claimData.Claimant.DateOfBirth;
             }
 
             EventDate = claimData.EventDateTime;
@@ -87,15 +99,21 @@ namespace UIDriver.Pages.Claims
         /// <param name="claimData"></param>
         public void FillFormForDamageTypeAndInitialEventDetails(ClaimCar claimData)
         {
-            DamageType         = claimData.DamageType;            
+            DamageType = claimData.DamageType;
             if (!IsMemberLoggedIntoPCM())
             {
                 ConfirmSurname = claimData.Claimant.Surname;
                 ConfirmDateOfBirth = claimData.Claimant.DateOfBirth;
             }
-            Email              = claimData.Claimant.GetEmail() ?? "NPE.b2cadmin@rac.com.au";
-            PhoneNumber        = claimData.Claimant.GetPhone() ?? $"04{DataHelper.RandomNumbersAsString(8)}";
 
+            Reporting.IsTrue(Boolean.Parse(GetAttribute(BaseXPath.Inputs.Email, "readonly")), "Email address field".IsDisabled());
+            Reporting.IsTrue(Boolean.Parse(GetAttribute(BaseXPath.Inputs.Phone, "readonly")), "Telephone number (include area code) field".IsDisabled());
+
+            Reporting.AreEqual(DataHelper.MaskPhoneNumber(claimData.Claimant.MobilePhoneNumber), GetValue(BaseXPath.Inputs.Phone));
+            Reporting.AreEqual(DataHelper.MaskEmailAddress(claimData.Claimant.PrivateEmail.Address), GetValue(BaseXPath.Inputs.Email),ignoreCase:true);
+
+            Reporting.AreEqual(Constant.Infobox.ContactUpdating, GetInnerText(XPath.Infobox.ContactUpdating));
+   
             EventLocation = claimData.EventLocation;
             SetPoliceReportDetails(claimData.PoliceReportNumber, claimData.PoliceReportDate);
             

@@ -166,9 +166,6 @@ namespace UIDriver.Pages.Spark.Claim.Motor.Glass
         }
 
         private List<string> GetPercyIgnoreCSS() =>
-          new List<string>()
-          {
-               "#claimNumberDisplay span"              
-          };
+          new List<string>() {};
     }
 }

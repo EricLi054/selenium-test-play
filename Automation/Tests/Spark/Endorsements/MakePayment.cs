@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using Tests.ActionsAndValidations.Endorsements;
 using static Rac.TestAutomation.Common.Constants.General;
 using static Rac.TestAutomation.Common.Constants.PolicyGeneral;
-using static UIDriver.Pages.Spark.Endorsements.PayYourRenewalPremium.Constants;
 
 namespace Spark.Endorsements
 {
@@ -26,8 +25,8 @@ namespace Spark.Endorsements
         [Test(Description = "Motor Renewal Or Midterm Or NB Annual DD Policy having Rejected Installment")]
         public void INSU_T65_Motor_RenewalOrMidtermOrNB_AnnualDD_RejectedInstallment()
         {
-            var testData = BuildTestDataForPayPolicy_Motor(MakePaymentScenarioType.ANY, null, 
-                new PaymentV2().CreditCard(DataHelper.RandomCreditCard()), isRejectedPayment: true);
+            var testData = BuildTestDataForPayPolicy_MotorRejectedInstalments(MakePaymentScenarioType.ANY, null, 
+                new PaymentV2().CreditCard(DataHelper.RandomCreditCard()));
 
             Reporting.LogTestData(TestContext.CurrentContext.Test.Name, testData.ToString());
             Reporting.LogTestStart();
@@ -83,7 +82,7 @@ namespace Spark.Endorsements
         [Test(Description = "Home Mid Term Annual Cash Policy having Submitted Installment")]
         public void INSU_T68_Home_RenewalOrMidtermOrNB_AnnualCC_RejectedInstallment()
         {
-            var testData = BuildTestDataForPayPolicy_Home(MakePaymentScenarioType.ANY, installmentStatus: null, isRejectedPayment: true);
+            var testData = BuildTestDataForPayPolicy_HomeRejectedInstalments(MakePaymentScenarioType.ANY, installmentStatus: null);
 
             Reporting.LogTestData(TestContext.CurrentContext.Test.Name, testData.ToString());
             Reporting.LogTestStart();
@@ -193,113 +192,110 @@ namespace Spark.Endorsements
         #endregion
 
         #region Test Case Helper Methods
-        private EndorseHome BuildTestDataForPayPolicy_Home(MakePaymentScenarioType makePaymentScenarioType, List<InstallmentStatus> installmentStatus,bool isRejectedPayment = false)
+        private EndorseHome BuildTestDataForPayPolicy_Home(MakePaymentScenarioType makePaymentScenarioType, List<InstallmentStatus> installmentStatus)
         {
             EndorseHome testData = null;
-            List<string> policies=null;
+            List<string> policies = null;
 
-            if (isRejectedPayment)
+            policies = ShieldPolicyDB.FindPolicyForPayNow(ShieldProductType.HGP, makePaymentScenarioType, installmentStatus);
+            foreach (var policy in policies)
             {
-                policies = ShieldPolicyDB.FindRejectedInstallmentForPayNow(ShieldProductType.HGP, PaymentScenario.AnnualCard);
-                foreach (var policy in policies)
+                var policyDetails = DataHelper.GetPolicyDetails(policy);
+                var contact = DataHelper.MapContactWithPersonAPI(policyDetails.Policyholder.Id.ToString(), policyDetails.Policyholder.ContactExternalNumber);
+
+                if (contact != null && !ShieldPolicyDB.PolicyHasBadInstallments(policy) &&
+                    !ShieldPolicyDB.PolicyHasPendingInstallmentsRelativeToDate(policy, DateTime.Now))
                 {
-                    var policyDetails = DataHelper.GetPolicyDetails(policy);
+                    testData = new HomeEndorsementBuilder().InitialiseHomeWithDefaultData(policy, contact)
+                              .WithSparkPaymentChoice(new PaymentV2().CreditCard(DataHelper.RandomCreditCard()))
+                              .Build();
+                    break;
+                }
 
-                    if (!policyDetails.RealTimePaymentDetails.IsEligibleForRealTime)
-                    {
-                        Reporting.Log($"Shield indicates that Policy {policy} is NOT eligible for real time payments. Skipping.");
-                        continue;
-                    }
+            }
 
-                    if (ShieldPolicyDB.PolicyHasPendingInstallmentsRelativeToDate(policyDetails.PolicyNumber, DateTime.Now))
-                    { continue; }
+            Reporting.IsNotNull(testData, "that we found test data. If null it means Shield does not have any policies in the required conditions");
+            return testData;
+        }
 
-                    var contact = DataHelper.MapContactWithPersonAPI(policyDetails.Policyholder.Id.ToString(), policyDetails.Policyholder.ContactExternalNumber);
-                    if (contact != null)
-                    {
-                        testData = new HomeEndorsementBuilder().InitialiseHomeWithDefaultData(policy, contact)
-                                  .WithSparkPaymentChoice(new PaymentV2().CreditCard(DataHelper.RandomCreditCard()))
-                                  .Build();
-                        break;
-                    }
+        private EndorseHome BuildTestDataForPayPolicy_HomeRejectedInstalments(MakePaymentScenarioType makePaymentScenarioType, List<InstallmentStatus> installmentStatus)
+        {
+            EndorseHome testData = null;
+            List<string> policies = null;
+
+            policies = ShieldPolicyDB.FindPolicyAndAddRejectedInstallmentForPayNow(ShieldProductType.HGP, PaymentScenario.AnnualCard);
+            foreach (var policy in policies)
+            {
+                var policyDetails = DataHelper.GetPolicyDetails(policy);
+
+                if (ShieldPolicyDB.PolicyHasPendingInstallmentsRelativeToDate(policyDetails.PolicyNumber, DateTime.Now))
+                { continue; }
+
+                var contact = DataHelper.MapContactWithPersonAPI(policyDetails.Policyholder.Id.ToString(), policyDetails.Policyholder.ContactExternalNumber);
+                if (contact != null)
+                {
+                    testData = new HomeEndorsementBuilder().InitialiseHomeWithDefaultData(policy, contact)
+                              .WithSparkPaymentChoice(new PaymentV2().CreditCard(DataHelper.RandomCreditCard()))
+                              .Build();
+                    break;
                 }
             }
-            else
+
+            ActionsMakePayment.ForceRejectedInstalmentOnPolicyInShield(_browser, testData.PolicyNumber);
+
+            Reporting.IsNotNull(testData, "that we found test data. If null it means Shield does not have any policies in the required conditions");
+            return testData;
+        }
+
+        private EndorseCar BuildTestDataForPayPolicy_Motor(MakePaymentScenarioType makePaymentScenarioType, List<InstallmentStatus> installmentStatus, PaymentV2 payment)
+        {
+            EndorseCar testData = null;
+            List<string> policies = null;
+
+            policies = ShieldPolicyDB.FindPolicyForPayNow(ShieldProductType.MGP, makePaymentScenarioType, installmentStatus);
+
+            foreach (var policy in policies)
             {
-                policies = ShieldPolicyDB.FindPolicyForPayNow(ShieldProductType.HGP, makePaymentScenarioType, installmentStatus);
-                foreach (var policy in policies)
+                var policyDetails = DataHelper.GetPolicyDetails(policy);
+                var contact = DataHelper.MapContactWithPersonAPI(policyDetails.Policyholder.Id.ToString(), policyDetails.Policyholder.ContactExternalNumber);
+
+                if (contact != null && !ShieldPolicyDB.PolicyHasBadInstallments(policy) &&
+                    (installmentStatus == null || installmentStatus.Contains(InstallmentStatus.Pending) ||
+                    !ShieldPolicyDB.PolicyHasPendingInstallmentsRelativeToDate(policy, DateTime.Now)))
                 {
-                    var policyDetails = DataHelper.GetPolicyDetails(policy);
-                    var contact = DataHelper.MapContactWithPersonAPI(policyDetails.Policyholder.Id.ToString(), policyDetails.Policyholder.ContactExternalNumber);
-
-                    if (contact != null && !ShieldPolicyDB.PolicyHasBadInstallments(policy) &&
-                        !ShieldPolicyDB.PolicyHasPendingInstallmentsRelativeToDate(policy, DateTime.Now))
-                    {
-                        testData = new HomeEndorsementBuilder().InitialiseHomeWithDefaultData(policy, contact)
-                                  .WithSparkPaymentChoice(new PaymentV2().CreditCard(DataHelper.RandomCreditCard()))
-                                  .Build();
-                        break;
-                    }
-
+                    testData = new MotorEndorsementBuilder().InitialiseMotorCarWithDefaultData(policy, contact)
+                              .WithSparkPaymentChoice(payment)
+                              .Build();
+                    break;
                 }
             }
 
             Reporting.IsNotNull(testData, "that we found test data. If null it means Shield does not have any policies in the required conditions");
             return testData;
         }
-        
-        private EndorseCar BuildTestDataForPayPolicy_Motor(MakePaymentScenarioType makePaymentScenarioType, List<InstallmentStatus> installmentStatus,PaymentV2 payment, bool isRejectedPayment=false)
+
+        private EndorseCar BuildTestDataForPayPolicy_MotorRejectedInstalments(MakePaymentScenarioType makePaymentScenarioType, List<InstallmentStatus> installmentStatus, PaymentV2 payment)
         {
             EndorseCar testData = null;
             List<string> policies = null;
 
-            if (isRejectedPayment)
+            policies = ShieldPolicyDB.FindPolicyAndAddRejectedInstallmentForPayNow(ShieldProductType.MGP, PaymentScenario.AnnualBank);
+
+            foreach (var policy in policies)
             {
-                policies = ShieldPolicyDB.FindRejectedInstallmentForPayNow(ShieldProductType.MGP, PaymentScenario.AnnualBank);
+                var policyDetails = DataHelper.GetPolicyDetails(policy);
 
-                foreach (var policy in policies)
+                var contact = DataHelper.MapContactWithPersonAPI(policyDetails.Policyholder.Id.ToString(), policyDetails.Policyholder.ContactExternalNumber);
+                if (contact != null)
                 {
-                    var policyDetails = DataHelper.GetPolicyDetails(policy);
-
-                    if (!policyDetails.RealTimePaymentDetails.IsEligibleForRealTime)
-                    {
-                        Reporting.Log($"Shield indicates that Policy {policy} is NOT eligible for real time payments. Skipping.");
-                        continue;
-                    }
-
-                    if (ShieldPolicyDB.PolicyHasPendingInstallmentsRelativeToDate(policyDetails.PolicyNumber, DateTime.Now))
-                    { continue; }
-
-                    var contact = DataHelper.MapContactWithPersonAPI(policyDetails.Policyholder.Id.ToString(), policyDetails.Policyholder.ContactExternalNumber);
-                    if (contact != null)
-                    {
-                        testData = new MotorEndorsementBuilder().InitialiseMotorCarWithDefaultData(policy, contact)
-                                  .WithSparkPaymentChoice(payment)
-                                  .Build();
-                        break;
-                    }
+                    testData = new MotorEndorsementBuilder().InitialiseMotorCarWithDefaultData(policy, contact)
+                              .WithSparkPaymentChoice(payment)
+                              .Build();
+                    break;
                 }
             }
-            else
-            {
-                policies = ShieldPolicyDB.FindPolicyForPayNow(ShieldProductType.MGP, makePaymentScenarioType, installmentStatus);
 
-                foreach (var policy in policies)
-                {
-                    var policyDetails = DataHelper.GetPolicyDetails(policy);
-                    var contact = DataHelper.MapContactWithPersonAPI(policyDetails.Policyholder.Id.ToString(), policyDetails.Policyholder.ContactExternalNumber);
-
-                    if (contact != null && !ShieldPolicyDB.PolicyHasBadInstallments(policy) &&
-                        (installmentStatus == null || installmentStatus.Contains(InstallmentStatus.Pending) ||
-                        !ShieldPolicyDB.PolicyHasPendingInstallmentsRelativeToDate(policy, DateTime.Now)))
-                    {
-                        testData = new MotorEndorsementBuilder().InitialiseMotorCarWithDefaultData(policy, contact)
-                                  .WithSparkPaymentChoice(payment)
-                                  .Build();
-                        break;
-                    }
-                }
-            }
+            ActionsMakePayment.ForceRejectedInstalmentOnPolicyInShield(_browser, testData.PolicyNumber);
 
             Reporting.IsNotNull(testData, "that we found test data. If null it means Shield does not have any policies in the required conditions");
             return testData;

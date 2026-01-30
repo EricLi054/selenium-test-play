@@ -25,15 +25,10 @@ namespace Spark.EFT
         /// Verify Bank details are added in the Shield
         /// Verify correct shield event is created
         /// </summary>
-        [Category(TestCategory.Spark), Category(TestCategory.EFT)]
+        [Category(TestCategory.Spark), Category(TestCategory.EFT), Category(TestCategory.MRO), Category(TestCategory.Regression)]
         [Test(Description = "MRO Flow: Provide Bank Details for Refund")]
         public void MRO_Enter_Bank_Details()
         {
-            if (Config.Get().Shield.IsUatEnvironment())
-            {
-                Reporting.SkipLog("Member Refund tests cannot be run in UAT as we don't have write permissions to the Refund storage table.");
-            }
-
             var testData = BuildTestDataForMROFlow();
 
             Reporting.LogTestData(TestContext.CurrentContext.Test.Name, testData.ToString());
@@ -44,6 +39,7 @@ namespace Spark.EFT
             ActionMemberRefund.EnterAndVerifyOTP(browser: _browser, testData, detailUiCheck: false);
             ActionMemberRefund.EnterRefundBankDetails(browser: _browser, testData, detailUiCheck: false);
             ActionMemberRefund.VerifyConfirmationPage(_browser);
+            VerifyMRO.VerifyBankDetailsInShield(testData);
 
             CleanUpTestData(testData);
         }
@@ -51,15 +47,10 @@ namespace Spark.EFT
         /// <summary>
         /// Checking the field validation for each of the UI fields
         /// </summary>
-        [Category(TestCategory.Spark), Category(TestCategory.EFT)]
+        [Category(TestCategory.Spark), Category(TestCategory.EFT), Category(TestCategory.MRO), Category(TestCategory.Regression)]
         [Test(Description = "MRO Flow: Provide Bank Details for Refund with Field validation")]
         public void MRO_Enter_Bank_Details_FieldValidation()
         {
-            if (Config.Get().Shield.IsUatEnvironment())
-            {
-                Reporting.SkipLog("Member Refund tests cannot be run in UAT as we don't have write permissions to the Refund storage table.");
-            }
-
             var testData = BuildTestDataForMROFlow();
             Reporting.LogTestData(TestContext.CurrentContext.Test.Name, testData.ToString());
             Reporting.LogTestStart();
@@ -69,6 +60,7 @@ namespace Spark.EFT
             ActionMemberRefund.EnterAndVerifyOTP(browser: _browser, testData, detailUiCheck: true);
             ActionMemberRefund.EnterRefundBankDetails(browser: _browser, testData, detailUiCheck: true);
             ActionMemberRefund.VerifyConfirmationPage(_browser);
+            VerifyMRO.VerifyBankDetailsInShield(testData);
 
             CleanUpTestData(testData);
         }
@@ -78,6 +70,14 @@ namespace Spark.EFT
         private RefundDetails BuildTestDataForMROFlow()
         {
             var contactCandidate = ShieldContacts.FetchAContactWithRACMembershipTier(membershipTiers: [MembershipTier.Gold, MembershipTier.Silver, MembershipTier.Bronze, MembershipTier.Red, MembershipTier.Blue]);
+
+            if (!string.Equals(contactCandidate.Id, contactCandidate.ExternalContactNumber))
+            {
+                // It is possible that during MC Sync, the Contact ID was updated to the Preferred Shield ID
+                // so we will ensure that we update the external contact number to match.
+                var contactFromShield = DataHelper.GetContactDetailsViaContactId(contactCandidate.Id);
+                contactCandidate.ExternalContactNumber = contactFromShield.ExternalContactNumber;
+            }
 
             var azureTable = new AzureTableOperation(Config.Get().Azure.StorageMemberRefund, "refunds");
 
@@ -96,9 +96,10 @@ namespace Spark.EFT
 
             var testData = new RefundDetails()
             {
-                RefundID = entry.PartitionKey,
-                Dob      = contactCandidate.DateOfBirth,
-                LastName = contactCandidate.Surname,
+                ContactId   = entry.ContactId,
+                RefundID    = entry.PartitionKey,
+                Dob         = contactCandidate.DateOfBirth,
+                LastName    = contactCandidate.Surname,
                 RefundAmount     = string.Format("{0:N2}", entry.RefundAmount),
                 RefundBankAmount = new BankAccount().InitWithRandomValues()
             };

@@ -55,12 +55,10 @@ namespace Tests.ActionsAndValidations
 
                 var policyDetails = DataHelper.GetPolicyDetails(testData.PolicyNumber);
 
-                // TODO: B2C-4561 Remove toggle and old Risk Suburb references as
-                // appropriate when removing toggle from B2C/PCM Functional code.
                 // If non-null address, we would have changed parking address:
                 if (testData.ParkingAddress != null)
                 {
-                    if (Config.Get().IsMotorRiskAddressEnabled() && policyDetails.MotorAsset.Address != null)
+                    if (policyDetails.MotorAsset.Address != null)
                     {
                         Reporting.AreEqual($"{testData.ParkingAddress.StreetSuburbStateShortened(longStreetType: false)} {testData.ParkingAddress.PostCode}", 
                             pcmHomePage.MotorPolicyParkingRiskAddress, ignoreCase: true, "expected value for 'Street address where your car is parked overnight' with displayed value");

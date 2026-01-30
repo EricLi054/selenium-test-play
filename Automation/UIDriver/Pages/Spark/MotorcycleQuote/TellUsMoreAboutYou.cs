@@ -1,11 +1,32 @@
 ﻿using OpenQA.Selenium;
 using Rac.TestAutomation.Common;
 using System.Linq;
+using static Rac.TestAutomation.Common.Constants.General;
 
 namespace UIDriver.Pages.Spark.MotorcycleQuote
 {
     public class TellUsMoreAboutYou : SparkPersonalInformationPage
     {
+        #region XPATHS
+
+        public static class XPath
+        {
+            public static class StepperLabels
+            {
+                public const string ConfirmDetails = "//div[contains(@class,'MuiStepper-vertical')]//div[contains(@class,'MuiStep-root')]//span[contains(text(),'Confirm policy details')]";
+            }
+
+            public static class DuplicateAlert
+            {
+                public const string Base        = "/html/body/div[2]/div[3]/div";
+                public const string Title       = Base + "//h2[@id='dialog-title']";
+                public const string Content     = Base + "//div[@data-testid='dialog-content']";
+                public const string Close       = Base + "//button[@aria-label='close']";
+            }
+        }
+
+        #endregion
+
         #region Settable properties and controls
 
         public new string MailingAddress
@@ -60,5 +81,17 @@ namespace UIDriver.Pages.Spark.MotorcycleQuote
             using (var spinner = new SparkSpinner(_browser))
                 spinner.WaitForSpinnerToFinish();
         }
+        public void ClickConfirmDetailsStep()
+        {
+            ClickControl(XPath.StepperLabels.ConfirmDetails);
+        }
+
+        public bool IsDuplicateAlertVisible() => _driver.TryWaitForElementToBeVisible(By.XPath(XPath.DuplicateAlert.Title), WaitTimes.T5SEC, out IWebElement dialogTitle);
+
+        public string GetDuplicateAlertTitle() => GetInnerText(XPath.DuplicateAlert.Title);
+
+        public string GetDuplicateAlertContent() => GetInnerText(XPath.DuplicateAlert.Content);
+
+        public void CloseDuplicateAlertDialog() => ClickControl(XPath.DuplicateAlert.Close);
     }
 }

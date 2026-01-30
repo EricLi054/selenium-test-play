@@ -150,6 +150,16 @@ namespace Rac.TestAutomation.Common
         /// </summary>
         public bool IsRACMember => MembershipTier != MembershipTier.None && !string.IsNullOrEmpty(MembershipNumber);
 
+        /// <summary>
+        /// Extension of "IsRACMember", where it returns whether the member
+        /// has Blue/Bronze/Silver/Gold as that indicates they have a Roadside
+        /// Assistance product.
+        /// </summary>
+        public bool HasRSAMembership => IsRACMember &&
+                    MembershipTier != Constants.Contacts.MembershipTier.Free2Go &&
+                    MembershipTier != Constants.Contacts.MembershipTier.Red;
+
+
         [JsonProperty("membershipNumber")]
         public string MembershipNumber        { get; set; }
         /// <summary>
@@ -499,9 +509,10 @@ namespace Rac.TestAutomation.Common
                 _emailAddress = value;
                 if (value != null && value.Length > MAX_EMAIL_LENGTH)
                 {
-                    var atIndex = value.IndexOf('@');
-                    var domain = value.Substring(atIndex);
-                    _emailAddress = $"{value.Substring(0, MAX_EMAIL_LENGTH - domain.Length)}{domain}";
+                    var domain     = value.Substring(value.IndexOf('@'));
+                    var nameString = value.Substring(0, MAX_EMAIL_LENGTH - domain.Length);
+                    nameString     = nameString.Trim('.'); // Because we're truncating, make sure we're not doing it right after a period
+                    _emailAddress = $"{nameString}{domain}";
                 }
             }
         }
@@ -546,7 +557,7 @@ namespace Rac.TestAutomation.Common
             var bankBranchState = new List<BankBranchDetails>(){
                                   new BankBranchDetails() {BsbNo = "066135", BranchDetails=  "CBA, Kwinana Town Centre WA"},
                                   new BankBranchDetails() {BsbNo = "306471", BranchDetails=  "BWA, Perth WA"},
-                                  new BankBranchDetails() {BsbNo = "766526", BranchDetails=  "CBA, York WA"},
+                                  new BankBranchDetails() {BsbNo = "066524", BranchDetails=  "CBA, Northam WA"},
                                   new BankBranchDetails() {BsbNo = "086479", BranchDetails=  "NAB, East Victoria Park WA"},
                                   new BankBranchDetails() {BsbNo = "944007", BranchDetails=  "MEB, Melbourne VIC"},
                                   new BankBranchDetails() {BsbNo = "640000", BranchDetails=  "HUM, Albury NSW"},

@@ -134,6 +134,9 @@ namespace Rac.TestAutomation.Common.TestData.Endorsements
         {
             var home = Get(x => x.NewAssetValues);
             home.PropertyAddress= propertyAddress;
+            // We set the Cyclone flag to false as current test automation cases aren't structured
+            // to endorse to a Cyclone address.
+            home.IsACycloneAddress = false;
             Set(x => x.NewAssetValues, home);
             return this
                 .WithRandomBuildingType()
@@ -212,9 +215,14 @@ namespace Rac.TestAutomation.Common.TestData.Endorsements
 
         public HomeEndorsementBuilder WithRandomAlarmSystem() => WithAlarmSystem(DataHelper.GetRandomEnum<Alarm>(startIndex: 1));
 
+        /// <summary>
+        /// B2C presents all financiers in uppercase so any value
+        /// provided will be forced to upper case.
+        /// </summary>
         public HomeEndorsementBuilder WithFinancier(string financier)
         {
-            Set(x => x.Financier, financier);
+            var uppercaseFinancier = string.IsNullOrEmpty(financier) ? financier : financier.ToUpperInvariant();
+            Set(x => x.Financier, uppercaseFinancier);
             return this;
         }
 
@@ -342,7 +350,9 @@ namespace Rac.TestAutomation.Common.TestData.Endorsements
 
         /// <summary>
         /// To support "Update How I Pay" tests, by setting the next instalment
-        /// date relative to the current next instalment.
+        /// date relative to the current next instalment. If the next pending
+        /// collection date, with added days, is in the past, we force it to today
+        /// as we can't set new dates in the past.
         /// </summary>
         /// <param name="days">integer of how many days (relative to current next instalment) to use in test</param>
         public HomeEndorsementBuilder WithNextPaymentDate(int days)
@@ -352,7 +362,9 @@ namespace Rac.TestAutomation.Common.TestData.Endorsements
             var currentPolicy = Get(x => x.OriginalPolicyData);
             if (currentPolicy.NextPendingInstallment() != null)
             {
-                Set(x => x.NextPaymentDate, currentPolicy.NextPendingInstallment().CollectionDate.AddDays(days));
+                var nextPendingDate = currentPolicy.NextPendingInstallment().CollectionDate.AddDays(days);
+                nextPendingDate = nextPendingDate < DateTime.Now.Date ? DateTime.Now.Date : nextPendingDate;
+                Set(x => x.NextPaymentDate, nextPendingDate);
             }
             return this;
         }

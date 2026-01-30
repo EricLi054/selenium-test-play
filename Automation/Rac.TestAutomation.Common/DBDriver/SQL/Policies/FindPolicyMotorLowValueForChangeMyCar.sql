@@ -15,6 +15,7 @@ SELECT TOP 500
   JOIN p_pol_header ph           ON p.id = ph.active_policy_id
   JOIN p_policy_contact ppc      ON  ppc.policy_id = PH.ACTIVE_POLICY_ID and ppc.policy_contact_role = 6
   JOIN cn_person cnp             ON cnp.contact_id = ppc.contact_id
+  JOIN CN_CONTACT_RACI cnr       ON cnr.ID = ppc.contact_id
   JOIN t_collection_method tcm   ON tcm.id = p.COLLECTION_METHOD_ID
   JOIN t_payment_terms tpt       ON tpt.id = p.payment_term_id
   join p_cover  pc               ON p.id=pc.ENDORSMENT_ID
@@ -44,4 +45,5 @@ SELECT TOP 500
   -- Tests do not always override KM Per Year value, so need policies where a valid value is defined
   AND asv.km_per_year_id != 3000005 -- T_KM_PER_YEAR.ID = 3000005 DESCRIPTION = 'Support Only' 
   AND (@needsQAS=0 OR car.IS_QAS_VALIDATED = 1) -- Only retrieves QAS Validated address
+  AND ((cnr.WESTPAC_CUSTOMER_ID is null) OR (cnr.WESTPAC_CUSTOMER_ID = cnr.ID)) -- Prevent NPE Westpac Tokenisation issues
 ORDER BY newid();

@@ -19,6 +19,7 @@ FROM p_policy p
 JOIN p_pol_header ph                  ON ph.active_policy_id = p.id
 JOIN p_policy_contact ppc             ON ppc.policy_id = PH.ACTIVE_POLICY_ID
 JOIN cn_contact c                     ON c.id = ppc.contact_id
+JOIN CN_CONTACT_RACI cnr              ON cnr.ID = c.ID
 JOIN cn_person cnp                    ON cnp.contact_id = ppc.contact_id
 JOIN p_policy_lob ppl                 ON PH.ACTIVE_POLICY_ID = ppl.policy_id
 JOIN P_POLICY_LOB_TO_LOB_ASSET PPLTLA ON PPL.ID = PPLTLA.POLICY_LOB_ID
@@ -42,5 +43,6 @@ WHERE ph.product_id           = 1000000 -- Motor Policy
   AND ass.MORTGAGE_TYPE_ID = 3 --No
   AND asvr.modification_type_id = 1000001 --No Mods
   AND (@needsQAS=0 OR car.IS_QAS_VALIDATED = 1) -- Only retrieves QAS Validated address
+  AND ((cnr.WESTPAC_CUSTOMER_ID is null) OR (cnr.WESTPAC_CUSTOMER_ID = cnr.ID)) -- Prevent NPE Westpac Tokenisation issues
   and tplo.option_type_id in (1000013, 1000017, 1000018)
 ORDER BY newid();
