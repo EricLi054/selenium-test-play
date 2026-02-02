@@ -1,5 +1,4 @@
-using Newtonsoft.Json;
-using Rac.TestAutomation.Common.DatabaseCalls.Claims;
+﻿using Rac.TestAutomation.Common.DatabaseCalls.Claims;
 using Rac.TestAutomation.Common.Exceptions;
 using System;
 using System.Collections.Generic;
@@ -7,9 +6,11 @@ using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using static Rac.TestAutomation.Common.Constants.Contacts;
+using Newtonsoft.Json;
+
 using static Rac.TestAutomation.Common.Constants.PolicyGeneral;
 using static Rac.TestAutomation.Common.Constants.PolicyHome;
+using static Rac.TestAutomation.Common.Constants.Contacts;
 
 namespace Rac.TestAutomation.Common.DatabaseCalls.Policies
 {
@@ -140,8 +141,7 @@ namespace Rac.TestAutomation.Common.DatabaseCalls.Policies
             {
                 var cover = new PolicyCoverDetails();
                 cover.CoverDescription = item.CoverTypeDescription;
-                cover.CoverCode = DataHelper.GetValueFromDescription<HomeCoverCodes>(item.CoverType);
-                cover.Excess = ((int)item.StandardExcess).ToString();
+                cover.CoverCode = DataHelper.GetValueFromDescription<HomeCoverCodes>(item.CoverType);                
                 result.Covers.Add(cover);
             }
             var policyHolders = new List<PolicyContactDB>();

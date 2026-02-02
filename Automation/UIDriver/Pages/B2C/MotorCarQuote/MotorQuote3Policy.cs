@@ -72,7 +72,6 @@ namespace UIDriver.Pages.B2C
         private const string XP_DIALOG_TITLE = XP_DIALOG_BASE + "//span[@id='simple-dialog_wnd_title']";
         private const string XP_DIALOG_CONTENT = XP_DIALOG_BASE + "//div[@id='simple-dialog']";
         private const string XP_DIALOG_CLOSE = XP_DIALOG_BASE + "//div[@class='cluetip-close']/a";
-
         #endregion
 
         #region Settable properties and controls
@@ -269,15 +268,22 @@ namespace UIDriver.Pages.B2C
                 }
             }
             Reporting.Log($"index = {index}");
+            Reporting.Log($"testConfig.IsMotorRiskAddressEnabled() = {Config.Get().IsMotorRiskAddressEnabled()}");
             bool doQASAddressSearch = false;
             /* Answering YES/NO toggle for if address is the same */
             if (index == 0)
             {
                 var isDriverAddressSameAsVehicle = vehicleParkingAddress.StreetSuburbPostcode(expandUnitAddresses: true).Equals(details.Details.MailingAddress.StreetSuburbPostcode(expandUnitAddresses: true));
-                ClickBinaryToggle($"{XPR_IS_ADDRESS_THE_SAME_YN}", XPR_YES, XPR_NO, isDriverAddressSameAsVehicle);
-                Reporting.Log($"Answered isDriverAddressSameAsVehicle = {isDriverAddressSameAsVehicle}", _browser.Driver.TakeSnapshot());
-
-                if (!isDriverAddressSameAsVehicle)
+                // TODO: B2C-4561 Remove MotorRiskAddress Toggle when removing toggle from B2C/PCM Functional code leaving !haveRetrievedQuote.
+                // Main driver is asked if addess is the same as vehicle address only if not a Retrieved Quote.
+                if (Config.Get().IsMotorRiskAddressEnabled())
+                {
+                    ClickBinaryToggle($"{XPR_IS_ADDRESS_THE_SAME_YN}", XPR_YES, XPR_NO, isDriverAddressSameAsVehicle);
+                    Reporting.Log($"Answered isDriverAddressSameAsVehicle = {isDriverAddressSameAsVehicle}", _browser.Driver.TakeSnapshot());
+                }
+                // TODO: B2C-4561 Remove MotorRiskAddress Toggle when removing toggle from B2C/PCM Functional code
+                if (!isDriverAddressSameAsVehicle ||
+                    !Config.Get().IsMotorRiskAddressEnabled())
                 {
                     Reporting.Log($"doQASAddressSearch = {doQASAddressSearch}");
                     doQASAddressSearch = true;
@@ -401,38 +407,52 @@ namespace UIDriver.Pages.B2C
                                      "aria-disabled",
                                      details.Details.Title.GetDescription(),
                                      "Driver's title"))
-            { return false; }
+                return false;
 
             if (!AssertReadOnlyFieldValue(string.Format(XP_PANEL_BODY_X + XPR_DRIVER_FIRSTNAME, index),
                                      "readonly",
                                      details.Details.FirstName,
                                      "Driver's first name"))
-            { return false; }
+                return false;
 
             if (!AssertReadOnlyFieldValue(string.Format(XP_PANEL_BODY_X + XPR_DRIVER_SURNAME, index),
                                      "readonly",
                                      details.Details.Surname,
                                      "Driver's last name"))
-            { return false; }
+                return false;
 
-            if (!AssertReadOnlyFieldValue(string.Format(XP_PANEL_BODY_X + XPR_DRIVER_EMAIL, index),
-                                     "readonly",
-                                     details.Details.GetEmail(),
-                                     "Driver's email"))
-            { return false; }
+            /* TODO: determine resolution for handling Benang having a different email than Shield
+             * if (!assertReadOnlyFieldValue(string.Format(XP_PANEL_BODY_X + XPR_DRIVER_EMAIL, index),
+             *                         "readonly",
+             *                         details.Details.GetEmail(),
+             *                         "Driver's email"))
+             *    return false;
+             */
 
             if (!AssertReadOnlyFieldValue(string.Format(XP_PANEL_BODY_X + XPR_DRIVER_PHONE, index),
                                      "readonly",
                                      details.Details.GetPhone(),
                                      "Driver's phone number"))
-            { return false; }
+                return false;
 
             var field = GetElement(string.Format(XP_PANEL_BODY_X + XPR_POLICYHOLDER_YES + "/input", index));
             if (field.GetAttribute("readonly") != "true" || field.GetAttribute("checked") != "true")
-            { return false; }
+                return false;
 
-            ClickBinaryToggle($"{XPR_IS_ADDRESS_THE_SAME_YN}", XPR_YES, XPR_NO, true);
-            Reporting.Log($"Answered isDriverAddressSameAsVehicle = true", _browser.Driver.TakeSnapshot());
+            // Expect main driver address to be pre-populated if Motor Risk Address not enabled,
+            if (!Config.Get().IsMotorRiskAddressEnabled())
+            {
+                // Does not use assertReadOnlyFieldText() as this uses "contains" instead of equals.
+                field = GetElement(string.Format(XP_PANEL_BODY_X + XPR_MAILADDR_COMPLETE, index));
+                if (!details.Details.MailingAddress.IsEqualToString(field.Text.ToLower()))
+                    return false;
+            }
+            else
+            {
+                // Where Motor Risk Address is enabled, set to true (for PPQ).
+                ClickBinaryToggle($"{XPR_IS_ADDRESS_THE_SAME_YN}", XPR_YES, XPR_NO, true);
+                Reporting.Log($"Answered isDriverAddressSameAsVehicle = true", _browser.Driver.TakeSnapshot());
+            }
 
             return success;
         }
