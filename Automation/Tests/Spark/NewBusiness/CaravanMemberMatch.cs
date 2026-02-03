@@ -241,6 +241,7 @@ namespace Spark.NewBusiness
             var caravanQuote = new CaravanBuilder()
                 .InitialiseCaravanWithRandomData(new List<Contact>() { mainPH })
                 .WithRandomCaravan(minValue: 30000)
+                .WithRegistration(DataHelper.RandomAlphanumerics(5, 8))
                 .Build();
             
             Reporting.LogTestData(TestContext.CurrentContext.Test.Name, caravanQuote.ToString());

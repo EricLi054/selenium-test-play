@@ -64,6 +64,8 @@ namespace Rac.TestAutomation.Common
             formattedString.AppendLine($"    Make        :    {Make}{Reporting.HTML_NEWLINE}");
             formattedString.AppendLine($"    Year        :    {Year}{Reporting.HTML_NEWLINE}");
             formattedString.AppendLine($"    Model       :    {Model}{Reporting.HTML_NEWLINE}");
+            if (!string.IsNullOrEmpty(Registration))
+                formattedString.AppendLine($"    Rego    :    {Registration}{Reporting.HTML_NEWLINE}");
             if (ParkingAddress != null)
                 formattedString.AppendLine($"    PostCode    :    {ParkingAddress.PostCode}{Reporting.HTML_NEWLINE}");
             formattedString.AppendLine($"    ParkLocation:    {ParkLocation}{Reporting.HTML_NEWLINE}");

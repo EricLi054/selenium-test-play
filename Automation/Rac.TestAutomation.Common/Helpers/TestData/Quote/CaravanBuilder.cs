@@ -230,126 +230,6 @@ namespace Rac.TestAutomation.Common.TestData.Quote
             return this;
         }
 
-        public CaravanBuilder WithRegistration(string registration)
-        {
-            Set(x => x.Registration, registration);
-            return this;
-        }
-
-        public CaravanBuilder WithMake(string make)
-        {
-            Set(x => x.Make, make);
-            return this;
-        }
-
-        public CaravanBuilder WithModel(string model)
-        {
-            Set(x => x.Model, model);
-            return this;
-        }
-
-        public CaravanBuilder WithYear(int year)
-        {
-            Set(x => x.Year, year);
-            return this;
-        }
-
-        public CaravanBuilder WithParkingAddress(Address address)
-        {
-            Set(x => x.ParkingAddress, address);
-            return this;
-        }
-
-        public CaravanBuilder WithRegistration(string registration)
-        {
-            Set(x => x.Registration, registration);
-            return this;
-        }
-
-        public CaravanBuilder WithMake(string make)
-        {
-            Set(x => x.Make, make);
-            return this;
-        }
-
-        public CaravanBuilder WithModel(string model)
-        {
-            Set(x => x.Model, model);
-            return this;
-        }
-
-        public CaravanBuilder WithYear(int year)
-        {
-            Set(x => x.Year, year);
-            return this;
-        }
-
-        public CaravanBuilder WithParkingAddress(Address address)
-        {
-            Set(x => x.ParkingAddress, address);
-            return this;
-        }
-
-        public CaravanBuilder WithRegistration(string registration)
-        {
-            Set(x => x.Registration, registration);
-            return this;
-        }
-
-        public CaravanBuilder WithMake(string make)
-        {
-            Set(x => x.Make, make);
-            return this;
-        }
-
-        public CaravanBuilder WithModel(string model)
-        {
-            Set(x => x.Model, model);
-            return this;
-        }
-
-        public CaravanBuilder WithYear(int year)
-        {
-            Set(x => x.Year, year);
-            return this;
-        }
-
-        public CaravanBuilder WithParkingAddress(Address address)
-        {
-            Set(x => x.ParkingAddress, address);
-            return this;
-        }
-
-        public CaravanBuilder WithRegistration(string registration)
-        {
-            Set(x => x.Registration, registration);
-            return this;
-        }
-
-        public CaravanBuilder WithMake(string make)
-        {
-            Set(x => x.Make, make);
-            return this;
-        }
-
-        public CaravanBuilder WithModel(string model)
-        {
-            Set(x => x.Model, model);
-            return this;
-        }
-
-        public CaravanBuilder WithYear(int year)
-        {
-            Set(x => x.Year, year);
-            return this;
-        }
-
-        public CaravanBuilder WithParkingAddress(Address address)
-        {
-            Set(x => x.ParkingAddress, address);
-            return this;
-        }
-
         protected override QuoteCaravan BuildEntity()
         {
             return new QuoteCaravan
@@ -359,7 +239,6 @@ namespace Rac.TestAutomation.Common.TestData.Quote
                 Year = GetOrDefault(x => x.Year),
                 Registration = GetOrDefault(x => x.Registration),
                 Model = GetOrDefault(x => x.Model),
-                Registration = GetOrDefault(x => x.Registration),
                 MarketValue = GetOrDefault(x => x.MarketValue),
                 IsForBusinessOrCommercialUse = GetOrDefault(x => x.IsForBusinessOrCommercialUse),
                 ParkingAddress = GetOrDefault(x => x.ParkingAddress),

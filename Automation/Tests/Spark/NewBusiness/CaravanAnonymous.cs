@@ -182,6 +182,7 @@ namespace Spark.NewBusiness
                                 .WithRandomDateOfBirth(MIN_AGE_FOR_EXCESS_WAIVER, MAX_PH_AGE).Build();
             var caravan = new CaravanBuilder().InitialiseCaravanWithRandomData(new List<Contact>() { mainPH, jointPH })
                                 .WithExcess(CARAVAN_MIN_EXCESS_VALUE)
+                                .WithRegistration(DataHelper.RandomAlphanumerics(5, 8))
                                 .WithPaymentMethod(new Payment(mainPH).BankAccount().Annual())
                                 .WithInsuredVariance(ActionsQuoteCaravan.MAX_SUM_INSURED_PERCENTAGE)
                                 .WithContentsCoverValue(MAX_CONTENT_INSURANCE_VALUE)
