@@ -53,15 +53,15 @@ namespace Tests.ActionsAndValidations
         /// <returns>Returns the policy number generated from the purchase.</returns>
         public static string ProceedWithThePurchaseOfQuote(Browser browser, QuoteHome quoteDetails, QuoteData premiumValues, bool detailUIChecking = false)
         {
-            HomeQuoteClickBuyPage2(browser);
-            HomeQuoteAddedDetailsPage3(browser, quoteDetails);
+            ClickBuyPage2(browser);
+            AddedDetailsPage3(browser, quoteDetails);
             
-            VerifyQuoteHome.VerifyQuoteSummaryPage(browser: browser, quoteDetails: quoteDetails);
+            VerifyQuoteHome.QuoteSummaryPage(browser: browser, quoteDetails: quoteDetails);
             
             return AcceptQuoteSummaryAndPurchase(browser, quoteDetails, premiumValues, detailUIChecking);
         }
 
-        public static void HomeQuoteClickBuyPage2(Browser browser)
+        public static void ClickBuyPage2(Browser browser)
         {
             using (var quotePage2 = new HomeQuote2Quote(browser))
             using (var quotePage3 = new HomeQuote3Policy(browser))
@@ -78,7 +78,7 @@ namespace Tests.ActionsAndValidations
         /// * Home details disclosure
         /// * policyholder details
         /// </summary>
-        public static void HomeQuoteAddedDetailsPage3(Browser browser, QuoteHome quoteDetails)
+        public static void AddedDetailsPage3(Browser browser, QuoteHome quoteDetails)
         {
             using (var quotePage3 = new HomeQuote3Policy(browser))
             using (var spinner = new RACSpinner(browser))
@@ -106,7 +106,7 @@ namespace Tests.ActionsAndValidations
         /// that the previously entered values have been retained. Mailing
         /// addresses need to be re-entered, then the page is submitted.
         /// </summary>
-        public static void HomeQuoteAddedDetailsPage3VerifyAndSubmit(this Browser browser, QuoteHome quoteDetails)
+        public static void AddedDetailsPage3VerifyAndSubmit(this Browser browser, QuoteHome quoteDetails)
         {
             using (var quotePage3 = new HomeQuote3Policy(browser))
             using (var quoteSummary = new HomeQuote3Summary(browser))
@@ -126,7 +126,7 @@ namespace Tests.ActionsAndValidations
 
             SubmitPayment(browser: browser, quoteDetails: quoteDetails, expectedPremiumValues: premiumValues, detailUIChecking);
 
-            var policyNumber = VerifyQuoteHome.VerifyHomeConfirmationPage(browser: browser, quoteDetails: quoteDetails, expectedPremiumValues: premiumValues, receiptNumber: out string receiptNumber);
+            var policyNumber = VerifyQuoteHome.ConfirmationPage(browser: browser, quoteDetails: quoteDetails, expectedPremiumValues: premiumValues, receiptNumber: out string receiptNumber);
 
             // CoC only applicable where building cover is involved.
             if (quoteDetails.BuildingValue.HasValue)

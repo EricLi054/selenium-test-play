@@ -32,7 +32,7 @@ namespace Tests.UAT.Policy
             var policyNumber = ActionsQuoteHome.PurchaseHomePolicy(_browser, testData);
 
             // Verify Policy against Shield database
-            VerifyQuoteHome.VerifyHomePolicyInShield(testData, policyNumber);
+            VerifyQuoteHome.PolicyInShield(testData, policyNumber);
         }
 
         [Test, Category(TestCategory.UAT), Category(TestCategory.Home), 
@@ -49,14 +49,14 @@ namespace Tests.UAT.Policy
             {
                 testData.QuoteHasBeenRetrieved = true;
             }
-            VerifyQuoteHome.VerifyQuoteAfterRetrieve(_browser, testData, expectedQuoteValues);
+            VerifyQuoteHome.QuoteAfterRetrieve(_browser, testData, expectedQuoteValues);
 
-            ActionsQuoteHome.HomeQuoteClickBuyPage2(_browser);
-            ActionsQuoteHome.HomeQuoteAddedDetailsPage3(_browser, testData);
+            ActionsQuoteHome.ClickBuyPage2(_browser);
+            ActionsQuoteHome.AddedDetailsPage3(_browser, testData);
             var policyNumber = ActionsQuoteHome.AcceptQuoteSummaryAndPurchase(_browser, testData, expectedQuoteValues);
 
             // Verify Policy against Shield database
-            VerifyQuoteHome.VerifyHomePolicyInShield(testData, policyNumber);
+            VerifyQuoteHome.PolicyInShield(testData, policyNumber);
         }
 
         [Test, Category(TestCategory.UAT), Category(TestCategory.Home), 
@@ -66,8 +66,8 @@ namespace Tests.UAT.Policy
             var testData = TestData_RentersAnonymous();
 
             var quoteNumber = ActionsQuoteHome.GetNewHomeQuote(browser: _browser, quoteDetails: testData, premiumValues: out QuoteData expectedQuoteValues);
-            ActionsQuoteHome.HomeQuoteClickBuyPage2(_browser);
-            ActionsQuoteHome.HomeQuoteAddedDetailsPage3(_browser, testData);
+            ActionsQuoteHome.ClickBuyPage2(_browser);
+            ActionsQuoteHome.AddedDetailsPage3(_browser, testData);
             _browser.CloseBrowser();
 
             ActionsQuote.RetrieveB2CQuote(_browser, testData.PropertyAddress, quoteNumber, ShieldProductType.HGP);
@@ -75,14 +75,14 @@ namespace Tests.UAT.Policy
             {
                 testData.QuoteHasBeenRetrieved = true;
             }
-            VerifyQuoteHome.VerifyQuoteAfterRetrieve(_browser, testData, expectedQuoteValues);
+            VerifyQuoteHome.QuoteAfterRetrieve(_browser, testData, expectedQuoteValues);
 
-            ActionsQuoteHome.HomeQuoteClickBuyPage2(_browser);
-            ActionsQuoteHome.HomeQuoteAddedDetailsPage3VerifyAndSubmit(_browser, testData);
+            ActionsQuoteHome.ClickBuyPage2(_browser);
+            ActionsQuoteHome.AddedDetailsPage3VerifyAndSubmit(_browser, testData);
             var policyNumber = ActionsQuoteHome.AcceptQuoteSummaryAndPurchase(_browser, testData, expectedQuoteValues);
 
             // Verify Policy against Shield database
-            VerifyQuoteHome.VerifyHomePolicyInShield(testData, policyNumber);
+            VerifyQuoteHome.PolicyInShield(testData, policyNumber);
         }
 
         [Test, Category(TestCategory.UAT), Category(TestCategory.Home), 
@@ -99,14 +99,14 @@ namespace Tests.UAT.Policy
             {
                 testData.QuoteHasBeenRetrieved = true; 
             }
-            VerifyQuoteHome.VerifyQuoteAfterRetrieve(_browser, testData, expectedQuoteValues);
+            VerifyQuoteHome.QuoteAfterRetrieve(_browser, testData, expectedQuoteValues);
 
-            ActionsQuoteHome.HomeQuoteClickBuyPage2(_browser);
-            ActionsQuoteHome.HomeQuoteAddedDetailsPage3(_browser, testData);
+            ActionsQuoteHome.ClickBuyPage2(_browser);
+            ActionsQuoteHome.AddedDetailsPage3(_browser, testData);
             var policyNumber = ActionsQuoteHome.AcceptQuoteSummaryAndPurchase(_browser, testData, expectedQuoteValues);
 
             // Verify Policy against Shield database
-            VerifyQuoteHome.VerifyHomePolicyInShield(testData, policyNumber);
+            VerifyQuoteHome.PolicyInShield(testData, policyNumber);
         }
 
         private QuoteHome TestData_OwnerOccupiedBuildingContentsMembershipDiscount()

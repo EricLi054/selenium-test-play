@@ -24,7 +24,7 @@ namespace Tests.ActionsAndValidations
         /// <param name="testData"></param>
         /// <param name="expectedQuoteValues"></param>
         /// <exception cref="NotSupportedException">Thrown if its not a valid Home Occupancy.</exception>
-        public static void VerifyQuoteAfterRetrieve(Browser browser, QuoteHome testData, QuoteData expectedQuoteValues)
+        public static void QuoteAfterRetrieve(Browser browser, QuoteHome testData, QuoteData expectedQuoteValues)
         {
             using (var quotePage2 = new HomeQuote2Quote(browser))
             {
@@ -56,11 +56,11 @@ namespace Tests.ActionsAndValidations
                     switch(testData.Occupancy)
                     {
                         case HomeOccupancy.OwnerOccupied:
-                            VerifyQuoteHome.VerifySpecifiedContentsRetrievedHomeQuoteDetailsOnPage2(browser, testData);
+                            VerifyQuoteHome.SpecifiedContentsRetrievedHomeQuoteDetailsOnPage2(browser, testData);
                             Reporting.AreEqual(testData.UnspecifiedValuablesInsuredAmount, quotePage2.UnspecifiedValuablesCover, "Unspecified valuables covers is equal");
                             break;
                         case HomeOccupancy.HolidayHome:
-                            VerifyQuoteHome.VerifySpecifiedContentsRetrievedHomeQuoteDetailsOnPage2(browser, testData);
+                            VerifyQuoteHome.SpecifiedContentsRetrievedHomeQuoteDetailsOnPage2(browser, testData);
                             Reporting.IsFalse(quotePage2.ArePersonalValuablesDisplayed, "whether personal valuable options are available - should not be when there is no contents cover");
                             break;
                         case HomeOccupancy.InvestmentProperty:
@@ -85,7 +85,7 @@ namespace Tests.ActionsAndValidations
             }
         }
 
-        public static void VerifyQuoteSummaryPage(Browser browser, QuoteHome quoteDetails)
+        public static void QuoteSummaryPage(Browser browser, QuoteHome quoteDetails)
         {
             using (var quotePage3Policy = new HomeQuote3Policy(browser))
             {
@@ -104,7 +104,7 @@ namespace Tests.ActionsAndValidations
             }
         }
 
-        public static void VerifyDuplicatePolicyAlert(Browser browser)
+        public static void DuplicatePolicyAlert(Browser browser)
         {
             using (var quotePage3 = new HomeQuote3Policy(browser))
             {
@@ -115,7 +115,7 @@ namespace Tests.ActionsAndValidations
             }
         }
 
-        public static string VerifyHomeConfirmationPage(Browser browser, QuoteHome quoteDetails, QuoteData expectedPremiumValues, out string receiptNumber)
+        public static string ConfirmationPage(Browser browser, QuoteHome quoteDetails, QuoteData expectedPremiumValues, out string receiptNumber)
         {
             var policyNumber = string.Empty;
             receiptNumber    = string.Empty;
@@ -232,7 +232,7 @@ namespace Tests.ActionsAndValidations
             return policyNumber;
         }
 
-        public static void VerifyHomePolicyInShield(QuoteHome quoteDetails, string policyNumber)
+        public static void PolicyInShield(QuoteHome quoteDetails, string policyNumber)
         {
             // Verify General Policy details via database query
             Reporting.LogTestShieldValidations("policy", policyNumber);
@@ -348,7 +348,7 @@ namespace Tests.ActionsAndValidations
                 Reporting.AreEqual(expectedContact.DateOfBirth.ToString(DataFormats.DATE_FORMAT_FORWARD_FORWARDSLASH),
                                    actualContact.DateOfBirth.ToString(DataFormats.DATE_FORMAT_FORWARD_FORWARDSLASH), "date of birth matches expected value");
                 Reporting.AreEqual(expectedContact.MailingAddress.QASStreetAddress(), actualContact.MailingAddress.QASStreetAddress(), ignoreCase: true, "mailing address is as expected");
-                VerifyContactTelephoneNumber(expectedContact, actualContact);
+                ContactTelephoneNumber(expectedContact, actualContact);
                 Reporting.IsTrue(actualContact.ContactRoles.Contains(expectedContactRole), $"expected Contact role ({expectedContactRole}) exists for contact number {i + 1}");
 
                 // Verify Preferred Delivery Method for Main PolicyHolder
@@ -358,7 +358,7 @@ namespace Tests.ActionsAndValidations
             }
 
             // Verify payment details
-            VerifyHomePolicyPaymentDetailsInShield(quoteDetails: quoteDetails, policyNumber: policyNumber);
+            PolicyPaymentDetailsInShield(quoteDetails: quoteDetails, policyNumber: policyNumber);
             // Verify contact multi match details
             VerifyPolicy.VerifyPolicyMultiMatchDetailsInShield(quoteDetails.PolicyHolders, policyNumber);
 
@@ -410,7 +410,7 @@ namespace Tests.ActionsAndValidations
         /// </summary>
         /// <param name="expectedContact">The test data generated for this contact in this test.</param>
         /// <param name="actualContact">The actual contact data returned from Shield for the contact in this test</param>
-        public static void VerifyContactTelephoneNumber(Contact expectedContact, Contact actualContact)
+        public static void ContactTelephoneNumber(Contact expectedContact, Contact actualContact)
         {
             if(!string.IsNullOrEmpty(expectedContact.MobilePhoneNumber))
             {
@@ -431,7 +431,7 @@ namespace Tests.ActionsAndValidations
             }
         }
 
-        public static void VerifySpecifiedContentsRetrievedHomeQuoteDetailsOnPage2(Browser browser, QuoteHome quoteDetails)
+        public static void SpecifiedContentsRetrievedHomeQuoteDetailsOnPage2(Browser browser, QuoteHome quoteDetails)
         {
 
             using (var quotePage2 = new HomeQuote2Quote(browser))
@@ -477,7 +477,7 @@ namespace Tests.ActionsAndValidations
         /// <param name="testConfig"></param>
         /// <param name="quoteDetails"></param>
         /// <param name="policyNumber"></param>
-        public static void VerifyHomePolicyPaymentDetailsInShield(QuoteHome quoteDetails, string policyNumber)
+        public static void PolicyPaymentDetailsInShield(QuoteHome quoteDetails, string policyNumber)
         {
             Reporting.Log($"Begin verify payment details from Shield DB. Param/s = {policyNumber}");
             var dbPaymentDetails      = ShieldPolicyDB.FetchPaymentDetailsForPolicy(policyNumber);

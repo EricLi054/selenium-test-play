@@ -43,7 +43,7 @@ namespace B2C.NewBusiness
             string policyNumber = ActionsQuoteHome.PurchaseHomePolicy(_browser, testData, detailUIChecking: true);
 
             // Verify Policy against Shield database
-            VerifyQuoteHome.VerifyHomePolicyInShield(testData, policyNumber);
+            VerifyQuoteHome.PolicyInShield(testData, policyNumber);
         }
 
         /// <summary>
@@ -61,7 +61,7 @@ namespace B2C.NewBusiness
             string policyNumber = ActionsQuoteHome.PurchaseHomePolicy(_browser, testData);
 
             // Verify Policy against Shield database
-            VerifyQuoteHome.VerifyHomePolicyInShield(testData, policyNumber);
+            VerifyQuoteHome.PolicyInShield(testData, policyNumber);
         }
         /// <summary>
         /// "B2C Anonymous - Home Policy - TC03 - Contents Only Renters"
@@ -79,7 +79,7 @@ namespace B2C.NewBusiness
             string policyNumber = ActionsQuoteHome.PurchaseHomePolicy(_browser, testData);
 
             // Verify Policy against Shield database
-            VerifyQuoteHome.VerifyHomePolicyInShield(testData, policyNumber);
+            VerifyQuoteHome.PolicyInShield(testData, policyNumber);
         }
 
         /// <summary>
@@ -97,7 +97,7 @@ namespace B2C.NewBusiness
 
             string policyNumber = ActionsQuoteHome.PurchaseHomePolicy(_browser, testData);
             // Verify Policy against Shield database
-            VerifyQuoteHome.VerifyHomePolicyInShield(testData, policyNumber);
+            VerifyQuoteHome.PolicyInShield(testData, policyNumber);
         }
 
         /// <summary>
@@ -111,20 +111,20 @@ namespace B2C.NewBusiness
             var testData = BuildTestDataDuplicateLandlordBuildingWithKnownAddress();
 
             ActionsQuoteHome.GetNewHomeQuote(_browser, testData, out _);
-            ActionsQuoteHome.HomeQuoteClickBuyPage2(_browser);
-            ActionsQuoteHome.HomeQuoteAddedDetailsPage3(_browser, testData);
+            ActionsQuoteHome.ClickBuyPage2(_browser);
+            ActionsQuoteHome.AddedDetailsPage3(_browser, testData);
 
-            VerifyQuoteHome.VerifyDuplicatePolicyAlert(_browser);
+            VerifyQuoteHome.DuplicatePolicyAlert(_browser);
             
             // Handle duplicate alert by changing address and continue the flow
             ActionsQuoteHome.HandleDuplicateAlertAndChangeAddress(_browser, testData);
             
             // Continue with Page 2 and Page 3 after address change
-            ActionsQuoteHome.HomeQuoteClickBuyPage2(_browser);
-            ActionsQuoteHome.HomeQuoteAddedDetailsPage3(_browser, testData);
+            ActionsQuoteHome.ClickBuyPage2(_browser);
+            ActionsQuoteHome.AddedDetailsPage3(_browser, testData);
             
             // Verify we're now on the summary page (no duplicate alert)
-            VerifyQuoteHome.VerifyQuoteSummaryPage(_browser, testData);
+            VerifyQuoteHome.QuoteSummaryPage(_browser, testData);
         }
 
         /// <summary>
@@ -148,11 +148,11 @@ namespace B2C.NewBusiness
             ActionsQuote.RetrieveB2CQuote(_browser, testData.PropertyAddress, expectedQuoteValues.QuoteNumber, ShieldProductType.HGP);
             testData.QuoteHasBeenRetrieved = true;
 
-            VerifyQuoteHome.VerifyQuoteAfterRetrieve(_browser, testData, expectedQuoteValues);
+            VerifyQuoteHome.QuoteAfterRetrieve(_browser, testData, expectedQuoteValues);
             string policyNumber = ActionsQuoteHome.ProceedWithThePurchaseOfQuote(_browser, testData, expectedQuoteValues);
 
             // Verify Policy against Shield database
-            VerifyQuoteHome.VerifyHomePolicyInShield(testData, policyNumber);
+            VerifyQuoteHome.PolicyInShield(testData, policyNumber);
         }
 
         /// <summary>
@@ -171,7 +171,7 @@ namespace B2C.NewBusiness
             string policyNumber = ActionsQuoteHome.PurchaseHomePolicy(_browser, testData);
 
             // Verify Policy against Shield database
-            VerifyQuoteHome.VerifyHomePolicyInShield(testData, policyNumber);
+            VerifyQuoteHome.PolicyInShield(testData, policyNumber);
         }
 
         private QuoteHome BuildTestDataBuildingContentsOwnerOccupied()
