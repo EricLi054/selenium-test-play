@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Rac.TestAutomation.Common;
 using Rac.TestAutomation.Common.TestData.Quote;
 using Tests.ActionsAndValidations;
@@ -91,7 +91,7 @@ namespace B2C.NewBusiness
             string tPolicyNumber = ActionsQuoteMotor.PurchaseMotorVehiclePolicy(_browser, vehicleQuote);
 
             // Verify policy against Shield
-            VerifyQuoteMotor.VerifyMotorVehiclePolicyInShield(vehicleQuote, tPolicyNumber);
+            VerifyQuoteMotor.PolicyInShield(vehicleQuote, tPolicyNumber);
         }
 
         /// <summary>
@@ -117,7 +117,7 @@ namespace B2C.NewBusiness
             string tPolicyNumber = ActionsQuoteMotor.PurchaseMotorVehiclePolicy(_browser, vehicleQuote);
 
             // Verify policy against Shield
-            VerifyQuoteMotor.VerifyMotorVehiclePolicyInShield(vehicleQuote, tPolicyNumber);
+            VerifyQuoteMotor.PolicyInShield(vehicleQuote, tPolicyNumber);
         }
 
         /// <summary>
@@ -139,7 +139,7 @@ namespace B2C.NewBusiness
             string tPolicyNumber = ActionsQuoteMotor.PurchaseMotorVehiclePolicy(_browser, vehicleQuote, detailUIChecking: true);
 
             // Verify policy against Shield
-            VerifyQuoteMotor.VerifyMotorVehiclePolicyInShield(vehicleQuote, tPolicyNumber);
+            VerifyQuoteMotor.PolicyInShield(vehicleQuote, tPolicyNumber);
         }
 
         /// <summary>
@@ -156,14 +156,14 @@ namespace B2C.NewBusiness
 
             ActionsQuoteMotor.OpenBaseB2CLandingPage(browser: _browser);
 
-            ActionsQuoteMotor.SubmitInitialMotorQuoteRatingValues(browser: _browser, vehicleQuote: vehicleQuote);
+            ActionsQuoteMotor.SubmitInitialQuoteRatingValues(browser: _browser, vehicleQuote: vehicleQuote);
 
             ActionsQuoteMotor.UpdateAndSubmitInitialQuotePage(browser: _browser, vehicleQuote: vehicleQuote, agreedQuotePrice: out quotePrice);
 
             /***********************************************************
              * Complete Page 3 details - check validations and end test
              ***********************************************************/
-            _browser.MotorQuoteAddedDetailsPage3FieldLengthValidations(vehicleQuote);
+            _browser.AddedDetailsPage3FieldLengthValidations(vehicleQuote);
 
         }
 
@@ -186,7 +186,7 @@ namespace B2C.NewBusiness
             string cPolicyNumber = ActionsQuoteMotor.PurchaseMotorVehiclePolicy(_browser, vehicleQuote);
 
             // Verify policy against Shield
-            VerifyQuoteMotor.VerifyMotorVehiclePolicyInShield(vehicleQuote, cPolicyNumber);
+            VerifyQuoteMotor.PolicyInShield(vehicleQuote, cPolicyNumber);
         }
 
         private QuoteCar BuildTestDataAnonymousMotorPolicyTC02ComprehensiveScenario2()

@@ -35,7 +35,7 @@ namespace Tests.UAT.Policy
             string policyNumber = ActionsQuoteMotor.PurchaseMotorVehiclePolicy(_browser, vehicleQuote, includeRequestEmailQuote: true);
 
             Reporting.LogTestShieldValidations("policy", policyNumber);
-            VerifyQuoteMotor.VerifyMotorVehiclePolicyInShield(vehicleQuote, policyNumber);
+            VerifyQuoteMotor.PolicyInShield(vehicleQuote, policyNumber);
         }
 
         private QuoteCar TestData_MFCOWithRSAPurchaseMultiplePHMultipleDrivers()
@@ -101,7 +101,7 @@ namespace Tests.UAT.Policy
             string policyNumber = ActionsQuoteMotor.PurchaseMotorVehiclePolicy(_browser, vehicleQuote);
 
             Reporting.LogTestShieldValidations("policy", policyNumber);
-            VerifyQuoteMotor.VerifyMotorVehiclePolicyInShield(vehicleQuote, policyNumber);
+            VerifyQuoteMotor.PolicyInShield(vehicleQuote, policyNumber);
         }
 
         //Motor Third Party Fire & Theft - Create and Retrieve Then Purchase - Single Driver - Multiple Match in MC resulting in Create New
@@ -117,7 +117,7 @@ namespace Tests.UAT.Policy
             string policyNumber = ActionsQuoteMotor.PurchaseMotorVehiclePolicy(_browser, vehicleQuote, includeRetrieveQuote: true);
             
             Reporting.LogTestShieldValidations("policy", policyNumber);
-            VerifyQuoteMotor.VerifyMotorVehiclePolicyInShield(vehicleQuote, policyNumber);
+            VerifyQuoteMotor.PolicyInShield(vehicleQuote, policyNumber);
 
         }
 
@@ -154,7 +154,7 @@ namespace Tests.UAT.Policy
             string policyNumber = ActionsQuoteMotor.PurchaseMotorVehiclePolicy(_browser, vehicleQuote, includeRetrieveQuote: true, includeRequestEmailQuote: true);
 
             Reporting.LogTestShieldValidations("policy", policyNumber);
-            VerifyQuoteMotor.VerifyMotorVehiclePolicyInShield(vehicleQuote, policyNumber);
+            VerifyQuoteMotor.PolicyInShield(vehicleQuote, policyNumber);
         }
 
         private QuoteCar TestData_MTPOWithRSATierMultiplePHMultipleDrivers()

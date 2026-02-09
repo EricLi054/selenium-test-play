@@ -23,7 +23,7 @@ namespace Tests.ActionsAndValidations
 
             OpenBaseB2CLandingPage(browser: browser);
 
-            chosenVehicle = SubmitInitialMotorQuoteRatingValues(browser: browser, vehicleQuote: vehicleQuote);
+            chosenVehicle = SubmitInitialQuoteRatingValues(browser: browser, vehicleQuote: vehicleQuote);
 
             var quoteNumber = UpdateInitialQuotePage(browser: browser, vehicleQuote: vehicleQuote, agreedQuotePrice: out agreedFirstPayment, includeRequestEmailQuote: includeRequestEmailQuote);
 
@@ -35,18 +35,18 @@ namespace Tests.ActionsAndValidations
                 Reporting.Log($"Capturing image after restoring any reset covers.", browser.Driver.TakeSnapshot());
             }
 
-            browser.MotorQuoteClickBuyPage2();
+            browser.ClickBuyPage2();
 
-            browser.MotorQuoteAddedDetailsPage3(vehicleQuote);
+            browser.AddedDetailsPage3(vehicleQuote);
 
-            VerifyQuoteMotor.VerifyQuoteSummaryPage(browser: browser,
+            VerifyQuoteMotor.QuoteSummaryPage(browser: browser,
                                                             vehicleQuote: vehicleQuote,
                                                             insuredVehicle: chosenVehicle);
             AcceptQuoteSummary(browser);
 
             SubmitPayment(browser: browser, vehicleQuote: vehicleQuote, expectedPrice: agreedFirstPayment, detailUIChecking);
 
-            policyNumber = VerifyQuoteMotor.VerifyMotorVehicleConfirmationPage(browser: browser,
+            policyNumber = VerifyQuoteMotor.ConfirmationPage(browser: browser,
                                                                                vehicleQuote: vehicleQuote,
                                                                                expectedPrice: agreedFirstPayment,
                                                                                insuredVehicle: chosenVehicle, 
@@ -76,7 +76,7 @@ namespace Tests.ActionsAndValidations
         /// <param name="browser"></param>
         /// <param name="vehicleQuote"></param>
         /// <returns></returns>
-        public static string SubmitInitialMotorQuoteRatingValues(Browser browser, QuoteCar vehicleQuote)
+        public static string SubmitInitialQuoteRatingValues(Browser browser, QuoteCar vehicleQuote)
         {
             string insuredVehicle = string.Empty;
             using (var quotePage1 = new MotorQuote1Details(browser))
@@ -113,7 +113,7 @@ namespace Tests.ActionsAndValidations
         public static string UpdateAndSubmitInitialQuotePage(Browser browser, QuoteCar vehicleQuote, out decimal agreedQuotePrice)
         {
             var quoteNumber = UpdateInitialQuotePage(browser, vehicleQuote, out agreedQuotePrice);
-            browser.MotorQuoteClickBuyPage2();
+            browser.ClickBuyPage2();
             return quoteNumber;
         }
 

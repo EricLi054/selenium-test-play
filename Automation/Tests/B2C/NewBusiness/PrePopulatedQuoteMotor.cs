@@ -60,7 +60,7 @@ namespace B2C.NewBusiness
 
             ActionsQuoteMotor.CompletePage3DetailsForPPQ(_browser, testVehicle);
 
-            VerifyQuoteMotor.VerifyQuoteSummaryPage(browser: _browser,
+            VerifyQuoteMotor.QuoteSummaryPage(browser: _browser,
                                                             vehicleQuote: testVehicle,
                                                             insuredVehicle: insuredVehicle,
                                                             isPPQ: true);
@@ -68,7 +68,7 @@ namespace B2C.NewBusiness
 
             ActionsQuoteMotor.SubmitPayment(browser: _browser, vehicleQuote: testVehicle, expectedPrice: firstPayment);
 
-            policyNumber = VerifyQuoteMotor.VerifyMotorVehicleConfirmationPage(browser: _browser,
+            policyNumber = VerifyQuoteMotor.ConfirmationPage(browser: _browser,
                                                                                vehicleQuote: testVehicle,
                                                                                expectedPrice: firstPayment,
                                                                                insuredVehicle: insuredVehicle, 
@@ -82,7 +82,7 @@ namespace B2C.NewBusiness
                                                             isMotorQuoteIncludingRoadside: testVehicle.AddRoadside);
 
             // Verify policy against Shield
-            VerifyQuoteMotor.VerifyMotorVehiclePolicyInShield(testVehicle, policyNumber);
+            VerifyQuoteMotor.PolicyInShield(testVehicle, policyNumber);
         }
 
          /// <summary>
@@ -112,18 +112,18 @@ namespace B2C.NewBusiness
             ActionsQuoteMotor.CompletePage3DetailsForPPQ(_browser, duplicateQuoteData);
 
             // Verify duplicate alert is displayed - this is the main focus of the test
-            VerifyQuoteMotor.VerifyDuplicatePolicyAlert(_browser);
+            VerifyQuoteMotor.DuplicatePolicyAlert(_browser);
 
             // Close alert, change rego, and continue
             ActionsQuoteMotor.HandleDuplicateAlertAndContinueWithNewRego(_browser, duplicateQuoteData);
 
             // Complete purchase flow
-            VerifyQuoteMotor.VerifyQuoteSummaryPage(browser: _browser, vehicleQuote: duplicateQuoteData, insuredVehicle: duplicateInsuredVehicle, isPPQ: true);
+            VerifyQuoteMotor.QuoteSummaryPage(browser: _browser, vehicleQuote: duplicateQuoteData, insuredVehicle: duplicateInsuredVehicle, isPPQ: true);
             ActionsQuoteMotor.AcceptQuoteSummary(_browser);
             ActionsQuoteMotor.SubmitPayment(browser: _browser, vehicleQuote: duplicateQuoteData, expectedPrice: duplicateFirstPayment);
             
             string receiptNumber = string.Empty;
-            VerifyQuoteMotor.VerifyMotorVehicleConfirmationPage(browser: _browser, vehicleQuote: duplicateQuoteData, expectedPrice: duplicateFirstPayment, 
+            VerifyQuoteMotor.ConfirmationPage(browser: _browser, vehicleQuote: duplicateQuoteData, expectedPrice: duplicateFirstPayment, 
                                                                insuredVehicle: duplicateInsuredVehicle, receiptNumber: out receiptNumber);
         }
 

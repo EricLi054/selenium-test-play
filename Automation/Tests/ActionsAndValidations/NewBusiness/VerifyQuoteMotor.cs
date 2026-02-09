@@ -18,13 +18,13 @@ namespace Tests.ActionsAndValidations
         private const string DUPLICATE_ALERT_TITLE = "You may already be insured";
         private const string DUPLICATE_ALERT_CONTENT = "Please call us on 13 17 03 so we can help you.";
 
-        public static void VerifyMotorVehiclePolicyInShield(QuoteCar vehicleQuote, string policyNumber)
+        public static void PolicyInShield(QuoteCar vehicleQuote, string policyNumber)
         {
             Reporting.LogTestShieldValidations("policy", policyNumber);
-            VerifyMotorVehiclePolicyInShieldBasicCoverDetails(vehicleQuote: vehicleQuote, policyNumber: policyNumber);
-            VerifyMotorVehiclePolicyInShieldPaymentDetails(vehicleQuote: vehicleQuote, policyNumber: policyNumber);
-            VerifyMotorVehiclePolicyInShieldDriverDetails(vehicleQuote: vehicleQuote, policyNumber: policyNumber);
-            VerifyMotorVehiclePolicyInShieldVehicleDetails(vehicleQuote: vehicleQuote, policyNumber: policyNumber);
+            PolicyInShieldBasicCoverDetails(vehicleQuote: vehicleQuote, policyNumber: policyNumber);
+            PolicyInShieldPaymentDetails(vehicleQuote: vehicleQuote, policyNumber: policyNumber);
+            PolicyInShieldDriverDetails(vehicleQuote: vehicleQuote, policyNumber: policyNumber);
+            PolicyInShieldVehicleDetails(vehicleQuote: vehicleQuote, policyNumber: policyNumber);
             VerifyPolicy.VerifyPolicyMultiMatchDetailsInShield(vehicleQuote.Drivers, policyNumber);
         }
 
@@ -43,7 +43,7 @@ namespace Tests.ActionsAndValidations
             return skipRegoCheck;
         }
 
-        public static void VerifyMotorVehiclePolicyInShieldBasicCoverDetails(QuoteCar vehicleQuote, string policyNumber)
+        public static void PolicyInShieldBasicCoverDetails(QuoteCar vehicleQuote, string policyNumber)
         {
             // Verify General Policy details
             Reporting.Log($"Begin verify policy details from Shield DB. Param/s = {policyNumber}");
@@ -61,7 +61,7 @@ namespace Tests.ActionsAndValidations
         /// <param name="testConfig"></param>
         /// <param name="vehicleQuote"></param>
         /// <param name="policyNumber"></param>
-        public static void VerifyMotorVehiclePolicyInShieldPaymentDetails(QuoteCar vehicleQuote, string policyNumber)
+        public static void PolicyInShieldPaymentDetails(QuoteCar vehicleQuote, string policyNumber)
         {
             Reporting.Log($"Begin verify payment details from Shield DB. Param/s = {policyNumber}");
             var dbPaymentDetails      = ShieldPolicyDB.FetchPaymentDetailsForPolicy(policyNumber);
@@ -91,7 +91,7 @@ namespace Tests.ActionsAndValidations
             VerifyPolicy.VerifyNewPolicyInstalments(policyNumber);
         }
 
-        public static void VerifyMotorVehiclePolicyInShieldDriverDetails(QuoteCar vehicleQuote, string policyNumber)
+        public static void PolicyInShieldDriverDetails(QuoteCar vehicleQuote, string policyNumber)
         {
             // Verify Financier Name via API:
             var policyDetails = DataHelper.GetPolicyDetails(policyNumber);
@@ -133,7 +133,7 @@ namespace Tests.ActionsAndValidations
         /// </summary>
         /// <param name="expectedContact">The test data generated for this contact in this test.</param>
         /// <param name="actualContact">The actual contact data returned from Shield for the contact in this test</param>
-        public static void VerifyContactTelephoneNumber(Driver expectedContact, Contact actualContact)
+        public static void ContactTelephoneNumber(Driver expectedContact, Contact actualContact)
         {
             if (!string.IsNullOrEmpty(expectedContact.Details.MobilePhoneNumber))
             {
@@ -154,7 +154,7 @@ namespace Tests.ActionsAndValidations
             }
         }
 
-        public static void VerifyMotorVehiclePolicyInShieldVehicleDetails(QuoteCar vehicleQuote, string policyNumber)
+        public static void PolicyInShieldVehicleDetails(QuoteCar vehicleQuote, string policyNumber)
         {
             // Verify vehicle details.
             Reporting.Log($"Begin verify insured vehicle details from Shield DB. Params = {policyNumber}");
@@ -178,7 +178,7 @@ namespace Tests.ActionsAndValidations
         /// This method assumes the alert is visible - it does not check for existence.
         /// </summary>
         /// <param name="browser">The browser instance</param>
-        public static void VerifyDuplicatePolicyAlert(Browser browser)
+        public static void DuplicatePolicyAlert(Browser browser)
         {
             using (var quotePage3 = new MotorQuote3Policy(browser))
             {
@@ -196,13 +196,13 @@ namespace Tests.ActionsAndValidations
         /// <param name="vehicleQuote"></param>
         /// <param name="insuredVehicle"></param>
         /// <param name="isPPQ"></param>
-        public static void VerifyQuoteSummaryPage(Browser browser, QuoteCar vehicleQuote, string insuredVehicle, bool isPPQ = false)
+        public static void QuoteSummaryPage(Browser browser, QuoteCar vehicleQuote, string insuredVehicle, bool isPPQ = false)
         {
             using (var quotePage3Policy = new MotorQuote3Policy(browser))
             {
                 if (quotePage3Policy.IsDuplicateAlertVisible())
                 {
-                    VerifyDuplicatePolicyAlert(browser);
+                    DuplicatePolicyAlert(browser);
                     return;
                 }
             }
@@ -234,7 +234,7 @@ namespace Tests.ActionsAndValidations
             }
         }
 
-        public static string VerifyMotorVehicleConfirmationPage(Browser browser, QuoteCar vehicleQuote, decimal expectedPrice, string insuredVehicle, out string receiptNumber)
+        public static string ConfirmationPage(Browser browser, QuoteCar vehicleQuote, decimal expectedPrice, string insuredVehicle, out string receiptNumber)
         {
             var policyNumber = string.Empty;
             receiptNumber    = string.Empty;
@@ -391,7 +391,7 @@ namespace Tests.ActionsAndValidations
                     // we just check the suburb and postcode. An annoyance with the way we get referenced mailing addresses.
                     Reporting.AreEqual(expectedAddr.SuburbAndCode(), contact.MailingAddress.SuburbAndCode(), true, "Mailing address");
                 }
-                VerifyContactTelephoneNumber(expectedDriver, contact);
+                ContactTelephoneNumber(expectedDriver, contact);
             }
         }
     }

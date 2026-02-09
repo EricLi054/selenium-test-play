@@ -59,7 +59,7 @@ namespace UIDriver.Helpers
             }
         }
 
-        public static void MotorQuoteClickBuyPage2(this Browser browser)
+        public static void ClickBuyPage2(this Browser browser)
         {
             using (var quotePage2 = new MotorQuote2Quote(browser))
             using (var quotePage3 = new MotorQuote3Policy(browser))
@@ -70,7 +70,7 @@ namespace UIDriver.Helpers
             }
         }
 
-        public static void MotorQuoteAddedDetailsPage3(this Browser browser, QuoteCar vehicle)
+        public static void AddedDetailsPage3(this Browser browser, QuoteCar vehicle)
         {
             using (var quotePage3 = new MotorQuote3Policy(browser))
             using (var quoteSummary = new MotorQuote3Summary(browser))
@@ -103,7 +103,7 @@ namespace UIDriver.Helpers
         /// </summary>
         /// <param name="browser"></param>
         /// <param name="vehicle"></param>
-        public static void MotorQuoteAddedDetailsPage3FieldLengthValidations(this Browser browser, QuoteCar vehicle)
+        public static void AddedDetailsPage3FieldLengthValidations(this Browser browser, QuoteCar vehicle)
         {
             using (var quotePage3 = new MotorQuote3Policy(browser))
             using (var quoteSummary = new MotorQuote3Summary(browser))
