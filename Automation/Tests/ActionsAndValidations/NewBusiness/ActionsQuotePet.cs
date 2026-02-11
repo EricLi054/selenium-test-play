@@ -1,4 +1,4 @@
-﻿using Rac.TestAutomation.Common;
+using Rac.TestAutomation.Common;
 using System;
 using System.Collections.Generic;
 using UIDriver.Helpers;
@@ -12,7 +12,7 @@ namespace Tests.ActionsAndValidations
 {
     public static class ActionsQuotePet
     {
-        public static string PurchasePetPolicy(Browser browser, QuotePet petQuote, bool detailUIChecking=false)
+        public static string PurchasePolicy(Browser browser, QuotePet petQuote, bool detailUIChecking=false)
         {
             decimal agreedFirstPayment = 0;
             string policyNumber        = null;
@@ -20,19 +20,19 @@ namespace Tests.ActionsAndValidations
 
             OpenBaseB2CLandingPage(browser: browser);
 
-            SubmitInitialPetQuoteRatingValues(browser: browser, petQuote: petQuote);
+            SubmitInitialQuoteRatingValues(browser: browser, petQuote: petQuote);
 
             UpdateAndSubmitInitialQuotePage(browser: browser, petQuote: petQuote, agreedQuotePrice: out agreedFirstPayment);
 
             UpdateAndSubmitAdditionalQuoteDetailsPage(browser: browser, petQuote: petQuote);
 
-            VerifyQuotePet.VerifyQuoteSummaryPage(browser: browser,
+            VerifyQuotePet.QuoteSummaryPage(browser: browser,
                                                    petQuote: petQuote);
             AcceptQuoteSummary(browser);
 
             agreedFirstPayment = SubmitPayment(browser: browser, petQuote: petQuote, expectedPrice: agreedFirstPayment, detailUIChecking);
 
-            policyNumber = VerifyQuotePet.VerifyPetConfirmationPage(browser: browser,
+            policyNumber = VerifyQuotePet.ConfirmationPage(browser: browser,
                                                                      petQuote: petQuote,
                                                                      expectedPrice: agreedFirstPayment, receiptNumber: out receiptNumber);
 
@@ -59,7 +59,7 @@ namespace Tests.ActionsAndValidations
         /// <param name="browser"></param>
         /// <param name="petQuote"></param>
         /// <returns></returns>
-        public static void SubmitInitialPetQuoteRatingValues(Browser browser, QuotePet petQuote)
+        public static void SubmitInitialQuoteRatingValues(Browser browser, QuotePet petQuote)
         {
             using (var quotePage1 = new PetQuote1Details(browser))
             using (var quotePage2 = new PetQuote2Quote(browser))

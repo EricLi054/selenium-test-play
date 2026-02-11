@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Rac.TestAutomation.Common;
 using Rac.TestAutomation.Common.TestData.Quote;
 using Tests.ActionsAndValidations;
@@ -35,10 +35,10 @@ namespace B2C.NewBusiness
             Reporting.LogTestData(TestContext.CurrentContext.Test.Name, petQuote.ToString());
 
             Reporting.LogTestStart();
-            string policyNumber = ActionsQuotePet.PurchasePetPolicy(_browser, petQuote, detailUIChecking: true);
+            string policyNumber = ActionsQuotePet.PurchasePolicy(_browser, petQuote, detailUIChecking: true);
 
             Reporting.LogTestShieldValidations("policy", policyNumber);
-            VerifyQuotePet.VerifyPetPolicyInShield(petQuote, policyNumber);
+            VerifyQuotePet.PolicyInShield(petQuote, policyNumber);
         }
 
         /// <summary>
@@ -55,10 +55,10 @@ namespace B2C.NewBusiness
             Reporting.LogTestData(TestContext.CurrentContext.Test.Name, petQuote.ToString());
 
             Reporting.LogTestStart();
-            string policyNumber = ActionsQuotePet.PurchasePetPolicy(_browser, petQuote);
+            string policyNumber = ActionsQuotePet.PurchasePolicy(_browser, petQuote);
 
             Reporting.LogTestShieldValidations("policy", policyNumber);
-            VerifyQuotePet.VerifyPetPolicyInShield(petQuote, policyNumber);
+            VerifyQuotePet.PolicyInShield(petQuote, policyNumber);
         }
 
         private QuotePet BuildTestDataDogPolicy()

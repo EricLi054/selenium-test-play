@@ -1,4 +1,4 @@
-﻿using Rac.TestAutomation.Common;
+using Rac.TestAutomation.Common;
 using Rac.TestAutomation.Common.DatabaseCalls.Policies;
 using UIDriver.Pages.B2C;
 using static Rac.TestAutomation.Common.Constants.Contacts;
@@ -8,7 +8,7 @@ namespace Tests.ActionsAndValidations
 {
     public static class VerifyQuotePet
     {
-        public static void VerifyQuoteSummaryPage(Browser browser, QuotePet petQuote)
+        public static void QuoteSummaryPage(Browser browser, QuotePet petQuote)
         {
             using (var quotePage3  = new PetQuote3Summary(browser))
             using (var paymentPage = new QuotePayments(browser))
@@ -24,7 +24,7 @@ namespace Tests.ActionsAndValidations
             }
         }
 
-        public static string VerifyPetConfirmationPage(Browser browser, QuotePet petQuote, decimal expectedPrice, out string receiptNumber)
+        public static string ConfirmationPage(Browser browser, QuotePet petQuote, decimal expectedPrice, out string receiptNumber)
         {
             var policyNumber = string.Empty;
             receiptNumber    = string.Empty;
@@ -65,13 +65,13 @@ namespace Tests.ActionsAndValidations
             return policyNumber;
         }
 
-        public static void VerifyPetPolicyInShield(QuotePet petQuote, string policyNumber)
+        public static void PolicyInShield(QuotePet petQuote, string policyNumber)
         {
-            VerifyPetPolicyInShieldBasicCoverDetails(petQuote: petQuote, policyNumber: policyNumber);
-            VerifyPetPolicyInShieldUIPaymentDetails(quoteDetails: petQuote, policyNumber: policyNumber);
+            PolicyInShieldBasicCoverDetails(petQuote: petQuote, policyNumber: policyNumber);
+            PolicyInShieldUIPaymentDetails(quoteDetails: petQuote, policyNumber: policyNumber);
         }
 
-        public static void VerifyPetPolicyInShieldBasicCoverDetails(QuotePet petQuote, string policyNumber)
+        public static void PolicyInShieldBasicCoverDetails(QuotePet petQuote, string policyNumber)
         {
             // Verify General Policy details
             Reporting.Log($"Begin verify policy details from Shield DB. Param/s = {policyNumber}");
@@ -99,7 +99,7 @@ namespace Tests.ActionsAndValidations
         /// <param name="testConfig"></param>
         /// <param name="quoteDetails"></param>
         /// <param name="policyNumber"></param>
-        public static void VerifyPetPolicyInShieldUIPaymentDetails(QuotePet quoteDetails, string policyNumber)
+        public static void PolicyInShieldUIPaymentDetails(QuotePet quoteDetails, string policyNumber)
         {
             Reporting.Log($"Begin verify payment details from Shield DB. Param/s = {policyNumber}");
             var dbPaymentDetails      = ShieldPolicyDB.FetchPaymentDetailsForPolicy(policyNumber);

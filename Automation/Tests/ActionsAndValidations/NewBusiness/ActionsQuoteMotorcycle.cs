@@ -1,4 +1,4 @@
-﻿using Rac.TestAutomation.Common;
+using Rac.TestAutomation.Common;
 using System.Threading;
 using UIDriver.Pages;
 using UIDriver.Pages.Spark;
@@ -24,9 +24,9 @@ namespace Tests.ActionsAndValidations
         /// <param name="testConfig"></param>
         /// <param name="quote">test data defining all input parameters</param>
         /// <returns></returns>
-        public static string PurchaseMotorcyclePolicy(Browser browser, QuoteMotorcycle quote)
+        public static string PurchasePolicy(Browser browser, QuoteMotorcycle quote)
         {
-            ActionsQuoteMotorcycle.FetchNewMotorCycleQuote(browser, quote);
+            ActionsQuoteMotorcycle.FetchNewQuote(browser, quote);
             return ProceedWithQuoteToPurchase(browser, quote);
         }
 
@@ -39,7 +39,7 @@ namespace Tests.ActionsAndValidations
         /// <param name="browser"></param>
         /// <param name="testConfig"></param>
         /// <param name="quote">test data defining all input parameters</param>
-        public static void FetchNewMotorCycleQuote(Browser browser, QuoteMotorcycle quote)
+        public static void FetchNewQuote(Browser browser, QuoteMotorcycle quote)
         {
             /***********************************************************
              * Open SPARK launch page.
@@ -94,12 +94,12 @@ namespace Tests.ActionsAndValidations
         public static string ProceedWithQuoteToPurchase(Browser browser, QuoteMotorcycle quote, bool detailUIChecking=false)
         {
             UpdateQuoteParametersAndSupplementaryInformation(browser, quote);
-            VerifyQuoteMotorcycle.VerifyPremiumChangePopup(browser, quote);
+            VerifyQuoteMotorcycle.PremiumChangePopupIfDisplayed(browser, quote);
 
             /***********************************************************
            * Enter payment details and purchase policy
            ***********************************************************/
-            VerifyQuoteMotorcycle.VerifyQuoteDetailsOnPaymentPage(browser, quote);
+            VerifyQuoteMotorcycle.QuoteDetailsOnPaymentPage(browser, quote);
 
             if (detailUIChecking)
             {
@@ -277,7 +277,7 @@ namespace Tests.ActionsAndValidations
             }
         }
 
-        public static string VerifyQuoteBreakdownTextAndGetQuoteNumber(Browser browser, QuoteMotorcycle quoteMotorcycle)
+        public static string QuoteBreakdownTextAndGetQuoteNumber(Browser browser, QuoteMotorcycle quoteMotorcycle)
         {
             using (var heresYourQuote = new HeresYourQuote(browser))
             {
@@ -291,7 +291,7 @@ namespace Tests.ActionsAndValidations
             }
         }
 
-        public static string VerifyCoverHelpTipAndGetQuoteNumber(Browser browser, QuoteMotorcycle quoteMotorcycle)
+        public static string CoverHelpTipAndGetQuoteNumber(Browser browser, QuoteMotorcycle quoteMotorcycle)
         {
             using (var heresYourQuote = new HeresYourQuote(browser))
             {
@@ -415,7 +415,7 @@ namespace Tests.ActionsAndValidations
                 tellUsMoreAboutYou.FillTellUsMoreAboutYou(quoteMotorcycle);
             }
 
-            VerifyQuoteMotorcycle.VerifyPremiumChangePopup(browser, quoteMotorcycle);
+            VerifyQuoteMotorcycle.PremiumChangePopupIfDisplayed(browser, quoteMotorcycle);
         }
 
         /// <summary>
@@ -463,265 +463,6 @@ namespace Tests.ActionsAndValidations
                 spinner.WaitForSpinnerToFinish(nextPage: tellUsMoreAboutYou);
                 tellUsMoreAboutYou.WaitForPage();
                 tellUsMoreAboutYou.FillTellUsMoreAboutYou(quoteMotorcycle);
-            }
-        }
-
-        /// <summary>
-        /// Handles the duplicate policy alert by closing it, navigating back to "Confirm policy details" step,
-        /// and changing the registration number.
-        /// </summary>
-        /// <param name="browser">The browser instance</param>
-        /// <param name="quoteMotorcycle">The quote data to update with new registration</param>
-        public static void HandleDuplicateAlertAndChangeRegistration(Browser browser, QuoteMotorcycle quoteMotorcycle)
-        {
-            using (var tellUsMoreAboutYou = new TellUsMoreAboutYou(browser))
-            using (var letsClarifyFewMoreDetails = new LetsClarifyFewMoreDetails(browser))
-            using (var spinner = new SparkSpinner(browser))
-            {
-                tellUsMoreAboutYou.CloseDuplicateAlertDialog();
-                
-                // Navigate back to "Confirm policy details" step
-                tellUsMoreAboutYou.ClickConfirmDetailsStep();
-                spinner.WaitForSpinnerToFinish(nextPage: letsClarifyFewMoreDetails);
-                letsClarifyFewMoreDetails.WaitForPage();
-                
-                // Update registration to a new random value
-                string newRego;
-                do
-                {
-                    newRego = DataHelper.RandomAlphanumerics(5, 8);
-                } while (newRego == quoteMotorcycle.Registration);
-                
-                quoteMotorcycle.Registration = newRego;
-                letsClarifyFewMoreDetails.BikeRego = newRego;
-                
-                Reporting.Log($"Changed motorcycle registration to: {newRego}", browser.Driver.TakeSnapshot());
-                
-                // Navigate forward to complete the flow
-                letsClarifyFewMoreDetails.ClickNext();
-                spinner.WaitForSpinnerToFinish(nextPage: tellUsMoreAboutYou);
-                
-                // Re-fill personal information
-                tellUsMoreAboutYou.WaitForPage();
-                tellUsMoreAboutYou.FillTellUsMoreAboutYou(quoteMotorcycle);
-                
-                if (quoteMotorcycle.IsPremiumChangeExpected)
-                {
-                    VerifyAnyPremiumChangePopup(browser, quoteMotorcycle);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Processes quote with existing policy details that will trigger duplicate alert.
-        /// This includes adjusting quote parameters, confirming policy details, and providing personal information.
-        /// </summary>
-        public static void ProcessQuoteWithExistingDetails(Browser browser, QuoteMotorcycle quoteMotorcycle)
-        {
-            AdjustQuoteParametersAndBeginPurchase(browser, quoteMotorcycle);
-            
-            using (var letsClarifyFewMoreDetails = new LetsClarifyFewMoreDetails(browser))
-            using (var spinner = new SparkSpinner(browser))
-            {
-                spinner.WaitForSpinnerToFinish(nextPage: letsClarifyFewMoreDetails);
-                letsClarifyFewMoreDetails.WaitForPage();
-                letsClarifyFewMoreDetails.FillClarifyFewDetails(quoteMotorcycle);
-            }
-            
-            using (var tellUsMoreAboutYou = new TellUsMoreAboutYou(browser))
-            using (var spinner = new SparkSpinner(browser))
-            {
-                spinner.WaitForSpinnerToFinish(nextPage: tellUsMoreAboutYou);
-                tellUsMoreAboutYou.WaitForPage();
-                tellUsMoreAboutYou.FillTellUsMoreAboutYou(quoteMotorcycle);
-            }
-        }
-
-        /// <summary>
-        /// Handles the duplicate policy alert by closing it, navigating back to "Confirm policy details" step,
-        /// and changing the registration number.
-        /// </summary>
-        /// <param name="browser">The browser instance</param>
-        /// <param name="quoteMotorcycle">The quote data to update with new registration</param>
-        public static void HandleDuplicateAlertAndChangeRegistration(Browser browser, QuoteMotorcycle quoteMotorcycle)
-        {
-            using (var tellUsMoreAboutYou = new TellUsMoreAboutYou(browser))
-            using (var letsClarifyFewMoreDetails = new LetsClarifyFewMoreDetails(browser))
-            using (var spinner = new SparkSpinner(browser))
-            {
-                tellUsMoreAboutYou.CloseDuplicateAlertDialog();
-                
-                // Navigate back to "Confirm policy details" step
-                tellUsMoreAboutYou.ClickConfirmDetailsStep();
-                spinner.WaitForSpinnerToFinish(nextPage: letsClarifyFewMoreDetails);
-                letsClarifyFewMoreDetails.WaitForPage();
-                
-                // Update registration to a new random value
-                string newRego;
-                do
-                {
-                    newRego = DataHelper.RandomAlphanumerics(5, 8);
-                } while (newRego == quoteMotorcycle.Registration);
-                
-                quoteMotorcycle.Registration = newRego;
-                letsClarifyFewMoreDetails.BikeRego = newRego;
-                
-                Reporting.Log($"Changed motorcycle registration to: {newRego}", browser.Driver.TakeSnapshot());
-                
-                // Navigate forward to complete the flow
-                letsClarifyFewMoreDetails.ClickNext();
-                spinner.WaitForSpinnerToFinish(nextPage: tellUsMoreAboutYou);
-                
-                // Re-fill personal information
-                tellUsMoreAboutYou.WaitForPage();
-                tellUsMoreAboutYou.FillTellUsMoreAboutYou(quoteMotorcycle);
-                
-                if (quoteMotorcycle.IsPremiumChangeExpected)
-                {
-                    VerifyAnyPremiumChangePopup(browser, quoteMotorcycle);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Processes quote with existing policy details that will trigger duplicate alert.
-        /// This includes adjusting quote parameters, confirming policy details, and providing personal information.
-        /// </summary>
-        public static void ProcessQuoteWithExistingDetails(Browser browser, QuoteMotorcycle quoteMotorcycle)
-        {
-            AdjustQuoteParametersAndBeginPurchase(browser, quoteMotorcycle);
-            
-            using (var letsClarifyFewMoreDetails = new LetsClarifyFewMoreDetails(browser))
-            using (var spinner = new SparkSpinner(browser))
-            {
-                spinner.WaitForSpinnerToFinish(nextPage: letsClarifyFewMoreDetails);
-                letsClarifyFewMoreDetails.WaitForPage();
-                letsClarifyFewMoreDetails.FillClarifyFewDetails(quoteMotorcycle);
-            }
-            
-            using (var tellUsMoreAboutYou = new TellUsMoreAboutYou(browser))
-            using (var spinner = new SparkSpinner(browser))
-            {
-                spinner.WaitForSpinnerToFinish(nextPage: tellUsMoreAboutYou);
-                tellUsMoreAboutYou.WaitForPage();
-                tellUsMoreAboutYou.FillTellUsMoreAboutYou(quoteMotorcycle);
-            }
-        }
-
-        /// <summary>
-        /// Handles the duplicate policy alert by closing it, navigating back to "Confirm policy details" step,
-        /// and changing the registration number.
-        /// </summary>
-        /// <param name="browser">The browser instance</param>
-        /// <param name="quoteMotorcycle">The quote data to update with new registration</param>
-        public static void HandleDuplicateAlertAndChangeRegistration(Browser browser, QuoteMotorcycle quoteMotorcycle)
-        {
-            using (var tellUsMoreAboutYou = new TellUsMoreAboutYou(browser))
-            using (var letsClarifyFewMoreDetails = new LetsClarifyFewMoreDetails(browser))
-            using (var spinner = new SparkSpinner(browser))
-            {
-                tellUsMoreAboutYou.CloseDuplicateAlertDialog();
-                
-                // Navigate back to "Confirm policy details" step
-                tellUsMoreAboutYou.ClickConfirmDetailsStep();
-                spinner.WaitForSpinnerToFinish(nextPage: letsClarifyFewMoreDetails);
-                letsClarifyFewMoreDetails.WaitForPage();
-                
-                // Update registration to a new random value
-                string newRego;
-                do
-                {
-                    newRego = DataHelper.RandomAlphanumerics(5, 8);
-                } while (newRego == quoteMotorcycle.Registration);
-                
-                quoteMotorcycle.Registration = newRego;
-                letsClarifyFewMoreDetails.BikeRego = newRego;
-                
-                Reporting.Log($"Changed motorcycle registration to: {newRego}", browser.Driver.TakeSnapshot());
-                
-                // Navigate forward to complete the flow
-                letsClarifyFewMoreDetails.ClickNext();
-                spinner.WaitForSpinnerToFinish(nextPage: tellUsMoreAboutYou);
-                
-                // Re-fill personal information
-                tellUsMoreAboutYou.WaitForPage();
-                tellUsMoreAboutYou.FillTellUsMoreAboutYou(quoteMotorcycle);
-                
-                if (quoteMotorcycle.IsPremiumChangeExpected)
-                {
-                    VerifyAnyPremiumChangePopup(browser, quoteMotorcycle);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Processes quote with existing policy details that will trigger duplicate alert.
-        /// This includes adjusting quote parameters, confirming policy details, and providing personal information.
-        /// </summary>
-        public static void ProcessQuoteWithExistingDetails(Browser browser, QuoteMotorcycle quoteMotorcycle)
-        {
-            AdjustQuoteParametersAndBeginPurchase(browser, quoteMotorcycle);
-            
-            using (var letsClarifyFewMoreDetails = new LetsClarifyFewMoreDetails(browser))
-            using (var spinner = new SparkSpinner(browser))
-            {
-                spinner.WaitForSpinnerToFinish(nextPage: letsClarifyFewMoreDetails);
-                letsClarifyFewMoreDetails.WaitForPage();
-                letsClarifyFewMoreDetails.FillClarifyFewDetails(quoteMotorcycle);
-            }
-            
-            using (var tellUsMoreAboutYou = new TellUsMoreAboutYou(browser))
-            using (var spinner = new SparkSpinner(browser))
-            {
-                spinner.WaitForSpinnerToFinish(nextPage: tellUsMoreAboutYou);
-                tellUsMoreAboutYou.WaitForPage();
-                tellUsMoreAboutYou.FillTellUsMoreAboutYou(quoteMotorcycle);
-            }
-        }
-
-        /// <summary>
-        /// Handles the duplicate policy alert by closing it, navigating back to "Confirm policy details" step,
-        /// and changing the registration number.
-        /// </summary>
-        /// <param name="browser">The browser instance</param>
-        /// <param name="quoteMotorcycle">The quote data to update with new registration</param>
-        public static void HandleDuplicateAlertAndChangeRegistration(Browser browser, QuoteMotorcycle quoteMotorcycle)
-        {
-            using (var tellUsMoreAboutYou = new TellUsMoreAboutYou(browser))
-            using (var letsClarifyFewMoreDetails = new LetsClarifyFewMoreDetails(browser))
-            using (var spinner = new SparkSpinner(browser))
-            {
-                tellUsMoreAboutYou.CloseDuplicateAlertDialog();
-                
-                // Navigate back to "Confirm policy details" step
-                tellUsMoreAboutYou.ClickConfirmDetailsStep();
-                spinner.WaitForSpinnerToFinish(nextPage: letsClarifyFewMoreDetails);
-                letsClarifyFewMoreDetails.WaitForPage();
-                
-                // Update registration to a new random value
-                string newRego;
-                do
-                {
-                    newRego = DataHelper.RandomAlphanumerics(5, 8);
-                } while (newRego == quoteMotorcycle.Registration);
-                
-                quoteMotorcycle.Registration = newRego;
-                letsClarifyFewMoreDetails.BikeRego = newRego;
-                
-                Reporting.Log($"Changed motorcycle registration to: {newRego}", browser.Driver.TakeSnapshot());
-                
-                // Navigate forward to complete the flow
-                letsClarifyFewMoreDetails.ClickNext();
-                spinner.WaitForSpinnerToFinish(nextPage: tellUsMoreAboutYou);
-                
-                // Re-fill personal information
-                tellUsMoreAboutYou.WaitForPage();
-                tellUsMoreAboutYou.FillTellUsMoreAboutYou(quoteMotorcycle);
-                
-                if (quoteMotorcycle.IsPremiumChangeExpected)
-                {
-                    VerifyAnyPremiumChangePopup(browser, quoteMotorcycle);
-                }
             }
         }
     }

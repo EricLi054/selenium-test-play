@@ -1,4 +1,4 @@
-﻿using Rac.TestAutomation.Common;
+using Rac.TestAutomation.Common;
 using UIDriver.Pages;
 using UIDriver.Pages.Spark;
 using UIDriver.Pages.Spark.CaravanQuote;
@@ -23,7 +23,7 @@ namespace Tests.ActionsAndValidations
         /// into the test data object (under child property QuoteData),
         /// which will be visible to caller after this method exits
         /// </summary>
-        public static void CreateNewCaravanQuote(Browser browser, QuoteCaravan quote)
+        public static void CreateNewQuote(Browser browser, QuoteCaravan quote)
         {
             LaunchPage.OpenSparkCaravanLandingPage(browser);
 
@@ -242,7 +242,7 @@ namespace Tests.ActionsAndValidations
                 //If the policy holder is a existing member then skip the validation
                 if (!quoteCaravan.PolicyHolders[0].IsRACMember && !quoteCaravan.PolicyHolders[0].IsMultiMatchRSAMember)
                 {
-                    VerifyQuoteCaravan.VerifyQuoteViaShieldAPI(quoteCaravan, SparkBasePage.QuoteStage.AFTER_QUOTE);
+                    VerifyQuoteCaravan.QuoteViaShieldAPI(quoteCaravan, SparkBasePage.QuoteStage.AFTER_QUOTE);
                 }
             }
         }
@@ -264,7 +264,7 @@ namespace Tests.ActionsAndValidations
                 ProvidePersonalInformationJointPH(browser, quoteCaravan);
             }
 
-            VerifyQuoteCaravan.VerifyQuoteViaShieldAPI(quoteCaravan, SparkBasePage.QuoteStage.AFTER_PERSONAL_INFO);
+            VerifyQuoteCaravan.QuoteViaShieldAPI(quoteCaravan, SparkBasePage.QuoteStage.AFTER_PERSONAL_INFO);
                         
             //Page 8: Payment
             ProvidePaymentDetails(browser, quoteCaravan, detailUIChecking);

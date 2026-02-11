@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Rac.TestAutomation.Common;
 using Rac.TestAutomation.Common.TestData.Quote;
 using Tests.ActionsAndValidations;
@@ -37,7 +37,7 @@ namespace Spark.NewBusiness
             QuoteMotorcycle quoteInputs;
             BuildTestDataTest001(out mainPH, out quoteInputs);
 
-            ActionsQuoteMotorcycle.PurchaseMotorcyclePolicy(_browser, quoteInputs);
+            ActionsQuoteMotorcycle.PurchasePolicy(_browser, quoteInputs);
         }
 
         /// <summary>
@@ -57,10 +57,10 @@ namespace Spark.NewBusiness
             // Setup test data
             var quoteInputs = BuildTestDataForIssuePolicyAnnualDirectDebitContactDoesNotExist();
 
-            ActionsQuoteMotorcycle.FetchNewMotorCycleQuote(_browser, quoteInputs);
+            ActionsQuoteMotorcycle.FetchNewQuote(_browser, quoteInputs);
             var policyNumber = ActionsQuoteMotorcycle.ProceedWithQuoteToPurchase(_browser, quoteInputs, detailUIChecking:true);
 
-            VerifyPolicyMotorcycle.VerifyPolicyDetailsInShieldDB(policyNumber, quoteInputs);
+            VerifyPolicyMotorcycle.PolicyDetailsInShieldDB(policyNumber, quoteInputs);
         }
 
         /// <summary>
@@ -80,12 +80,12 @@ namespace Spark.NewBusiness
         {
             var quoteInputs = BuildTestDataFor_CreateQuoteNoMatchAttempted();
 
-            ActionsQuoteMotorcycle.FetchNewMotorCycleQuote(_browser, quoteInputs);
-            var quoteNumber = ActionsQuoteMotorcycle.VerifyQuoteBreakdownTextAndGetQuoteNumber(_browser, quoteInputs);
+            ActionsQuoteMotorcycle.FetchNewQuote(_browser, quoteInputs);
+            var quoteNumber = ActionsQuoteMotorcycle.QuoteBreakdownTextAndGetQuoteNumber(_browser, quoteInputs);
 
             Contact expectedContact = ShieldAPIVerification.BuildExpectedContact(Vehicle.Motorcycle, SparkBasePage.QuoteStage.AFTER_QUOTE, quoteInputs.Drivers[0].Details);
 
-            VerifyPolicyMotorcycle.VerifyQuoteContactAndVehicleDetailsInShield(quoteInputs, quoteNumber, expectedContact, SparkBasePage.QuoteStage.AFTER_QUOTE);
+            VerifyPolicyMotorcycle.QuoteContactAndVehicleDetailsInShield(quoteInputs, quoteNumber, expectedContact, SparkBasePage.QuoteStage.AFTER_QUOTE);
         }
 
         private void BuildTestDataTest001(out Contact mainPH, out QuoteMotorcycle motorcycleQuote)

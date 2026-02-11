@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Rac.TestAutomation.Common;
 using Rac.TestAutomation.Common.TestData.Quote;
 using System;
@@ -42,12 +42,12 @@ namespace Spark.NewBusiness
             var quoteInputs = BuildTestDataZeroExcessMaxSIMaxContSIRandomIndividualsAndCaravan();
 
             Reporting.LogTestStart();
-            ActionsQuoteCaravan.CreateNewCaravanQuote(_browser, quoteInputs);
+            ActionsQuoteCaravan.CreateNewQuote(_browser, quoteInputs);
             ActionsQuoteCaravan.ProceedWithQuoteToPurchase(_browser, quoteInputs, detailUIChecking: true);
             string policyNumber = ActionsQuoteCaravan.GetPolicyNumberFromConfirmationPage(_browser);
 
             Reporting.LogTestShieldValidations("policy", policyNumber);
-            VerifyQuoteCaravan.VerifyCaravanPolicyInShield(_browser, quoteInputs, policyNumber);
+            VerifyQuoteCaravan.PolicyInShield(_browser, quoteInputs, policyNumber);
         }
 
         /// <summary>
@@ -71,12 +71,12 @@ namespace Spark.NewBusiness
             var quoteInputs = BuildTestDataWithMinExcessMaxSIMaxContSIPositivePremChngPayAnnualRandom20OldIndividual();
 
             Reporting.LogTestStart();
-            ActionsQuoteCaravan.CreateNewCaravanQuote(_browser, quoteInputs);
+            ActionsQuoteCaravan.CreateNewQuote(_browser, quoteInputs);
             ActionsQuoteCaravan.ProceedWithQuoteToPurchase(_browser, quoteInputs);
             string policyNumber = ActionsQuoteCaravan.GetPolicyNumberFromConfirmationPage(_browser);
 
             Reporting.LogTestShieldValidations("policy", policyNumber);
-            VerifyQuoteCaravan.VerifyCaravanPolicyInShield(_browser, quoteInputs, policyNumber);
+            VerifyQuoteCaravan.PolicyInShield(_browser, quoteInputs, policyNumber);
             //TODO AUNT-196 Add further confirmation of member information to match manual SPK-T281 test.
         }
 
@@ -99,12 +99,12 @@ namespace Spark.NewBusiness
             var quoteInputs = BuildTestDataNegativePremChngPayMonthlyRandom75OldIndividual();
 
             Reporting.LogTestStart();
-            ActionsQuoteCaravan.CreateNewCaravanQuote(_browser, quoteInputs);
+            ActionsQuoteCaravan.CreateNewQuote(_browser, quoteInputs);
             ActionsQuoteCaravan.ProceedWithQuoteToPurchase(_browser, quoteInputs);
             string policyNumber = ActionsQuoteCaravan.GetPolicyNumberFromConfirmationPage(_browser);
 
             Reporting.LogTestShieldValidations("policy", policyNumber);
-            VerifyQuoteCaravan.VerifyCaravanPolicyInShield(_browser, quoteInputs, policyNumber);
+            VerifyQuoteCaravan.PolicyInShield(_browser, quoteInputs, policyNumber);
         }
 
         /// <summary>
@@ -128,7 +128,7 @@ namespace Spark.NewBusiness
 
             Reporting.LogTestStart();
 
-            ActionsQuoteCaravan.CreateNewCaravanQuote(_browser, quoteInputs);
+            ActionsQuoteCaravan.CreateNewQuote(_browser, quoteInputs);
             ActionsQuote.RetrieveSparkQuoteFromEmail(_browser, quoteInputs.ParkingAddress, quoteInputs.PolicyHolders[0].PrivateEmail.Address, ShieldProductType.MGV);
 
             ActionsQuoteCaravan.VerifyHeresYourQuoteAfterRetrieve(_browser, quoteInputs);
@@ -137,7 +137,7 @@ namespace Spark.NewBusiness
             string policyNumber = ActionsQuoteCaravan.GetPolicyNumberFromConfirmationPage(_browser);
 
             Reporting.LogTestShieldValidations("policy", policyNumber);
-            VerifyQuoteCaravan.VerifyCaravanPolicyInShield(_browser, quoteInputs, policyNumber);
+            VerifyQuoteCaravan.PolicyInShield(_browser, quoteInputs, policyNumber);
         }
 
         /// <summary>
@@ -158,7 +158,7 @@ namespace Spark.NewBusiness
             var quoteInputs = BuildTestDataWith0ExcessAndContentInsured15000Monthly();
 
             Reporting.LogTestStart();
-            ActionsQuoteCaravan.CreateNewCaravanQuote(_browser, quoteInputs);
+            ActionsQuoteCaravan.CreateNewQuote(_browser, quoteInputs);
             ActionsQuote.RetrieveSparkQuoteByQuoteNumber(_browser, quoteInputs.ParkingAddress, quoteInputs.QuoteData.QuoteNumber, ShieldProductType.MGV);
 
             ActionsQuoteCaravan.VerifyHeresYourQuoteAfterRetrieve(_browser, quoteInputs);
@@ -167,7 +167,7 @@ namespace Spark.NewBusiness
             string policyNumber = ActionsQuoteCaravan.GetPolicyNumberFromConfirmationPage(_browser);
 
             Reporting.LogTestShieldValidations("policy", policyNumber);
-            VerifyQuoteCaravan.VerifyCaravanPolicyInShield(_browser, quoteInputs, policyNumber);
+            VerifyQuoteCaravan.PolicyInShield(_browser, quoteInputs, policyNumber);
         }
         #endregion
 

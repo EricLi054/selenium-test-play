@@ -1,5 +1,6 @@
-﻿using Rac.TestAutomation.Common;
+using Rac.TestAutomation.Common;
 using UIDriver.Pages.Spark.MotorcycleQuote;
+using System.Threading;
 
 using static Rac.TestAutomation.Common.Constants.PolicyMotor;
 using static Rac.TestAutomation.Common.Constants.PolicyMotorcycle;
@@ -20,7 +21,7 @@ namespace Tests.ActionsAndValidations
         /// This method checks for the alert visibility and validates its title and content.
         /// </summary>
         /// <param name="browser">The browser instance</param>
-        public static void VerifyDuplicatePolicyAlert(Browser browser)
+        public static void DuplicatePolicyAlert(Browser browser)
         {
             using (var tellUsMoreAboutYou = new TellUsMoreAboutYou(browser))
             {
@@ -42,7 +43,7 @@ namespace Tests.ActionsAndValidations
         /// </summary>
         /// <param name="browser"></param>
         /// <param name="contact"></param>
-        public static void VerifyQuoteDetailsOnPaymentPage(Browser browser, QuoteMotorcycle quoteDetails)
+        public static void QuoteDetailsOnPaymentPage(Browser browser, QuoteMotorcycle quoteDetails)
         {
             using (var page = new PaymentDetails(browser))
             {
@@ -75,6 +76,19 @@ namespace Tests.ActionsAndValidations
                 {
                     Reporting.Log($"Motor Cover = {MotorCovers.TPO} so there is no Sum Insured to compare");
                 }
+            }
+        }
+
+        /// <summary>
+        /// If the premium change popup is displayed, verifies it and closes it (updating quote data).
+        /// </summary>
+        public static void PremiumChangePopupIfDisplayed(Browser browser, QuoteMotorcycle quote)
+        {
+            Thread.Sleep(2000);
+            using (var popup = new PremiumChangePopup(browser))
+            {
+                if (popup.IsDisplayed())
+                    popup.VerifyPremiumChange(browser, quote, SparkBasePage.QuoteStage.AFTER_QUOTE);
             }
         }
     }

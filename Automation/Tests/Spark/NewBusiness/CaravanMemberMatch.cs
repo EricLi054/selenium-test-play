@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using NUnit.Framework;
 using Rac.TestAutomation.Common;
 using Rac.TestAutomation.Common.TestData.Quote;
@@ -47,12 +47,12 @@ namespace Spark.NewBusiness
             var quoteInputs = BuildTestDataUpfrontSingleMatchRule1GoldDiscountCreateQuote();
 
             Reporting.LogTestStart();
-            ActionsQuoteCaravan.CreateNewCaravanQuote(_browser, quoteInputs);
+            ActionsQuoteCaravan.CreateNewQuote(_browser, quoteInputs);
             ActionsQuoteCaravan.ProceedWithQuoteToPurchase(_browser, quoteInputs);
             string policyNumber = ActionsQuoteCaravan.GetPolicyNumberFromConfirmationPage(_browser);
 
             Reporting.LogTestShieldValidations("policy", policyNumber);
-            VerifyQuoteCaravan.VerifyCaravanPolicyInShield(_browser, quoteInputs, policyNumber);
+            VerifyQuoteCaravan.PolicyInShield(_browser, quoteInputs, policyNumber);
         }
         /// <summary>
         /// Test emulates the workflow of a single match silver member along with a single match Gold joint policyholder, getting a Caravan Policy via Spark Caravan:
@@ -76,12 +76,12 @@ namespace Spark.NewBusiness
             var quoteInputs = BuildTestDataMainPHUpfrontSingleMatchRule1SilverDiscountJointPHGoldMatchIssuePolicy();
 
             Reporting.LogTestStart();
-            ActionsQuoteCaravan.CreateNewCaravanQuote(_browser, quoteInputs);
+            ActionsQuoteCaravan.CreateNewQuote(_browser, quoteInputs);
             ActionsQuoteCaravan.ProceedWithQuoteToPurchase(_browser, quoteInputs);
             string policyNumber = ActionsQuoteCaravan.GetPolicyNumberFromConfirmationPage(_browser);
 
             Reporting.LogTestShieldValidations("policy", policyNumber);
-            VerifyQuoteCaravan.VerifyCaravanPolicyInShield(_browser, quoteInputs, policyNumber);
+            VerifyQuoteCaravan.PolicyInShield(_browser, quoteInputs, policyNumber);
         }
         /// <summary>
         /// Test emulates the workflow of a single match Gold member along with a single match silver joint policyholder,  who fails to declare the membership on Page 1 (Are you an RAC member):
@@ -102,12 +102,12 @@ namespace Spark.NewBusiness
             var quoteInputs = BuildTestDataPurchaseFlowPH1SingleMatchGoldPH2SingleMatchSilver();
 
             Reporting.LogTestStart();
-            ActionsQuoteCaravan.CreateNewCaravanQuote(_browser, quoteInputs);
+            ActionsQuoteCaravan.CreateNewQuote(_browser, quoteInputs);
             ActionsQuoteCaravan.ProceedWithQuoteToPurchase(_browser, quoteInputs);
             string policyNumber = ActionsQuoteCaravan.GetPolicyNumberFromConfirmationPage(_browser);
 
             Reporting.LogTestShieldValidations("policy", policyNumber);
-            VerifyQuoteCaravan.VerifyCaravanPolicyInShield(_browser, quoteInputs, policyNumber);
+            VerifyQuoteCaravan.PolicyInShield(_browser, quoteInputs, policyNumber);
         }
         /// <summary>
         /// Test emulates the workflow of a Multi Match silver member along with a single Gold joint policyholder, who fails to declare the membership on Page 1 (Are you an RAC member),
@@ -130,12 +130,12 @@ namespace Spark.NewBusiness
             var quoteInputs = BuildTestDataPurchaseFlowPH1MultiMatchSilverPH2SingleMatchGold();
 
             Reporting.LogTestStart();
-            ActionsQuoteCaravan.CreateNewCaravanQuote(_browser, quoteInputs);
+            ActionsQuoteCaravan.CreateNewQuote(_browser, quoteInputs);
             ActionsQuoteCaravan.ProceedWithQuoteToPurchase(_browser, quoteInputs);
             string policyNumber = ActionsQuoteCaravan.GetPolicyNumberFromConfirmationPage(_browser);
 
             Reporting.LogTestShieldValidations("policy", policyNumber);
-            VerifyQuoteCaravan.VerifyCaravanPolicyInShield(_browser, quoteInputs, policyNumber);
+            VerifyQuoteCaravan.PolicyInShield(_browser, quoteInputs, policyNumber);
         }
         /// <summary>
         /// This test emulates the workflow of:
@@ -157,7 +157,7 @@ namespace Spark.NewBusiness
             var quoteInputs = BuildTestDataWith0ExcessAndContentInsured15000Monthly();
 
             Reporting.LogTestStart();
-            ActionsQuoteCaravan.CreateNewCaravanQuote(_browser, quoteInputs);
+            ActionsQuoteCaravan.CreateNewQuote(_browser, quoteInputs);
             ActionsQuote.RetrieveSparkQuoteByQuoteNumber(_browser, quoteInputs.ParkingAddress, quoteInputs.QuoteData.QuoteNumber, ShieldProductType.MGV);
 
             ActionsQuoteCaravan.VerifyHeresYourQuoteAfterRetrieve(_browser, quoteInputs);
@@ -166,7 +166,7 @@ namespace Spark.NewBusiness
             string policyNumber = ActionsQuoteCaravan.GetPolicyNumberFromConfirmationPage(_browser);
 
             Reporting.LogTestShieldValidations("policy", policyNumber);
-            VerifyQuoteCaravan.VerifyCaravanPolicyInShield(_browser, quoteInputs, policyNumber);
+            VerifyQuoteCaravan.PolicyInShield(_browser, quoteInputs, policyNumber);
         }
 
         /// <summary>
@@ -187,12 +187,12 @@ namespace Spark.NewBusiness
             var quoteInputs = BuildTestDataNoUpfrontSingleMatchRule1SilverDiscountCreateQuote();
 
             Reporting.LogTestStart();
-            ActionsQuoteCaravan.CreateNewCaravanQuote(_browser, quoteInputs);
+            ActionsQuoteCaravan.CreateNewQuote(_browser, quoteInputs);
             ActionsQuoteCaravan.ProceedWithQuoteToPurchase(_browser, quoteInputs);
             string policyNumber = ActionsQuoteCaravan.GetPolicyNumberFromConfirmationPage(_browser);
 
             Reporting.LogTestShieldValidations("policy", policyNumber);
-            VerifyQuoteCaravan.VerifyCaravanPolicyInShield(_browser, quoteInputs, policyNumber);
+            VerifyQuoteCaravan.PolicyInShield(_browser, quoteInputs, policyNumber);
         }
 
         /// <summary>
@@ -214,12 +214,12 @@ namespace Spark.NewBusiness
             var quoteInputs = BuildTestDataForDuplicateAlert();
 
             Reporting.LogTestStart();
-            ActionsQuoteCaravan.CreateNewCaravanQuote(_browser, quoteInputs);
+            ActionsQuoteCaravan.CreateNewQuote(_browser, quoteInputs);
             ActionsQuoteCaravan.ConfirmQuote(_browser);
             ActionsQuoteCaravan.SetPolicyStartDate(_browser, quoteInputs);
             ActionsQuoteCaravan.ProvidePersonalInformationMainPH(_browser, quoteInputs);
 
-            VerifyQuoteCaravan.VerifyDuplicatePolicyAlert(_browser);
+            VerifyQuoteCaravan.DuplicatePolicyAlert(_browser);
 
             ActionsQuoteCaravan.HandleDuplicateAlertAndChangeRegistration(_browser, quoteInputs);
 
@@ -228,7 +228,7 @@ namespace Spark.NewBusiness
             string policyNumber = ActionsQuoteCaravan.GetPolicyNumberFromConfirmationPage(_browser);
 
             Reporting.LogTestShieldValidations("policy", policyNumber);
-            VerifyQuoteCaravan.VerifyCaravanPolicyInShield(_browser, quoteInputs, policyNumber);
+            VerifyQuoteCaravan.PolicyInShield(_browser, quoteInputs, policyNumber);
         }
         #endregion
 

@@ -1,4 +1,4 @@
-﻿using Rac.TestAutomation.Common;
+using Rac.TestAutomation.Common;
 using Rac.TestAutomation.Common.API;
 using Rac.TestAutomation.Common.DatabaseCalls.Policies;
 using System;
@@ -17,7 +17,7 @@ namespace Tests.ActionsAndValidations
     {
         public const string QUOTE_SECURITY_IMMOBILISER_IN_SHIELD = "Immobiliser";
 
-        public static void VerifyPolicyDetailsInShieldDB(string policyNumber, QuoteMotorcycle policyData)
+        public static void PolicyDetailsInShieldDB(string policyNumber, QuoteMotorcycle policyData)
         {
             Reporting.Log($"Begin verify policy details from Shield DB for: {policyNumber}");
             var policyInfo = ShieldMotorDB.FetchMotorPolicyDetail(policyNumber);
@@ -32,12 +32,12 @@ namespace Tests.ActionsAndValidations
                 Reporting.AreEqual(policyData.PremiumAnnualFromQuotePage, policyInfo.AnnualPremium, "Policy Annual Premium value in Shield");
             }
 
-            VerifyMotorcyclePolicyInShieldBasicCoverDetails(policyData, policyNumber);
-            VerifyMotorcyclePolicyInShieldPaymentDetails(policyData, policyNumber);
+            PolicyInShieldBasicCoverDetails(policyData, policyNumber);
+            PolicyInShieldPaymentDetails(policyData, policyNumber);
             VerifyPolicy.VerifyPolicyMultiMatchDetailsInShield(policyData.Drivers, policyNumber);
         }
 
-        public static void VerifyMotorcyclePolicyInShieldBasicCoverDetails(QuoteMotorcycle quoteInputs, string policyNumber)
+        public static void PolicyInShieldBasicCoverDetails(QuoteMotorcycle quoteInputs, string policyNumber)
         {
             Reporting.Log($"Begin verify policy basic cover details from Shield DB for: {policyNumber}");
             var policyInfo = ShieldMotorDB.FetchMotorPolicyDetail(policyNumber);
@@ -55,7 +55,7 @@ namespace Tests.ActionsAndValidations
             }
         }
 
-        public static void VerifyMotorcyclePolicyInShieldPaymentDetails(QuoteMotorcycle quoteInputs, string policyNumber)
+        public static void PolicyInShieldPaymentDetails(QuoteMotorcycle quoteInputs, string policyNumber)
         {
             Reporting.Log($"Begin verify payment details from Shield DB for {policyNumber}");
             var dbPaymentDetails = ShieldPolicyDB.FetchPaymentDetailsForPolicy(policyNumber);
@@ -84,7 +84,7 @@ namespace Tests.ActionsAndValidations
         /// as expected.
         /// </summary>
         /// <param name="policyHolder">The contact details from the test, that we are expecting to find in Member Central</param>
-        public static void VerifyUpdatedEmailAddressInMemberCentral(Contact policyHolder)
+        public static void UpdatedEmailAddressInMemberCentral(Contact policyHolder)
         {
             API_MemberCentralPersonV2Response mcMatch = null;
             bool emailMatched = false;
@@ -144,22 +144,22 @@ namespace Tests.ActionsAndValidations
         /// <param name="quoteInputs"></param>
         /// <param name="quoteNumber"></param>
         /// <param name="quoteStage"></param>
-        public static void VerifyQuoteContactAndVehicleDetailsInShield(QuoteMotorcycle quoteInputs, string quoteNumber, Contact expectedContact, QuoteStage quoteStage)
+        public static void QuoteContactAndVehicleDetailsInShield(QuoteMotorcycle quoteInputs, string quoteNumber, Contact expectedContact, QuoteStage quoteStage)
         {
-            var quoteDetailsFromShieldAPI = VerifyQuoteDetailsInShield(quoteInputs, quoteNumber);
+            var quoteDetailsFromShieldAPI = QuoteDetailsInShield(quoteInputs, quoteNumber);
 
             // Should always exclude mailing address as we're dealing with quote stage at this point,
             // so no detailed PH details should have been entered.
             VerifyPolicy.VerifyPHDetailsWithAPIResponse(expectedContact, quoteDetailsFromShieldAPI.Policyholder.Id.ToString(), includeMailingAddress: false, quoteStage: quoteStage);
 
-            VerifyVehicleDetailsInShield(quoteInputs, quoteDetailsFromShieldAPI);
+            VehicleDetailsInShield(quoteInputs, quoteDetailsFromShieldAPI);
         }
 
-        private static GetQuotePolicy_Response VerifyQuoteDetailsInShield(QuoteMotorcycle quoteInputs, string quoteNumber)
+        private static GetQuotePolicy_Response QuoteDetailsInShield(QuoteMotorcycle quoteInputs, string quoteNumber)
         {
             var quoteDetailsFromShieldAPI = DataHelper.GetQuoteDetails(quoteNumber);
 
-            VerifyQuoteMotorcycleAssetDetailsInShield(quoteInputs, quoteDetailsFromShieldAPI);
+            AssetDetailsInShield(quoteInputs, quoteDetailsFromShieldAPI);
 
             Reporting.IsTrue(quoteDetailsFromShieldAPI.Covers[0].CoverTypeDescription.StartsWith(MotorcycleCoverNameMappings[quoteInputs.CoverType].TextShield), "Cover Type in Shield");
             Reporting.AreEqual(Status.Proposal.GetDescription(), quoteDetailsFromShieldAPI.Status, "Status in Shield");
@@ -176,7 +176,7 @@ namespace Tests.ActionsAndValidations
             return quoteDetailsFromShieldAPI;
         }
 
-        private static void VerifyQuoteMotorcycleAssetDetailsInShield(QuoteMotorcycle quoteInputs, GetQuotePolicy_Response quoteDetailsFromShieldAPI)
+        private static void AssetDetailsInShield(QuoteMotorcycle quoteInputs, GetQuotePolicy_Response quoteDetailsFromShieldAPI)
         {
             string security = null;
 
@@ -202,7 +202,7 @@ namespace Tests.ActionsAndValidations
             }
         }
 
-        private static void VerifyVehicleDetailsInShield(QuoteMotorcycle quoteInputs, Rac.TestAutomation.Common.API.GetQuotePolicy_Response quoteDetailsFromShieldAPI)
+        private static void VehicleDetailsInShield(QuoteMotorcycle quoteInputs, Rac.TestAutomation.Common.API.GetQuotePolicy_Response quoteDetailsFromShieldAPI)
         {
             var vehicleDetailsFromShieldAPI = DataHelper.GetVehicleDetails(quoteDetailsFromShieldAPI.MotorcycleAsset.VehicleId);
             Reporting.AreEqual(ShieldMainVehicleTypeDesc.MOTORCYCLES.GetDescription(), vehicleDetailsFromShieldAPI.Vehicles[0].MainVehicleTypeDescription, "Main Vehicle Type Description in Shield");

@@ -1,4 +1,4 @@
-﻿using Rac.TestAutomation.Common;
+using Rac.TestAutomation.Common;
 using UIDriver.Pages;
 using UIDriver.Pages.Spark;
 using UIDriver.Pages.Spark.BoatQuote;
@@ -20,7 +20,7 @@ namespace Tests.ActionsAndValidations
         /// into the test data object (under child property QuoteData),
         /// which will be visible to caller after this method exits.
         /// </summary>
-        public static void CreateNewBoatQuote(Browser browser, QuoteBoat quote)
+        public static void CreateNewQuote(Browser browser, QuoteBoat quote)
         {
             Reporting.Log("Begin input of values to build boat quote.");
         }

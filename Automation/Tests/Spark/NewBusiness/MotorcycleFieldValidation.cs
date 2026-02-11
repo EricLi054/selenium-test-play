@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Rac.TestAutomation.Common;
 using Rac.TestAutomation.Common.TestData.Quote;
 using Tests.ActionsAndValidations;
@@ -78,7 +78,7 @@ namespace Spark.NewBusiness
             testQuoteData.EngineCC    = randomBike.EngineCC;
             testQuoteData.MarketValue = randomBike.MarketValue;
 
-            ActionsQuoteMotorcycle.FetchNewMotorCycleQuote(_browser, testQuoteData);
+            ActionsQuoteMotorcycle.FetchNewQuote(_browser, testQuoteData);
 
             ActionsQuoteMotorcycle.AdjustQuoteParametersRemainOnQuotePage(_browser, testQuoteData);
 

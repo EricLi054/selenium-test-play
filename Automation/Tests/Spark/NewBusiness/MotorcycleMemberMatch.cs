@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Rac.TestAutomation.Common;
 using Rac.TestAutomation.Common.TestData.Quote;
 using Rac.TestAutomation.Common.DatabaseCalls.Contacts;
@@ -40,7 +40,7 @@ namespace Spark.NewBusiness
         {
             var quoteInputs = BuildTestDataTest002();
 
-            ActionsQuoteMotorcycle.PurchaseMotorcyclePolicy(_browser, quoteInputs);
+            ActionsQuoteMotorcycle.PurchasePolicy(_browser, quoteInputs);
         }
 
         /// <summary>
@@ -63,11 +63,11 @@ namespace Spark.NewBusiness
         {
             var quoteInputs = BuildTestDataForIssuePolicyComprehensiveAnnualCreditCardFutureDatedMatchRule1();
 
-            var policyNumber = ActionsQuoteMotorcycle.PurchaseMotorcyclePolicy(_browser, quoteInputs);
+            var policyNumber = ActionsQuoteMotorcycle.PurchasePolicy(_browser, quoteInputs);
 
-            VerifyPolicyMotorcycle.VerifyPolicyDetailsInShieldDB(policyNumber, quoteInputs);
+            VerifyPolicyMotorcycle.PolicyDetailsInShieldDB(policyNumber, quoteInputs);
 
-            VerifyPolicyMotorcycle.VerifyUpdatedEmailAddressInMemberCentral(quoteInputs.Drivers[0].Details);
+            VerifyPolicyMotorcycle.UpdatedEmailAddressInMemberCentral(quoteInputs.Drivers[0].Details);
             //TODO AUNT-195 Add further confirmation of member information to match manual SPK-T14 test.
         }
 
@@ -91,11 +91,11 @@ namespace Spark.NewBusiness
             }
             var quoteInputs = BuildTestDataForIssuePolicyTPPDMonthlyDirectDebitMatchRule3Gold();
 
-            ActionsQuoteMotorcycle.FetchNewMotorCycleQuote(_browser, quoteInputs);
-            ActionsQuoteMotorcycle.VerifyCoverHelpTipAndGetQuoteNumber(_browser, quoteInputs);
+            ActionsQuoteMotorcycle.FetchNewQuote(_browser, quoteInputs);
+            ActionsQuoteMotorcycle.CoverHelpTipAndGetQuoteNumber(_browser, quoteInputs);
             var policyNumber = ActionsQuoteMotorcycle.ProceedWithQuoteToPurchase(_browser, quoteInputs);
             
-            VerifyPolicyMotorcycle.VerifyPolicyDetailsInShieldDB(policyNumber, quoteInputs);
+            VerifyPolicyMotorcycle.PolicyDetailsInShieldDB(policyNumber, quoteInputs);
             VerifyPaymentDetails.VerifyPolicyPaymentDetails(policyNumber, quoteInputs.PayMethod.Payer.BankAccounts[0]);
         }
 
@@ -120,8 +120,8 @@ namespace Spark.NewBusiness
         {
             var quoteInputs = BuildTestDataForMCOCreateQuoteUpfrontSingleMatchGoldDiscount();
 
-            ActionsQuoteMotorcycle.FetchNewMotorCycleQuote(_browser, quoteInputs);
-            var quoteNumber = ActionsQuoteMotorcycle.VerifyCoverHelpTipAndGetQuoteNumber(_browser, quoteInputs);
+            ActionsQuoteMotorcycle.FetchNewQuote(_browser, quoteInputs);
+            var quoteNumber = ActionsQuoteMotorcycle.CoverHelpTipAndGetQuoteNumber(_browser, quoteInputs);
 
             //Change Excess (expecting premiums to be updated)
             ActionsQuoteMotorcycle.AdjustQuoteParametersRemainOnQuotePage(_browser, quoteInputs);
@@ -129,7 +129,7 @@ namespace Spark.NewBusiness
             //Verify Quote details (To verify the updated premiums)
             Contact expectedContact = ShieldAPIVerification.BuildExpectedContact(Vehicle.Motorcycle, SparkBasePage.QuoteStage.AFTER_QUOTE, quoteInputs.Drivers[0].Details);
 
-            VerifyPolicyMotorcycle.VerifyQuoteContactAndVehicleDetailsInShield(quoteInputs, quoteNumber, expectedContact, SparkBasePage.QuoteStage.AFTER_QUOTE);
+            VerifyPolicyMotorcycle.QuoteContactAndVehicleDetailsInShield(quoteInputs, quoteNumber, expectedContact, SparkBasePage.QuoteStage.AFTER_QUOTE);
 
         }
 
@@ -150,7 +150,7 @@ namespace Spark.NewBusiness
         {
             var quoteInputs = BuildTestDataForMCOCreateQuoteUpfrontSingleMatchMFCORule1SilverDiscount();
 
-            ActionsQuoteMotorcycle.FetchNewMotorCycleQuote(_browser, quoteInputs);
+            ActionsQuoteMotorcycle.FetchNewQuote(_browser, quoteInputs);
 
             ActionsQuoteMotorcycle.AdjustQuoteParametersRemainOnQuotePage(_browser, quoteInputs);
 
@@ -158,7 +158,7 @@ namespace Spark.NewBusiness
 
             Contact expectedContact = ShieldAPIVerification.BuildExpectedContact(Vehicle.Motorcycle, SparkBasePage.QuoteStage.AFTER_QUOTE, quoteInputs.Drivers[0].Details);
 
-            VerifyPolicyMotorcycle.VerifyQuoteContactAndVehicleDetailsInShield(quoteInputs, quoteNumber, expectedContact, SparkBasePage.QuoteStage.AFTER_QUOTE);
+            VerifyPolicyMotorcycle.QuoteContactAndVehicleDetailsInShield(quoteInputs, quoteNumber, expectedContact, SparkBasePage.QuoteStage.AFTER_QUOTE);
         }
 
         /// <summary>
@@ -174,13 +174,13 @@ namespace Spark.NewBusiness
         {
             var quoteInputs = BuildTestDataForMCOCreateQuoteUpfrontSingleMatchTFTPGoldMembership();
 
-            ActionsQuoteMotorcycle.FetchNewMotorCycleQuote(_browser, quoteInputs);
-            var quoteNumber = ActionsQuoteMotorcycle.VerifyCoverHelpTipAndGetQuoteNumber(_browser, quoteInputs);
+            ActionsQuoteMotorcycle.FetchNewQuote(_browser, quoteInputs);
+            var quoteNumber = ActionsQuoteMotorcycle.CoverHelpTipAndGetQuoteNumber(_browser, quoteInputs);
             ActionsQuoteMotorcycle.SelectCover(_browser, quoteInputs);
 
             Contact expectedContact = ShieldAPIVerification.BuildExpectedContact(Vehicle.Motorcycle, SparkBasePage.QuoteStage.AFTER_QUOTE, quoteInputs.Drivers[0].Details);
 
-            VerifyPolicyMotorcycle.VerifyQuoteContactAndVehicleDetailsInShield(quoteInputs, quoteNumber, expectedContact, SparkBasePage.QuoteStage.AFTER_QUOTE);
+            VerifyPolicyMotorcycle.QuoteContactAndVehicleDetailsInShield(quoteInputs, quoteNumber, expectedContact, SparkBasePage.QuoteStage.AFTER_QUOTE);
         }
 
         /// <summary>
@@ -196,19 +196,19 @@ namespace Spark.NewBusiness
             var quoteInputs = BuildTestDataForDuplicateAlert();
 
             Reporting.LogTestStart();
-            ActionsQuoteMotorcycle.FetchNewMotorCycleQuote(_browser, quoteInputs);
+            ActionsQuoteMotorcycle.FetchNewQuote(_browser, quoteInputs);
             ActionsQuoteMotorcycle.ProcessQuoteWithExistingDetails(_browser, quoteInputs);
 
-            VerifyQuoteMotorcycle.VerifyDuplicatePolicyAlert(_browser);
+            VerifyQuoteMotorcycle.DuplicatePolicyAlert(_browser);
 
             ActionsQuoteMotorcycle.HandleDuplicateAlertAndChangeRegistration(_browser, quoteInputs);
 
-            VerifyQuoteMotorcycle.VerifyQuoteDetailsOnPaymentPage(_browser, quoteInputs);
+            VerifyQuoteMotorcycle.QuoteDetailsOnPaymentPage(_browser, quoteInputs);
             
             string policyNumber = ActionsQuoteMotorcycle.EnterPaymentDetailAndPurchasePolicy(_browser, quoteInputs);
 
             Reporting.LogTestShieldValidations("policy", policyNumber);
-            VerifyPolicyMotorcycle.VerifyPolicyDetailsInShieldDB(policyNumber, quoteInputs);
+            VerifyPolicyMotorcycle.PolicyDetailsInShieldDB(policyNumber, quoteInputs);
         }
 
         private QuoteMotorcycle BuildTestDataTest002()

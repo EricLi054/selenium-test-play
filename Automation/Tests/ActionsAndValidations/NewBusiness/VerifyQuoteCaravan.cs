@@ -1,4 +1,4 @@
-﻿using Rac.TestAutomation.Common;
+using Rac.TestAutomation.Common;
 using Rac.TestAutomation.Common.API;
 using Rac.TestAutomation.Common.DatabaseCalls.Policies;
 using System;
@@ -38,17 +38,17 @@ namespace Tests.ActionsAndValidations
         /// </summary>
         /// <param name="testConfig"></param>
         /// <param name="quote"></param>
-        public static void VerifyQuoteViaShieldAPI(QuoteCaravan quote, SparkBasePage.QuoteStage quoteStage)
+        public static void QuoteViaShieldAPI(QuoteCaravan quote, SparkBasePage.QuoteStage quoteStage)
         {
             Reporting.Log($"Verifying quote details in Shield {quoteStage}");
             Contact expectedContact = ShieldAPIVerification.BuildExpectedContact(Constants.PolicyGeneral.Vehicle.Caravan, quoteStage, quote.PolicyHolders[0]);
             var quoteDetailsFromAPI = DataHelper.GetQuoteDetails(quote.QuoteData.QuoteNumber);
-            VerifyQuoteAndCoverDetailsViaShieldAPI(quote, quoteDetailsFromAPI, quoteStage);
+            QuoteAndCoverDetailsViaShieldAPI(quote, quoteDetailsFromAPI, quoteStage);
             VerifyPolicy.VerifyPHDetailsWithAPIResponse(expectedContact, quoteDetailsFromAPI.Policyholder.Id.ToString(), quoteStage: quoteStage);
-            VerifyCaravanDetailsViaShieldAPI(quote, quoteDetailsFromAPI);
+            DetailsViaShieldAPI(quote, quoteDetailsFromAPI);
         }
 
-        private static void VerifyQuoteAndCoverDetailsViaShieldAPI(QuoteCaravan quote, GetQuotePolicy_Response quoteDetailsFromAPI, SparkBasePage.QuoteStage quoteStage)
+        private static void QuoteAndCoverDetailsViaShieldAPI(QuoteCaravan quote, GetQuotePolicy_Response quoteDetailsFromAPI, SparkBasePage.QuoteStage quoteStage)
         {
             //Verify quote breakdown
             if (quote.PayMethod.PaymentFrequency == PaymentFrequency.Annual)
@@ -62,12 +62,12 @@ namespace Tests.ActionsAndValidations
 
             //Verify covers
             if (quote.ParkLocation == CaravanParkLocation.OnSite)
-            { VerifyCoverInQuoteAPI("Caravan On-Site", quote.SumInsuredValue, quote.Excess.Value, quoteDetailsFromAPI); }
+            { CoverInQuoteAPI("Caravan On-Site", quote.SumInsuredValue, quote.Excess.Value, quoteDetailsFromAPI); }
             else
-            { VerifyCoverInQuoteAPI("Caravan Trailed", quote.SumInsuredValue, quote.Excess.Value, quoteDetailsFromAPI); }
+            { CoverInQuoteAPI("Caravan Trailed", quote.SumInsuredValue, quote.Excess.Value, quoteDetailsFromAPI); }
 
-            VerifyCoverInQuoteAPI("Caravan Contents", quote.ContentsSumInsured, quote.Excess.Value, quoteDetailsFromAPI);
-            VerifyCoverInQuoteAPI("Caravan Annexe", CARAVAN_DEFAULT_ANNEXE_COVER, quote.Excess.Value, quoteDetailsFromAPI);
+            CoverInQuoteAPI("Caravan Contents", quote.ContentsSumInsured, quote.Excess.Value, quoteDetailsFromAPI);
+            CoverInQuoteAPI("Caravan Annexe", CARAVAN_DEFAULT_ANNEXE_COVER, quote.Excess.Value, quoteDetailsFromAPI);
 
             //Verify Product Type, Status, Policy End Date and Proposal Valid Date
             Reporting.AreEqual(ShieldProductType.MGV, quoteDetailsFromAPI.ProductType, "Product Type in Shield");
@@ -95,7 +95,7 @@ namespace Tests.ActionsAndValidations
         /// <param name="expectedSI"></param>
         /// <param name="expectedExcess"></param>
         /// <param name="apiMessage"></param>
-        private static void VerifyCoverInQuoteAPI(string coverName, decimal expectedSI, decimal expectedExcess, GetQuotePolicy_Response apiMessage)
+        private static void CoverInQuoteAPI(string coverName, decimal expectedSI, decimal expectedExcess, GetQuotePolicy_Response apiMessage)
         {
             var matchingCover = apiMessage.Covers.FirstOrDefault(x => x.CoverTypeDescription.Equals(coverName, StringComparison.InvariantCultureIgnoreCase));
             Reporting.IsTrue(matchingCover != null, "Matching cover name was found in the API response");
@@ -103,7 +103,7 @@ namespace Tests.ActionsAndValidations
             Reporting.AreEqual(expectedExcess, matchingCover?.StandardExcess, $"Excess for {coverName} cover is set to ${expectedExcess}");
         }
 
-        private static void VerifyCaravanDetailsViaShieldAPI(QuoteCaravan quote, GetQuotePolicy_Response quoteDetailsFromAPI)
+        private static void DetailsViaShieldAPI(QuoteCaravan quote, GetQuotePolicy_Response quoteDetailsFromAPI)
         {
             Reporting.AreEqual(VehicleUsage.Private.ToString(), quoteDetailsFromAPI.CaravanAsset.VehicleUsage, "Vehicle Usage in Shield");
             Reporting.AreEqual(quote.ParkingAddress.Suburb, quoteDetailsFromAPI.CaravanAsset.Suburb, true);
@@ -120,15 +120,15 @@ namespace Tests.ActionsAndValidations
             Reporting.AreEqual(quote.Year, vehicleDetailsFromShieldAPI.Vehicles[0].ModelYear, "Caravan Year in Shield");
         }
 
-        public static void VerifyCaravanPolicyInShield(Browser browser, QuoteCaravan caravanQuote, string policyNumber)
+        public static void PolicyInShield(Browser browser, QuoteCaravan caravanQuote, string policyNumber)
         {
             CaravanPolicy policyInfo = ShieldCaravanDB.FetchCaravanPolicyDetail(policyNumber, caravanQuote.Type);
-            VerifyCaravanPolicyInShieldBasicCoverDetails(caravanQuote, policyInfo);
-            VerifyCaravanPolicyPaymentDetailsInShield(browser, caravanQuote, policyNumber, policyInfo);
+            PolicyInShieldBasicCoverDetails(caravanQuote, policyInfo);
+            PolicyPaymentDetailsInShield(browser, caravanQuote, policyNumber, policyInfo);
             VerifyPolicy.VerifyPolicyMultiMatchDetailsInShield(caravanQuote.PolicyHolders, policyNumber);
         }
 
-        private static void VerifyCaravanPolicyInShieldBasicCoverDetails(QuoteCaravan caravanQuote, CaravanPolicy policyInfo)
+        private static void PolicyInShieldBasicCoverDetails(QuoteCaravan caravanQuote, CaravanPolicy policyInfo)
         {
             Reporting.AreEqual(caravanQuote.ParkLocation.GetDescription(), policyInfo.CaravanPolicyOutput.CaravanLocation, 
                 ignoreCase: true, "Caravan parking location in Shield DB");
@@ -160,7 +160,7 @@ namespace Tests.ActionsAndValidations
             Reporting.AreEqual(CARAVAN_EMAIL_TYPE,  policyInfo.CaravanPolicyOutput.EmailType, "Email Type from Shield DB");            
         }
 
-        private static void VerifyCaravanPolicyPaymentDetailsInShield(Browser browser, QuoteCaravan caravanQuote, string policyNumber, CaravanPolicy policyInfo)
+        private static void PolicyPaymentDetailsInShield(Browser browser, QuoteCaravan caravanQuote, string policyNumber, CaravanPolicy policyInfo)
         {
             Reporting.Log($"Begin verify policy payment details from Shield DB. Param/s = {policyNumber}");
             Reporting.AreEqual(caravanQuote.StartDate.ToString(DataFormats.DATE_FORMAT_FORWARD_FORWARDSLASH),
@@ -204,7 +204,7 @@ namespace Tests.ActionsAndValidations
             VerifyPolicy.VerifyNewPolicyInstalments(policyNumber);
         }
 
-        public static void VerifyDuplicatePolicyAlert(Browser browser)
+        public static void DuplicatePolicyAlert(Browser browser)
         {
             using (var tellUsMoreAboutYou = new TellUsMoreAboutYou(browser))
             {
