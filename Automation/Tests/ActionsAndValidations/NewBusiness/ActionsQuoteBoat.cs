@@ -15,20 +15,10 @@ namespace Tests.ActionsAndValidations
     class ActionsQuoteBoat
     {
         /// <summary>
-        /// Supports Spark Boat
-        /// Will create a new boat quote on spark boat and set the quote number and premium values,
-        /// into the test data object (under child property QuoteData),
-        /// which will be visible to caller after this method exits.
-        /// </summary>
-        public static void CreateNewQuote(Browser browser, QuoteBoat quote)
-        {
-            Reporting.Log("Begin input of values to build boat quote.");
-        }
-        /// <summary>
-        /// Reusable generic steps used by boat quote to purchase tests.
+        /// Reusable generic steps used by boat quote to purchase tests (quote through to policy).
         /// </summary>
         /// <param name="detailedUiChecking">Optional parameter, if set to true will investigate field validation errors etc</param>
-        public static void QuoteStepsEndToEnd(Browser browser, QuoteBoat quoteBoat, bool detailedUiChecking = false)
+        public static void QuoteToPolicyEndToEnd(Browser browser, QuoteBoat quoteBoat, bool detailedUiChecking = false)
         {
             //Page 0: Important information
             if (detailedUiChecking)
@@ -72,10 +62,11 @@ namespace Tests.ActionsAndValidations
         }
 
         /// <summary>
-        /// Reusable generic steps used to generate a quote without finalising the purchase, for use in testing Retrieve Quote.
+        /// Creates a new boat quote and sets quote number and premium values in the test data object (QuoteData).
+        /// Does not complete payment; for use in testing Retrieve Quote or when only a quote is needed.
         /// </summary>
         /// <param name="detailedUiChecking">Optional parameter, if set to true will investigate field validation errors etc</param>
-        public static void QuoteWithoutPurchase(Browser browser, QuoteBoat quoteBoat, bool detailedUiChecking = false)
+        public static void CreateNewQuote(Browser browser, QuoteBoat quoteBoat, bool detailedUiChecking = false)
         {
             //Page 0: Important information
             if (detailedUiChecking)
@@ -140,7 +131,7 @@ namespace Tests.ActionsAndValidations
         }
 
         /// <summary>
-        /// Short run alternative to QuoteStepsEndToEnd for smoke testing, only checking the unique content 
+        /// Short run alternative to QuoteToPolicyEndToEnd for smoke testing, only checking the unique content 
         /// on the Important Information page.
         /// </summary>
         public static void SmokeTestUniqueContentOnly(Browser browser)

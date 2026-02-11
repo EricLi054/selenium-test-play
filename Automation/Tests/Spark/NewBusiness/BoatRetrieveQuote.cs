@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using NUnit.Framework;
 using Rac.TestAutomation.Common;
 using Rac.TestAutomation.Common.TestData.Quote;
@@ -36,7 +36,7 @@ namespace Spark.NewBusiness
             Reporting.LogTestStart();
             LaunchPage.OpenSparkBoatLandingPageAndSetConfig(_browser);
 
-            ActionsQuoteBoat.QuoteWithoutPurchase(_browser, quoteBoat);
+            ActionsQuoteBoat.CreateNewQuote(_browser, quoteBoat);
 
             var quoteData = quoteBoat.QuoteData;
             LaunchPage.OpenSparkBoatRetrieveQuoteAndSetConfig(_browser);
@@ -59,7 +59,7 @@ namespace Spark.NewBusiness
             Reporting.LogTestStart();
             LaunchPage.OpenSparkBoatLandingPageAndSetConfig(_browser);
 
-            ActionsQuoteBoat.QuoteWithoutPurchase(_browser, quoteBoat);
+             ActionsQuoteBoat.CreateNewQuote(_browser, quoteBoat);
 
             var quoteData = quoteBoat.QuoteData;
             LaunchPage.OpenSparkBoatRetrieveQuoteAndSetConfig(_browser);

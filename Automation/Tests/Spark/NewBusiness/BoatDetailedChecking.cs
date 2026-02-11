@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using NUnit.Framework;
 using Rac.TestAutomation.Common;
@@ -36,7 +36,7 @@ namespace Spark.NewBusiness
             Reporting.LogTestStart();
             LaunchPage.OpenSparkBoatLandingPageAndSetConfig(_browser);
 
-            ActionsQuoteBoat.QuoteStepsEndToEnd(_browser, quoteBoat, detailedUiChecking: true);
+            ActionsQuoteBoat.QuoteToPolicyEndToEnd(_browser, quoteBoat, detailedUiChecking: true);
         }
         #endregion
 

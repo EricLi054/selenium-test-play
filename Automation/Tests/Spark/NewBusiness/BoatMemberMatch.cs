@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using NUnit.Framework;
 using Rac.TestAutomation.Common;
 using Rac.TestAutomation.Common.DatabaseCalls.Contacts;
@@ -35,7 +35,7 @@ namespace Spark.NewBusiness
             Reporting.LogTestStart();
             LaunchPage.OpenSparkBoatLandingPageAndSetConfig(_browser);
 
-            ActionsQuoteBoat.QuoteStepsEndToEnd(_browser, quoteBoat);
+            ActionsQuoteBoat.QuoteToPolicyEndToEnd(_browser, quoteBoat);
         }
 
         /// <summary>
@@ -50,7 +50,7 @@ namespace Spark.NewBusiness
             Reporting.LogTestStart();
             LaunchPage.OpenSparkBoatLandingPageAndSetConfig(_browser);
 
-            ActionsQuoteBoat.QuoteStepsEndToEnd(_browser, quoteBoat);
+            ActionsQuoteBoat.QuoteToPolicyEndToEnd(_browser, quoteBoat);
         }
 
         #endregion
