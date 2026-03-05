@@ -1,4 +1,4 @@
-﻿using OpenQA.Selenium;
+using OpenQA.Selenium;
 using Rac.TestAutomation.Common;
 using System;
 using System.Collections.Generic;

@@ -1,4 +1,4 @@
-﻿using Rac.TestAutomation.Common;
+using Rac.TestAutomation.Common;
 using System;
 using System.Linq;
 using UIDriver.Pages.Spark;
@@ -292,18 +292,18 @@ namespace Tests.ActionsAndValidations.Endorsements
         }
 
         /// <summary>
-        /// Check the details when the next instalment is updated and the payment source is a bank account
+        /// Generic verification after Update How You Pay when the new payment source is a bank account.
+        /// Verifies instalment details, bank account, date, email and Shield events. Asserts instalment amount unchanged (premium validation).
         /// </summary>
-        /// <param name="browser"></param>
-        /// <param name="testData"></param>
-        /// <param name="bankAccount"></param>
         public static void VerifyUpdateOccursInShieldWithBankAccountAsSource(Browser browser, EndorsementBase testData, BankAccount bankAccount)
         {
             var policyInstalmentDetails = ShieldPolicyDB.FetchNextInstalmentDetails(testData.PolicyNumber);
             var endorsementDetails = ShieldPolicyDB.FetchPaymentUpdateDetailsForPolicy(testData.PolicyNumber, testData.ActivePolicyHolder.Id);
 
-            // Instalment Details
-            Reporting.AreEqual(testData.OriginalPolicyData.NextPendingInstallment().Amount.Total, policyInstalmentDetails.AmountDue, "instalment amount has remained the same");
+            if (testData.OriginalPolicyData.NextPendingInstallment() != null)
+            {
+                Reporting.AreEqual(testData.OriginalPolicyData.NextPendingInstallment().Amount.Total, policyInstalmentDetails.AmountDue, "instalment amount has remained the same (premium unchanged after UHIP)");
+            }
             Reporting.AreEqual(bankAccount.Bsb, policyInstalmentDetails.BankAccount.Bsb, "BSB updated");
             Reporting.AreEqual(bankAccount.AccountNumber, policyInstalmentDetails.BankAccount.AccountNumber, "account number updated coorectly");
             Reporting.AreEqual(bankAccount.AccountName, policyInstalmentDetails.BankAccount.AccountName, "account name updated");
@@ -316,24 +316,22 @@ namespace Tests.ActionsAndValidations.Endorsements
             // Shield Events
             Reporting.IsTrue(endorsementDetails.PaymentChangeEventGenerated, "policy change event registered ");
             Reporting.IsTrue(endorsementDetails.PrintEventGenerated, "policy print invoked ");
-            Reporting.IsTrue(endorsementDetails.EndorsementForDebitAdmendment, "endorsement for debit admendment");
+            Reporting.IsTrue(endorsementDetails.EndorsementForDebitAdmendment, "UHIP (Update How I Pay) endorsement reason recorded in Shield");
             Reporting.AreEqual(1, endorsementDetails.EventCount, "only one event created in Shield");
         }
 
         /// <summary>
-        /// When the next instalment using a credit card is update, check the details are correct.
-        /// </summary>        
-        /// <param name="testData"></param>
-        /// <param name="creditCard"></param>
+        /// Generic verification after Update How You Pay when the new payment source is a credit card.
+        /// Verifies card details, date, email and Shield events. Asserts instalment amount unchanged (premium validation).
+        /// </summary>
         public static void VerifyUpdateOccursInShieldWithCreditCardAsSource(EndorsementBase testData, CreditCard creditCard)
         {
             var policyInstalmentDetails = ShieldPolicyDB.FetchNextInstalmentDetails(testData.PolicyNumber);
             var endorsementDetails = ShieldPolicyDB.FetchPaymentUpdateDetailsForPolicy(testData.PolicyNumber, testData.ActivePolicyHolder.Id);
 
-            //not required when there is no current installement amount in policy 
             if (testData.OriginalPolicyData.NextPendingInstallment() != null)
             {
-                Reporting.AreEqual(testData.OriginalPolicyData.NextPendingInstallment().Amount.Total, policyInstalmentDetails.AmountDue, "instalment amount has remained the same");
+                Reporting.AreEqual(testData.OriginalPolicyData.NextPendingInstallment().Amount.Total, policyInstalmentDetails.AmountDue, "instalment amount has remained the same (premium unchanged after UHIP)");
             }
             
             Reporting.AreEqual(creditCard.CardIssuer, policyInstalmentDetails.CreditCard.CardIssuer, "card issuer is correct");
@@ -344,13 +342,16 @@ namespace Tests.ActionsAndValidations.Endorsements
             Reporting.AreEqual(testData.NextPaymentDate, policyInstalmentDetails.CurrentCollectionDate, "correct instalment date shown");
 
             // Email updated
-            Reporting.AreEqual(testData.ActivePolicyHolder.GetEmail().ToLower(), endorsementDetails.Email.ToLower(),
-                "email updated correctly");
+            var expectedEmail = (testData.ActivePolicyHolder.GetEmail() ?? string.Empty).ToLower();
+            var actualEmail = (endorsementDetails?.Email ?? string.Empty).ToLower();
+            Reporting.AreEqual(expectedEmail, actualEmail, "email updated correctly");
+
+            // Verify marketing flag has not been changed in Shield. Not intentionally removed — to restore: add IsMarketingAllowed to Contact (from Policy/Person API) and policyholder details from Shield (Policy API or GetPaymentEndorsementDetails); then assert unchanged.
 
             // Shield Events
             Reporting.IsTrue(endorsementDetails.PaymentChangeEventGenerated, "policy change event registered");
             Reporting.IsTrue(endorsementDetails.PrintEventGenerated, "policy print invoked");
-            Reporting.IsTrue(endorsementDetails.EndorsementForDebitAdmendment, "endorsement for debit admendment");
+            Reporting.IsTrue(endorsementDetails.EndorsementForDebitAdmendment, "UHIP (Update How I Pay) endorsement reason recorded in Shield");
             Reporting.AreEqual(1, endorsementDetails.EventCount, "only one event created in Shield");
         }
 

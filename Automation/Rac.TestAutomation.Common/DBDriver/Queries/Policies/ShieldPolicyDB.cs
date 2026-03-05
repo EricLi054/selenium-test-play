@@ -1,4 +1,4 @@
-﻿using Rac.TestAutomation.Common.DatabaseCalls.Claims;
+using Rac.TestAutomation.Common.DatabaseCalls.Claims;
 using System.Collections.Generic;
 using System;
 using System.Linq;
@@ -404,6 +404,63 @@ namespace Rac.TestAutomation.Common.DatabaseCalls.Policies
             }
 
             Reporting.IsTrue(result.Count > 0, "that we found at least one suitable policy matching test criteria");
+            return result;
+        }
+
+        /// <summary>
+        /// Returns policies for Update How You Pay where the policyholder's age is one year before a premium age-threshold (21, 24, 50, 71, 76).
+        /// Returns an empty list when none found; use with fallback to standard finder when preferring age-threshold data.
+        /// </summary>
+        public static List<string> FindPoliciesByAgeThresholdForPremiumChange(ShieldProductType productType, bool isCreditCard)
+        {
+            var candidatePolicies = new List<string>();
+            var candidatePolicyHolders = new List<string>();
+            var result = new List<string>();
+            var paymentScenario = isCreditCard ? PaymentScenario.MonthlyCard : PaymentScenario.MonthlyBank;
+            var queryParams = new Dictionary<string, string>(GetShieldPaymentMethodParameters(paymentScenario))
+            {
+                { "productId", ((int)productType).ToString() },
+                { "isCreditCard", isCreditCard ? "1" : "0" }
+            };
+
+            try
+            {
+                string query = ShieldDB.ReadSQLFromFile("Policies\\FindPolicyDetailsForMidTermMonthlyWherePremiumWillChangeByAge.sql");
+
+                using (var db = ShieldDB.GetDatabaseHandle())
+                {
+                    var reader = db.ExecuteQuery(query, queryParams);
+                    while (reader.Read())
+                    {
+                        try
+                        {
+                            if (!DataHelper.HasValidPhoneNumberSet(mobile: reader.GetDbValueFromColumnName("MobilePhone"),
+                                                                   homePhone: reader.GetDbValueFromColumnName("HomePhone")))
+                            {
+                                continue;
+                            }
+                            candidatePolicies.Add(reader.GetDbValueFromColumnName("PolicyNumber"));
+                            candidatePolicyHolders.Add(reader.GetDbValueFromColumnName("ContactID"));
+                        }
+                        catch (Exception ex) when (ex is SqlException || ex is IOException || ex is ArgumentException)
+                        { Reporting.Log("Error getting value from column: " + ex.Message); }
+                    }
+                }
+            }
+            catch (Exception e) when (e is ArgumentException || e is IOException || e is SqlException)
+            {
+                Reporting.Error($"SQL error encountered: {e.Message}");
+            }
+
+            for (int i = 0; i < candidatePolicies.Count; i++)
+            {
+                if (HasInvalidCharactersOrIncorrectLengthInContactAccountNames(candidatePolicyHolders[i]))
+                {
+                    continue;
+                }
+                result.Add(candidatePolicies[i]);
+            }
+
             return result;
         }
 

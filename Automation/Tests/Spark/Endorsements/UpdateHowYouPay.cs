@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+using System.Collections.Generic;
+using NUnit.Framework;
 using Rac.TestAutomation.Common;
 using Rac.TestAutomation.Common.DatabaseCalls.Policies;
 using Rac.TestAutomation.Common.TestData.Endorsements;
@@ -313,21 +314,35 @@ namespace Spark.Endorsements
             return testData;
         }
 
+        /// <summary>
+        /// Build test data for Motor policy Update How You Pay. Prefers policies where policyholder is one year before
+        /// an age threshold (so UHIP premium validation is meaningful); falls back to standard monthly credit card policies.
+        /// </summary>
         private EndorseCar BuildTestDataForMotorPolicyReschedule_CreditCard()
         {
             EndorseCar testData = null;
-            var policies = ShieldPolicyDB.FindPolicyPaidMonthlyViaCreditCardForChangeHowYouPay(ShieldProductType.MGP);
+            // Prefer age-threshold candidate policies (PH ages 20/23/49/70/75) so the "instalment amount unchanged" assertion is meaningful.
+            // If none are available in the current environment, fall back to the standard monthly finder so the UHIP flow still has data to run against.
+            var policiesByAgeThreshold = ShieldPolicyDB.FindPoliciesByAgeThresholdForPremiumChange(ShieldProductType.MGP, isCreditCard: true);
+            var usingAgeThresholdCandidates = policiesByAgeThreshold.Count > 0;
+            var policies = usingAgeThresholdCandidates
+                ? policiesByAgeThreshold
+                : ShieldPolicyDB.FindPolicyPaidMonthlyViaCreditCardForChangeHowYouPay(ShieldProductType.MGP);
+
+            Reporting.Log(usingAgeThresholdCandidates
+                ? $"UHIP data: age-threshold candidates ({policies.Count})."
+                : "UHIP data: fallback to standard monthly credit card (any PH age).");
 
             foreach (var policy in policies)
             {
                 try
                 {
-                    Reporting.Log($"Evaluating candidate policy '{policy}'");
                     var policyDetails = DataHelper.GetPolicyDetails(policy);
                     var policyHolder = DataHelper.MapContactWithPersonAPI(policyDetails.Policyholder.Id.ToString(), policyDetails.Policyholder.ContactExternalNumber);
 
                     if (policyHolder != null && policyHolder.MobilePhoneNumber != null)
                     {
+                        Reporting.Log($"Evaluating candidate policy '{policy}' (source: {(usingAgeThresholdCandidates ? "age-threshold" : "fallback")}, policyholderAge: {policyHolder.GetContactAge()})");
                         testData = new MotorEndorsementBuilder().InitialiseMotorCarWithDefaultData(policy, policyHolder)
                                                             .WithNextPaymentDate(4)
                                                             .Build();
@@ -409,21 +424,35 @@ namespace Spark.Endorsements
             return testData;
         }
 
+        /// <summary>
+        /// Build test data for Caravan policy Update How You Pay. Prefers policies where policyholder is one year before
+        /// an age threshold (so UHIP premium validation is meaningful); falls back to standard monthly bank debit policies.
+        /// </summary>
         private EndorseCaravan BuildTestDataCaravanPolicyPaidViaBankAccountAndNewInstalmentDate()
         {
             EndorseCaravan testData = null;
-            var policies = ShieldPolicyDB.FindPolicyPaidMonthlyViaBankDebit(ShieldProductType.MGV);
+            // Prefer age-threshold candidate policies (PH ages 20/23/49/70/75) so the "instalment amount unchanged" assertion is meaningful.
+            // If none are available in the current environment, fall back to the standard monthly finder so the UHIP flow still has data to run against.
+            var policiesByAgeThreshold = ShieldPolicyDB.FindPoliciesByAgeThresholdForPremiumChange(ShieldProductType.MGV, isCreditCard: false);
+            var usingAgeThresholdCandidates = policiesByAgeThreshold.Count > 0;
+            var policies = usingAgeThresholdCandidates
+                ? policiesByAgeThreshold
+                : ShieldPolicyDB.FindPolicyPaidMonthlyViaBankDebit(ShieldProductType.MGV);
+
+            Reporting.Log(usingAgeThresholdCandidates
+                ? $"UHIP data: age-threshold candidates ({policies.Count})."
+                : "UHIP data: fallback to standard monthly bank debit (any PH age).");
 
             foreach (var policy in policies)
             {
                 try
                 {
-                    Reporting.Log($"Evaluating candidate policy '{policy}'");
                     var policyDetails = DataHelper.GetPolicyDetails(policy);
                     var policyHolder = DataHelper.MapContactWithPersonAPI(policyDetails.Policyholder.Id.ToString(), policyDetails.Policyholder.ContactExternalNumber);
 
                     if (policyHolder != null && policyHolder.MobilePhoneNumber != null)
                     {
+                        Reporting.Log($"Evaluating candidate policy '{policy}' (source: {(usingAgeThresholdCandidates ? "age-threshold" : "fallback")}, policyholderAge: {policyHolder.GetContactAge()})");
                         testData = new CaravanEndorsementBuilder().InitialiseCaravanWithDefaultData(policy, policyHolder)
                                                               .WithNextPaymentDate(5)
                                                               .Build();

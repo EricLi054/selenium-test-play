@@ -1,5 +1,8 @@
-﻿/*
-PURPOSE: Get details about a policy that has had its payment details update.
+/*
+PURPOSE: Get details about a policy that has had its payment details update (Update How I Pay / UHIP).
+
+Endorsement reason is matched by T_ENDORSMENT_REASON.EXTERNAL_CODE = 'UHIP' and DESCRIPTION = 'Update How I Pay'
+(output column debit_admendment = True when that reason is present).
 
 PARAMETERS:
 @policyNumber  p_policy.external_policy_number 
@@ -25,9 +28,9 @@ SELECT p.external_policy_number
     ,CASE WHEN policy_event_payment_change.event_type = 2000153 THEN 'True' ELSE 'False' END as policy_event_payment_change
     ,policy_event_payment_change.EVENT_TYPE
     ,policy_event_payment_change.EVENT_TYPE_DSC
-    ,CASE WHEN debit_admendment.ENDORSMENT_REASON_ID = 1000006 THEN 'True' ELSE 'False' END as debit_admendment
-    ,debit_admendment.ENDORSMENT_REASON_ID
-    ,debit_admendment.ENDORSEMENT_DESCRIPTION
+    ,CASE WHEN uhip_reason.POLICY_ID IS NOT NULL THEN 'True' ELSE 'False' END as debit_admendment
+    ,uhip_reason.ENDORSMENT_REASON_ID
+    ,uhip_reason.ENDORSEMENT_DESCRIPTION
     ,event_records.EVENT_COUNT
 FROM p_policy p
     JOIN p_pol_header ph                         ON ph.active_policy_id = p.id
@@ -53,8 +56,9 @@ FROM p_policy p
                FROM    P_POLICY_ENDORSMENT_REASON per
                JOIN    T_ENDORSMENT_REASON ter ON ter.ID = per.ENDORSMENT_REASON_ID
                WHERE   per.POLICY_ID is NOT NULL
-               AND     per.ENDORSMENT_REASON_ID = 1000006)  -- Amend instalment debit details
-               debit_admendment       ON debit_admendment.policy_ID = p.id
+               AND     ( (ter.EXTERNAL_CODE = 'UHIP' AND ter.DESCRIPTION = 'Update How I Pay')
+                     OR per.ENDORSMENT_REASON_ID = 1000006 ))  -- UHIP (new) or Amend instalment debit details (legacy)
+               uhip_reason            ON uhip_reason.POLICY_ID = p.id
      JOIN      (SELECT p2.POLICY_HEADER_ID, count(*)as "EVENT_COUNT"
                FROM p_policy p2
                JOIN p_pol_header ph2  ON ph2.id = p2.POLICY_HEADER_ID 
