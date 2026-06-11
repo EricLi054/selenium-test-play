@@ -23,6 +23,8 @@ namespace UIDriver.Pages.Spark.Claim.UploadInvoice
         {
             public static string RemainingFileText(string number) => $"e.g. quotes, invoices and receipts. You can upload {number} for this claim.";
             public static readonly string MaxFileUploadText = "e.g. quotes, invoices and receipts. You've uploaded the maximum number of files.";
+            public static string HomeRemainingFileText(string number) => $"You can upload {number} for this claim.";
+            public static readonly string HomeMaxFileUploadText = "You've uploaded the maximum number of files.";
             public static readonly string NoFileUploadText = "Please upload a file";
             public static readonly string UnsupportedFileText = "Couldn't upload your file. File type not supported";
             public static readonly string ExceedsMaxFileSizeText = "Couldn't upload your file. It exceeds the maximum size of 8.5 MB";
@@ -78,7 +80,7 @@ namespace UIDriver.Pages.Spark.Claim.UploadInvoice
             return true;
         }
 
-        private void UploadFiles(List<string> files)
+        protected void UploadFiles(List<string> files)
         {
             string filePath = null;
 
@@ -225,7 +227,7 @@ namespace UIDriver.Pages.Spark.Claim.UploadInvoice
         }
 
         //Check file uploaded successfully
-        private bool UploadFileSuccessfully(List<string> file)
+        protected bool UploadFileSuccessfully(List<string> file)
         {
             var endTime = DateTime.Now.AddSeconds(WaitTimes.T10SEC);
             var success = false;
@@ -261,22 +263,28 @@ namespace UIDriver.Pages.Spark.Claim.UploadInvoice
         //Based on the how many files are uploade, verify the message        
         private void VerifyRemainingFilesMessage(int number)
         {            
-           _browser.PercyScreenCheck(DocumentUpload.RemainingFileMessage(number), GetPercyIgnoreCSS());
+            _browser.PercyScreenCheck(DocumentUpload.RemainingFileMessage(number), GetPercyIgnoreCSS());
+            bool isHomeClaim = _browser.Driver.Url.ToLower().Contains("home");
+
             if (number == 0)
             {
-                Reporting.AreEqual(Constants.MaxFileUploadText, GetInnerText(XPath.Field.RemainingFiles), "Remaining number of files");
+                var expected = isHomeClaim ? Constants.HomeMaxFileUploadText : Constants.MaxFileUploadText;
+                Reporting.AreEqual(expected, GetInnerText(XPath.Field.RemainingFiles), "Remaining number of files");
             }
             else if (number == 1)
             {
-                Reporting.AreEqual(Constants.RemainingFileText("one more file"), GetInnerText(XPath.Field.RemainingFiles), "Remaining number of files");
+                var expected = isHomeClaim ? Constants.HomeRemainingFileText("one more file") : Constants.RemainingFileText("one more file");
+                Reporting.AreEqual(expected, GetInnerText(XPath.Field.RemainingFiles), "Remaining number of files");
             }
             else if(number > 1 && number < 5)
             {
-                Reporting.AreEqual(Constants.RemainingFileText($"{number} more files"), GetInnerText(XPath.Field.RemainingFiles), "Remaining number of files");
+                var expected = isHomeClaim ? Constants.HomeRemainingFileText($"{number} more files") : Constants.RemainingFileText($"{number} more files");
+                Reporting.AreEqual(expected, GetInnerText(XPath.Field.RemainingFiles), "Remaining number of files");
             }
             else if (number == 5)
             {
-                Reporting.AreEqual(Constants.RemainingFileText($"{number} files"), GetInnerText(XPath.Field.RemainingFiles), "Remaining number of files");
+                var expected = isHomeClaim ? Constants.HomeRemainingFileText($"{number} files") : Constants.RemainingFileText($"{number} files");
+                Reporting.AreEqual(expected, GetInnerText(XPath.Field.RemainingFiles), "Remaining number of files");
             }
             else
             {

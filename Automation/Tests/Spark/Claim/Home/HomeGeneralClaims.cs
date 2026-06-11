@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -426,6 +426,12 @@ namespace Spark.Claim.Home
             }
             Reporting.IsNotNull(testData, $"suitable test data has been found, removing {testData.PolicyDetails.PolicyNumber} from list");
             policiesForSparkClaims.RemoveAll(x => x == testData.PolicyDetails.PolicyNumber);
+            if (testData.ExpectedOutcome == ExpectedClaimOutcome.RepairsCompleted || testData.ExpectedOutcome == ExpectedClaimOutcome.AlreadyHaveRepairQuote)
+            {
+                testData.FilesToUpload = new List<string> { FileType.PNGFile, FileType.PDFFile, FileType.JPGFile1, FileType.JPGFile2, FileType.JPGFile3 };
+                testData.FilesToDelete = new List<string> { FileType.JPGFile2, FileType.JPGFile3 };
+            }
+
             return testData;
         }
         #endregion

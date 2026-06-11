@@ -1,4 +1,4 @@
-﻿using Rac.TestAutomation.Common;
+using Rac.TestAutomation.Common;
 using UIDriver.Pages.Spark;
 using UIDriver.Pages.Spark.Claim.Home;
 using static Rac.TestAutomation.Common.Constants.ClaimsHome;
@@ -10,6 +10,7 @@ using UIDriver.Pages.MyRAC;
 using UIDriver.Pages.MyRACRegisterAnAccount;
 using UIDriver.Pages.MicrosoftAD;
 using UIDriver.Pages;
+using System.Linq;
 
 namespace Tests.ActionsAndValidations.Claims
 {
@@ -304,6 +305,21 @@ namespace Tests.ActionsAndValidations.Claims
 
             Reporting.LogTestShieldValidations($"Home Storm {claim.DamagedCovers.GetDescription()} Claim", claim.ClaimNumber);
             VerifySparkStormClaim.VerifyStormClaimDetailsInShield(claim, browser);
+
+            if (claim.FilesToUpload != null && claim.FilesToUpload.Count > 0)
+            {
+                if (claim.FilesToDelete != null && claim.FilesToDelete.Count > 0)
+                {
+                    claim.FilesToUpload = claim.FilesToUpload.Except(claim.FilesToDelete).ToList();
+                }
+
+                var person = DataHelper.GetPersonFromMemberCentralByContactId(claim.Claimant.Id);
+                Reporting.IsNotNull(person, $"Person API returned details for contact id: {claim.Claimant.Id}");
+                var uploadedFiles = Rac.TestAutomation.Common.DatabaseCalls.Claims.ShieldClaimDB.GetUploadedInvoiceFileNames(claim.ClaimNumber);
+                Reporting.AreEqual(claim.FilesToUpload.Count, uploadedFiles.Count, "Shield has the correct number of uploaded files attached to the claim");
+                var remainingFiles = DataHelper.GetRemainingUploadDocumentCount(person.PersonId, claim.ClaimNumber);
+                Reporting.AreEqual((Rac.TestAutomation.Common.Constants.ClaimsGeneral.MaxNumberOfFile - claim.FilesToUpload.Count), remainingFiles, "Remaining file upload count");
+            }
 
             if (useMyRACLogin 
                 && (claim.IsEmailAddressChanged || claim.IsMobileNumberChanged))
@@ -740,7 +756,11 @@ namespace Tests.ActionsAndValidations.Claims
                     uploadDocuments.VerifyDetailedContent(claim);
                 }
 
-                uploadDocuments.ClickNext();
+                if (claim.FilesToUpload != null && claim.FilesToUpload.Any())
+                    uploadDocuments.UploadFilesAndClickNext(claim.FilesToUpload, claim.FilesToDelete);
+                else
+                    uploadDocuments.ClickNext();
+
                 spinner.WaitForSpinnerToFinish();
             }
         }

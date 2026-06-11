@@ -32,6 +32,7 @@ namespace Rac.TestAutomation.Common
                     public static readonly string FirstAddress          = "id('mailingAddress-input-listbox')/li[not(contains(text(),'Loading'))]";
                     public static readonly string FirstAddressPopupDs   = "id('mailingAddress-input-field-popup')/li[not(contains(text(),'Loading'))]";
                     public static readonly string FirstNameInput        = "id('firstName')";
+                    public static readonly string MiddleNameInput       = "id('middleName')";
                     public static readonly string LastNameInput         = "id('lastName')";
                     public static readonly string ContactNumberInput    = "id('contactNumber')";
                     public static readonly string EmailInput            = "id('email')";
@@ -48,6 +49,7 @@ namespace Rac.TestAutomation.Common
                     public static readonly string LastNameLabel         = FORM + "//label[text()='Last name']";
                     // Policyholder details for No Match
                     public static readonly string FirstNameLabel        = FORM + "//label[text()='First name']";
+                    public static readonly string MiddleNameLabel       = FORM + "//label[@id='label-middleName']";
                     public static readonly string ContactNumberLabel    = FORM + "//label[text()='Contact number']";
                     public static readonly string EmailLabel            = FORM + "//label[text()='Email']";
                 }
@@ -67,6 +69,13 @@ namespace Rac.TestAutomation.Common
             get => GetValue(XPathPersonalInfo.Policyholder.Personal.FirstNameInput);
 
             set => WaitForTextFieldAndEnterText(XPathPersonalInfo.Policyholder.Personal.FirstNameInput, value, false);
+        }
+
+        public string MiddleName
+        {
+            get => GetValue(XPathPersonalInfo.Policyholder.Personal.MiddleNameInput);
+
+            set => WaitForTextFieldAndEnterText(XPathPersonalInfo.Policyholder.Personal.MiddleNameInput, value, false);
         }
 
         public string LastName

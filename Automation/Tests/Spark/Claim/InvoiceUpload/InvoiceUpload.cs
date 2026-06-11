@@ -32,8 +32,26 @@ namespace Spark.Claim.Motor
         }
 
         #region Test Cases
-
         
+        [Category(TestCategory.ClaimServicing), Category(TestCategory.Motor), Category(TestCategory.Spark), Category(TestCategory.SingleVehicleCollision), Category(TestCategory.Regression)]
+        [Test(Description = "Lodge a new motor collision claim with car not drivable and towed, then submit receipts via Claims Servicing")]
+        public void CMC_SingleVehicleCollision_NotDrivable_InvoiceUpload()
+        {
+            var claim = BuildTestDataMotorCollisionClaimNotDrivableWithUploadFiles();
+            Reporting.LogTestData(TestContext.CurrentContext.Test.Name, claim.ToString());
+
+            Reporting.LogTestStart();
+            LaunchPage.OpenClaimMotorCollisionURL(_browser, claim);
+            ActionSparkMotorCollisionClaim.LodgeMotorCollisionClaim(_browser, claim);
+
+            VerifySparkMotorCollisionClaim.VerifyConfirmationPage(_browser, claim);
+            claim.ClaimUploadFile.ClaimNumber = claim.ClaimNumber;
+            ActionSparkMotorCollisionClaim.ClickSubmitReceiptsNow(_browser, claim);
+            ActionClaimUploadInvoice.UploadAndSubmitInvoice(_browser, claim.ClaimUploadFile);
+            ActionClaimUploadInvoice.VerifyConfirmationPage(_browser, claim.ClaimUploadFile);
+            VerifyUploadInvoiceInShield(claim.ClaimUploadFile);
+        }
+
         [Category(TestCategory.ClaimServicing), Category(TestCategory.Motor), Category(TestCategory.Spark), Category(TestCategory.Glass), 
             Category(TestCategory.VisualTest), Category(TestCategory.Regression)]
         [Test(Description = "Verify maximum file limit reached error page")]
@@ -321,6 +339,22 @@ namespace Spark.Claim.Motor
 
             Reporting.IsNotNull(testData, "suitable test data has been found");
             return testData;
+        }
+
+        private ClaimCar BuildTestDataMotorCollisionClaimNotDrivableWithUploadFiles()
+        {
+            var azureTableName = Config.Get().Shield.Environment + DataType.Policy + DataPurpose.ForClaim + ProductType.Motor;
+            var motorPolicyEntities = DataHelper.AzureTableGetAllRecords(azureTableName)
+                .FindAll(x => (x.CoverType == DataHelper.GetDescription(MotorCovers.MFCO)) && (!x.IsEV) && (x.IsRegistrationValid)).PickRandom(10);
+
+            var claim = ClaimMotorCollision.BuildRandomTestDataSingleVehicleCollision(motorPolicyEntities, MotorClaimScenario.AccidentWithWildlife, TravelDirection.Forward, isDrivable: false, hasTPDetails: false);
+
+            var person = DataHelper.GetPersonFromMemberCentralByContactId(claim.Claimant.Id);
+            Reporting.IsNotNull(person, $"Person API returned details for contact id: {claim.Claimant.Id}");
+
+            var files = new List<string> { FileType.PNGFile, FileType.PDFFile, FileType.JPGFile1 };
+            claim.ClaimUploadFile = new ClaimUploadFile(null, person.PersonId, person.FirstName, files);
+            return claim;
         }
 
         private ClaimUploadFile BuildTestDataMotorGlassClaimClosedUploadFile(List<string> file, string contactRole)

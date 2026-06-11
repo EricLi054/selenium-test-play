@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Rac.TestAutomation.Common;
 using Rac.TestAutomation.Common.DatabaseCalls.Claims;
 using System;
@@ -25,7 +25,7 @@ namespace Spark.Claim.Motor
         private List<MotorPolicyEntity> _thirdPartyCoverMotorPoliciesForClaims;
         private List<MotorPolicyEntity> _evMotorPoliciesForClaims;
 
-        private readonly string _azureTableName = Config.Get().Shield.Environment + DataType.Policy + DataPurpose.ForClaim + ProductType.Motor;
+        private static readonly string _azureTableName = Config.Get().Shield.Environment + DataType.Policy + DataPurpose.ForClaim + ProductType.Motor;
 
         [OneTimeSetUp]
         public void OneTimeSetup()
@@ -410,7 +410,7 @@ namespace Spark.Claim.Motor
             public List<PolicyDetail> linkedMotorPolicies { get; set; }
         }
 
-        private ClaimCar BuildRandomTestDataSingleVehicleCollision(List<MotorPolicyEntity> motorPolicies, MotorClaimScenario motorClaimScenario, TravelDirection travelDirection,
+        public static ClaimCar BuildRandomTestDataSingleVehicleCollision(List<MotorPolicyEntity> motorPolicies, MotorClaimScenario motorClaimScenario, TravelDirection travelDirection,
             bool isDrivable, bool hasTPDetails, bool isTPAssetDamage = false, bool isTPOnlyClaim = false, bool repairerAllocationExhausted = false, RepairerOption repairerOption = RepairerOption.None)
         {
             ClaimPolicy motorClaimPolicy;
@@ -495,7 +495,6 @@ namespace Spark.Claim.Motor
             DataHelper.AzureTableDeleteEntityBasedOnPolicyNumber(motorClaimPolicy.motorPolicy.PolicyNumber, _azureTableName);
             return claimCar.Build();
         }
-
 
         private ClaimCar BuildRandomTestDataMultiVehicleCollision(List<MotorPolicyEntity> motorPolicies, MotorClaimScenario motorClaimScenario, TravelDirection travelDirection,
             bool isDrivable, bool hasTPDetails, bool isTPOnlyClaim = false, bool repairerAllocationExhausted = false, RepairerOption repairerOption = RepairerOption.None)
@@ -589,7 +588,7 @@ namespace Spark.Claim.Motor
         /// <param name="driverRole">The Driver role i.e. Policy Holder/ Co Policy Holder/ Additional driver/ New Contact</param>       
         /// <returns>Return an eligible motor policy for claim</returns>
         /// <exception cref="NotFoundException"></exception>
-        private ClaimPolicy GetEligiblePolicy(List<MotorPolicyEntity> motorPolicyEntities, DriverRole driverRole, MotorClaimTowedTo towedTo = MotorClaimTowedTo.None)
+        private static ClaimPolicy GetEligiblePolicy(List<MotorPolicyEntity> motorPolicyEntities, DriverRole driverRole, MotorClaimTowedTo towedTo = MotorClaimTowedTo.None)
         {
             ClaimPolicy claimPolicy = new ClaimPolicy();
             foreach (var entity in motorPolicyEntities)
@@ -635,7 +634,7 @@ namespace Spark.Claim.Motor
         /// <param name="policy"></param>
         /// <returns>Returns a Contact object, if could not found a driver based on the driver role then it will return null</returns>
         /// <exception cref="NotSupportedException"></exception>
-        private Contact GetDriver(DriverRole driverRole, MotorPolicy policy)
+        private static Contact GetDriver(DriverRole driverRole, MotorPolicy policy)
         {
             Contact driver = null;
 

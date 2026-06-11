@@ -1,6 +1,7 @@
-﻿using OpenQA.Selenium;
+using OpenQA.Selenium;
 using Rac.TestAutomation.Common;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using UIDriver.Pages.Spark.Claim.UploadInvoice;
 
@@ -97,6 +98,20 @@ namespace UIDriver.Pages.Spark.Claim.Home
         /// Capture a screenshot of the page for Extent Report, then select the button to confirm details
         /// and progress to the next page.
         /// </summary>
+        public void UploadFilesAndClickNext(List<string> files, List<string> filesToDelete = null)
+        {
+            UploadFiles(files);
+            if (!UploadFileSuccessfully(files))
+                Reporting.Error("File upload did not complete before proceeding", _driver.TakeSnapshot());
+
+            if (filesToDelete != null && filesToDelete.Any())
+            {
+                DeleteFiles(files, filesToDelete);
+            }
+
+            ClickNext();
+        }
+
         public void ClickNext()
         {
             Reporting.Log("Capturing Home Claim - Upload page before continuing.", _browser.Driver.TakeSnapshot());

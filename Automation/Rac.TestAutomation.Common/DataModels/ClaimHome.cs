@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -34,6 +34,8 @@ namespace Rac.TestAutomation.Common
         }
 
         public string ClaimNumber { get; set; }
+        public List<string> FilesToUpload { get; set; }
+        public List<string> FilesToDelete { get; set; }
         public GetQuotePolicy_Response PolicyDetails { get; set; }
         /// <summary>
         /// PolicyHolder / Representative who will lodge claim.

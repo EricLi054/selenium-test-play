@@ -18,48 +18,81 @@ namespace Tests.ActionsAndValidations
         #endregion
         /// <summary>
         /// Calls the Shield Contact API to retrieve a contact and verify the contact's details
-        /// against the test's expected values.
+        /// against the test's expected values. Supports both the main policyholder and additional
+        /// policyholders (co-owners).
         /// </summary>
-        /// <param name="expectedContact">Contact object that the test data is using to input into Insurance</param>
-        /// <param name="contactId">The Contact ID that Shield should have recorded this contact against</param>
-        /// <param name="includeMailingAddress">TRUE if we also verify mailing address, otherwise skip (such as where we haven't entered PH details yet).</param>
-        /// <param name="quoteStage"> The current stage of the Quote
-        public static void VerifyPHDetailsWithAPIResponse(Contact expectedContact, string contactId, bool includeMailingAddress = true, QuoteStage quoteStage = QuoteStage.POLICY_ISSUED)
+        /// <param name="expectedContact">Contact object that the test data is using to input into Insurance.</param>
+        /// <param name="contactId">The contact ID recorded in Shield.</param>
+        /// <param name="includeMailingAddress">TRUE if we also verify the full mailing address. Set to FALSE when PH details have not been entered yet (e.g. early quote stages).</param>
+        /// <param name="quoteStage">The current stage of the quote.</param>
+        /// <param name="isMainPolicyholder">TRUE when verifying the main policyholder (asserts policyholder Role + Gender). FALSE for an additional policyholder, where Role is not asserted (co-owners have a different role in Shield).</param>
+        /// <param name="assertMiddleName">TRUE to also assert the middle name in Shield matches the expected one. Defaults to FALSE so products that have not yet adopted middle name in their quote flow (e.g. Motorcycle) are not affected. Callers for products that do persist middle name (e.g. Caravan) should opt-in by passing TRUE.</param>
+        public static void VerifyPHDetailsWithAPIResponse(Contact expectedContact, string contactId, bool includeMailingAddress = true, QuoteStage quoteStage = QuoteStage.POLICY_ISSUED, bool isMainPolicyholder = true, bool assertMiddleName = false)
         {
             var contactDetailsFromShieldAPI = DataHelper.GetContactDetailsViaContactId(contactId);
 
             Reporting.AreEqual(expectedContact.DateOfBirth.Date, contactDetailsFromShieldAPI.DateOfBirth.Date, "Date Of Birth in Shield");
-            Reporting.AreEqual(QUOTE_ROLE_IN_SHIELD, contactDetailsFromShieldAPI.Roles[0].ExternalCode, "Role in Shield");
 
-            if (quoteStage == QuoteStage.POLICY_ISSUED)
+            if (isMainPolicyholder)
+            {
+                Reporting.IsTrue(contactDetailsFromShieldAPI.Roles != null && contactDetailsFromShieldAPI.Roles.Count > 0, "Roles are returned in Shield");
+                Reporting.AreEqual(QUOTE_ROLE_IN_SHIELD, contactDetailsFromShieldAPI.Roles[0].ExternalCode, "Role in Shield");
+            }
+
+            // Main PH title is only fully reconciled at policy issue; additional PH title is
+            // persisted as soon as personal info is captured.
+            if (quoteStage == QuoteStage.POLICY_ISSUED || !isMainPolicyholder)
             {
                 Reporting.AreEqual(expectedContact.Title, contactDetailsFromShieldAPI.Title, "Title in Shield");
             }
-            
-            Reporting.AreEqual(expectedContact.FirstName, contactDetailsFromShieldAPI.FirstName, ignoreCase: true, "First Name in Shield (NOT CASE SENSITIVE)");
-            Reporting.AreEqual(expectedContact.Surname, contactDetailsFromShieldAPI.Surname, ignoreCase: true, "Last Name in Shield (NOT CASE SENSITIVE)");
-            Reporting.AreEqual(expectedContact.Gender, contactDetailsFromShieldAPI.Gender, "Gender in Shield");
 
-            if (includeMailingAddress && 
-                expectedContact.MailingAddress != null && 
+            VerifyNameFieldsInShield(expectedContact, contactDetailsFromShieldAPI, assertMiddleName);
+
+            if (isMainPolicyholder)
+            {
+                Reporting.AreEqual(expectedContact.Gender, contactDetailsFromShieldAPI.Gender, "Gender in Shield");
+            }
+
+            if (includeMailingAddress &&
+                expectedContact.MailingAddress != null &&
                 expectedContact.MailingAddress.StreetNumber != null)
             {
                 Reporting.IsTrue(expectedContact.MailingAddress.IsEqualIgnorePostcode(contactDetailsFromShieldAPI.MailingAddress), $"Mailing address of policy holder ({expectedContact.MailingAddress.QASStreetAddress()}) should equal {contactDetailsFromShieldAPI.MailingAddress.QASStreetAddress()}");
                 Reporting.AreEqual(expectedContact.MailingAddress.State, contactDetailsFromShieldAPI.MailingAddress.State, "Mailing Address:State in Shield");
                 Reporting.AreEqual(expectedContact.MailingAddress.PostCode, contactDetailsFromShieldAPI.MailingAddress.PostCode, "Mailing Address:HouseNumber in Shield");
-            }else
+            }
+            else if (expectedContact.MailingAddress != null)
             {
                 Reporting.AreEqual(expectedContact.MailingAddress.Country, contactDetailsFromShieldAPI.MailingAddress.Country, true, "Mailing Address:Country in Shield");
                 Reporting.AreEqual(expectedContact.MailingAddress.State, contactDetailsFromShieldAPI.MailingAddress.State, true, "Mailing Address:State in Shield");
             }
-            
+
+            VerifyContactDetailsInShield(expectedContact, contactDetailsFromShieldAPI);
+        }
+
+        private static void VerifyNameFieldsInShield(Contact expectedContact, Contact actualContact, bool assertMiddleName)
+        {
+            Reporting.AreEqual(expectedContact.FirstName, actualContact.FirstName, ignoreCase: true, "First Name in Shield (NOT CASE SENSITIVE)");
+            // When the caller has opted in to middle name verification we always assert it,
+            // including when the expected value is empty - that proves the quote did not
+            // change the contact's middle name. Expected value precision is the caller's
+            // responsibility (see ShieldAPIVerification.BuildExpectedContact for the rules).
+            if (assertMiddleName)
+            {
+                Reporting.AreEqual(expectedContact.MiddleName, actualContact.MiddleName, ignoreCase: true, "Middle Name in Shield (NOT CASE SENSITIVE)");
+            }
+            Reporting.AreEqual(expectedContact.Surname, actualContact.Surname, ignoreCase: true, "Last Name in Shield (NOT CASE SENSITIVE)");
+        }
+
+        private static void VerifyContactDetailsInShield(Contact expectedContact, Contact actualContact)
+        {
             if (!string.IsNullOrEmpty(expectedContact.MobilePhoneNumber))
             {
-                Reporting.AreEqual(expectedContact.MobilePhoneNumber, contactDetailsFromShieldAPI.MobilePhoneNumber, "Mobile in Shield");
+                Reporting.AreEqual(expectedContact.MobilePhoneNumber, actualContact.MobilePhoneNumber, "Mobile in Shield");
             }
             if (expectedContact.PrivateEmail != null)
             {
-                Reporting.AreEqual(expectedContact.PrivateEmail.Address, contactDetailsFromShieldAPI.PrivateEmail.Address, ignoreCase: true, "Private Email address in Shield");
+                Reporting.AreEqual(expectedContact.PrivateEmail.Address, actualContact.PrivateEmail.Address, ignoreCase: true, "Private Email address in Shield");
             }
         }
 

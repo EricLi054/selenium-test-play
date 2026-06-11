@@ -178,7 +178,7 @@ namespace Spark.NewBusiness
         {
             var mainPH = new ContactBuilder().InitialiseRandomIndividual().WithoutDeclaringMembership(true)
                                 .WithRandomDateOfBirth(MIN_PH_AGE_VEHICLES, MIN_AGE_FOR_EXCESS_WAIVER - 1).Build();
-            var jointPH = new ContactBuilder().InitialiseRandomIndividual().WithoutDeclaringMembership(true)
+            var jointPH = new ContactBuilder().InitialiseRandomIndividual().WithoutMiddleName().WithoutDeclaringMembership(true)
                                 .WithRandomDateOfBirth(MIN_AGE_FOR_EXCESS_WAIVER, MAX_PH_AGE).Build();
             var caravan = new CaravanBuilder().InitialiseCaravanWithRandomData(new List<Contact>() { mainPH, jointPH })
                                 .WithExcess(CARAVAN_MIN_EXCESS_VALUE)
@@ -195,7 +195,7 @@ namespace Spark.NewBusiness
 
         private QuoteCaravan BuildTestDataWithMinExcessMaxSIMaxContSIPositivePremChngPayAnnualRandom20OldIndividual()
         {
-            var mainPH = new ContactBuilder().InitialiseRandomIndividual().WithoutDeclaringMembership(true)
+            var mainPH = new ContactBuilder().InitialiseRandomIndividual().WithoutMiddleName().WithoutDeclaringMembership(true)
                                 .WithDateOfBirth(DateTime.Now.AddYears(-PremiumChangePopup.DRIVER_AGE_FACTOR_RATE_GROUP2_MIN_AGE).AddDays(1)) //To trigger the Positive Premium change pop-up (based on the driver age factor), when the Policy start date is set to the next day.
                                 .Build();
             var caravanBuilder = new CaravanBuilder().InitialiseCaravanWithRandomData(new List<Contact>() { mainPH })

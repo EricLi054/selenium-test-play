@@ -44,7 +44,27 @@ namespace Tests.ActionsAndValidations
             Contact expectedContact = ShieldAPIVerification.BuildExpectedContact(Constants.PolicyGeneral.Vehicle.Caravan, quoteStage, quote.PolicyHolders[0]);
             var quoteDetailsFromAPI = DataHelper.GetQuoteDetails(quote.QuoteData.QuoteNumber);
             QuoteAndCoverDetailsViaShieldAPI(quote, quoteDetailsFromAPI, quoteStage);
-            VerifyPolicy.VerifyPHDetailsWithAPIResponse(expectedContact, quoteDetailsFromAPI.Policyholder.Id.ToString(), quoteStage: quoteStage);
+            VerifyPolicy.VerifyPHDetailsWithAPIResponse(
+                expectedContact,
+                quoteDetailsFromAPI.Policyholder.Id.ToString(),
+                quoteStage: quoteStage,
+                assertMiddleName: true);
+
+            //Verify the joint policyholder's details in Shield (only after personal info entered, when both PH details are persisted in Shield).
+            if (quoteStage == SparkBasePage.QuoteStage.AFTER_PERSONAL_INFO &&
+                quote.PolicyHolders.Count > 1)
+            {
+                Reporting.IsTrue(quoteDetailsFromAPI.PolicyCoOwners != null && quoteDetailsFromAPI.PolicyCoOwners.Count > 0,
+                    "Shield quote response includes co-owner details when quote has joint policyholders");
+                Contact expectedJointContact = ShieldAPIVerification.BuildExpectedContact(Constants.PolicyGeneral.Vehicle.Caravan, quoteStage, quote.PolicyHolders[1]);
+                VerifyPolicy.VerifyPHDetailsWithAPIResponse(
+                    expectedJointContact,
+                    quoteDetailsFromAPI.PolicyCoOwners[0].Id.ToString(),
+                    quoteStage: quoteStage,
+                    isMainPolicyholder: false,
+                    assertMiddleName: true);
+            }
+
             DetailsViaShieldAPI(quote, quoteDetailsFromAPI);
         }
 

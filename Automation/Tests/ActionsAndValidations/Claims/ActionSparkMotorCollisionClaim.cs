@@ -1,4 +1,4 @@
-﻿using Rac.TestAutomation.Common;
+using Rac.TestAutomation.Common;
 using Rac.TestAutomation.Common.API;
 using System;
 using System.Collections.Generic;
@@ -445,6 +445,18 @@ namespace Tests.ActionsAndValidations.Claims
                 }
                 repairerOptions.VerifyRepairerDetails(claim, serviceProviders);
                 repairerOptions.SelectRepairer(claim, serviceProviders);
+            }
+        }
+
+        /// <summary>
+        /// On the Motor Collision Confirmation page, click the 'Submit receipts now' button
+        /// to navigate to Claims Servicing for document upload.
+        /// </summary>
+        public static void ClickSubmitReceiptsNow(Browser browser, ClaimCar claim)
+        {
+            using (var confirmation = new Confirmation(browser))
+            {
+                confirmation.SubmitReceiptsNow(claim);
             }
         }
     }

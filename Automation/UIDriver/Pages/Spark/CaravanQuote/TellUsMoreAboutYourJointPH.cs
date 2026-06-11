@@ -30,6 +30,8 @@ namespace UIDriver.Pages.Spark.CaravanQuote
                 GetElement(XPathPersonalInfo.Policyholder.Details.GenderButtonGroup);
                 GetElement(XPathPersonalInfo.Policyholder.Details.FirstNameLabel);
                 GetElement(XPathPersonalInfo.Policyholder.Personal.FirstNameInput);
+                GetElement(XPathPersonalInfo.Policyholder.Details.MiddleNameLabel);
+                GetElement(XPathPersonalInfo.Policyholder.Personal.MiddleNameInput);
                 GetElement(XPathPersonalInfo.Policyholder.Details.LastNameLabel);
                 GetElement(XPathPersonalInfo.Policyholder.Personal.LastNameInput);
                 GetElement(XPathPersonalInfo.Policyholder.Details.ContactNumberLabel);
@@ -59,6 +61,10 @@ namespace UIDriver.Pages.Spark.CaravanQuote
         {
             SetTitleWithGender(jointPolicyHolder);
             FirstName = jointPolicyHolder.FirstName;
+            if (!string.IsNullOrEmpty(jointPolicyHolder.MiddleName))
+            {
+                MiddleName = jointPolicyHolder.MiddleName;
+            }
             LastName = jointPolicyHolder.Surname;
             ContactNumber = jointPolicyHolder.MobilePhoneNumber;
             Email = jointPolicyHolder.PrivateEmail.Address;

@@ -1,7 +1,7 @@
 ﻿using Rac.TestAutomation.Common;
 using System;
-using System.Globalization;
 using System.Text.RegularExpressions;
+using static Rac.TestAutomation.Common.Constants.Contacts;
 using static Rac.TestAutomation.Common.Constants.PolicyCaravan;
 using static Rac.TestAutomation.Common.Constants.PolicyGeneral;
 using static Rac.TestAutomation.Common.Constants.General;
@@ -216,7 +216,8 @@ namespace UIDriver.Pages.Spark.CaravanQuote
         //Verify policyholder details
         private void VerifyPolicyHolderDetails(QuoteCaravan quoteCaravan)
         {
-            Reporting.AreEqual($"{quoteCaravan.PolicyHolders[0].Title} {quoteCaravan.PolicyHolders[0].FirstName} {quoteCaravan.PolicyHolders[0].Surname}", PolicyHolderName, ignoreCase: true, "Policy holder name on policy summary screen (NOT CASE SENSITIVE)");
+            bool isRetrieveQuote = quoteCaravan.RetrieveQuote.HasValue;
+            VerifyPolicySummaryName(quoteCaravan.PolicyHolders[0], PolicyHolderName, "Policy holder name on policy summary screen (NOT CASE SENSITIVE)", isRetrieveQuote);
             if (quoteCaravan.PolicyHolders[0].Title == Constants.Contacts.Title.Dr || quoteCaravan.PolicyHolders[0].Title == Constants.Contacts.Title.Mx)
             {
                 Reporting.AreEqual(quoteCaravan.PolicyHolders[0].GenderString, PolicyHolderGender, "Policy holder gender on policy summary screen");
@@ -229,7 +230,7 @@ namespace UIDriver.Pages.Spark.CaravanQuote
             //Verify additional policy holder details
             if (quoteCaravan.PolicyHolders.Count > 1)
             {
-                Reporting.AreEqual($"{quoteCaravan.PolicyHolders[1].Title} {quoteCaravan.PolicyHolders[1].FirstName} {quoteCaravan.PolicyHolders[1].Surname}", JointPolicyHolderName, ignoreCase: true, comparisonContext: "Joint Policy holder name on policy summary screen (NOT CASE SENSITIVE)");
+                VerifyPolicySummaryName(quoteCaravan.PolicyHolders[1], JointPolicyHolderName, "Joint Policy holder name on policy summary screen (NOT CASE SENSITIVE)", isRetrieveQuote);
                 if (quoteCaravan.PolicyHolders[1].Title == Constants.Contacts.Title.Dr || quoteCaravan.PolicyHolders[1].Title == Constants.Contacts.Title.Mx)
                 {
                     Reporting.AreEqual(quoteCaravan.PolicyHolders[1].GenderString, JointPolicyHolderGender, "Joint Policy holder gender on policy summary screen");
@@ -239,6 +240,28 @@ namespace UIDriver.Pages.Spark.CaravanQuote
                 Reporting.IsTrue(quoteCaravan.PolicyHolders[1].MailingAddress.IsEqualToString(JointPolicyHolderAddress), $"Joint Policy holder address {quoteCaravan.PolicyHolders[1].MailingAddress.QASStreetAddress()} matches the shown address of {JointPolicyHolderAddress} on policy summary screen");
                 Reporting.AreEqual(quoteCaravan.PolicyHolders[1].DateOfBirth.ToString(Constants.General.DateTimeTextFormat.ddMMyyyy), JointPolicyHolderDateOfBirth, "Joint Policy holder date of birth on policy summary screen");
             }
+        }
+
+        private static void VerifyPolicySummaryName(Contact policyHolder, string displayedName, string comparisonContext, bool isRetrieveQuote)
+        {
+            // The policy summary renders the title in its short enum form (e.g. "Dr", "Mr") rather
+            // than the description form ("Doctor"). Middle name only appears on the summary when
+            // the policyholder actually entered it on the 'Tell us more about you' page (no-match
+            // upfront / skip-declaring-membership), OR when the quote was retrieved and Shield
+            // rehydrated a previously persisted middle name onto the page. For matched-upfront
+            // flows that are not a retrieve, the field is never shown to the user, so it is
+            // omitted from the expected string even when the test data carries a middle name.
+            var titlePrefix = policyHolder.Title == Constants.Contacts.Title.None ? string.Empty : $"{policyHolder.Title} ";
+            var includeMiddleName = !string.IsNullOrEmpty(policyHolder.MiddleName)
+                                    && ((policyHolder.MemberMatchRule == MemberMatchRule.None && !policyHolder.IsMultiMatchRSAMember)
+                                        || policyHolder.SkipDeclaringMembership
+                                        || isRetrieveQuote);
+
+            var expectedName = includeMiddleName
+                ? $"{titlePrefix}{policyHolder.FirstName} {policyHolder.MiddleName} {policyHolder.Surname}"
+                : $"{titlePrefix}{policyHolder.FirstName} {policyHolder.Surname}";
+
+            Reporting.AreEqual(expectedName, displayedName, ignoreCase: true, comparisonContext);
         }
 
         public void VerifyPaymentAmount(QuoteCaravan quoteCaravan)

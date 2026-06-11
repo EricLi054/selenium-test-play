@@ -73,43 +73,50 @@ namespace UIDriver.Pages.Spark.CaravanQuote
         public void VerifyPageContent(Contact policyHolder, RetrieveQuoteType? retrieveQuote)
         {
             //When member single matched upfront
-            if ((policyHolder.MemberMatchRule != MemberMatchRule.None) && !policyHolder.IsMultiMatchRSAMember && !policyHolder.SkipDeclaringMembership && !retrieveQuote.HasValue)
+            if (policyHolder.MemberMatchRule != MemberMatchRule.None && !policyHolder.IsMultiMatchRSAMember && !policyHolder.SkipDeclaringMembership && !retrieveQuote.HasValue)
             {
-                bool AreRelevantLabelsAndFieldsDisplayed = IsControlDisplayed(XPath.MatchedMember.ConfirmAddressLabel) && IsControlDisplayed(XPathPersonalInfo.Policyholder.Personal.MailingAddress);
-                bool AreIrrelevantLabelsAndFieldsNotDisplayed;
+                bool valid = IsControlDisplayed(XPath.MatchedMember.ConfirmAddressLabel) && IsControlDisplayed(XPathPersonalInfo.Policyholder.Personal.MailingAddress) &&
+                             IsHidden(XPathPersonalInfo.Policyholder.Details.LastNameLabel, XPathPersonalInfo.Policyholder.Personal.LastNameInput) &&
+                             IsHidden(XPathPersonalInfo.Policyholder.Details.FirstNameLabel, XPathPersonalInfo.Policyholder.Personal.FirstNameInput) &&
+                             IsHidden(XPathPersonalInfo.Policyholder.Details.MiddleNameLabel, XPathPersonalInfo.Policyholder.Personal.MiddleNameInput) &&
+                             IsHidden(XPathPersonalInfo.Policyholder.Details.ContactNumberLabel, XPathPersonalInfo.Policyholder.Personal.ContactNumberInput) &&
+                             IsHidden(XPathPersonalInfo.Policyholder.Details.EmailLabel, XPathPersonalInfo.Policyholder.Personal.EmailInput) &&
+                             IsHidden(XPathPersonalInfo.Policyholder.Details.TitleLabel, XPathPersonalInfo.Policyholder.Details.TitleButtonGroup);
 
-                AreIrrelevantLabelsAndFieldsNotDisplayed = !IsControlDisplayed(XPathPersonalInfo.Policyholder.Details.LastNameLabel) && !IsControlDisplayed(XPathPersonalInfo.Policyholder.Personal.LastNameInput) &&
-                                                                !IsControlDisplayed(XPathPersonalInfo.Policyholder.Details.FirstNameLabel) && !IsControlDisplayed(XPathPersonalInfo.Policyholder.Personal.FirstNameInput) &&
-                                                                !IsControlDisplayed(XPathPersonalInfo.Policyholder.Details.ContactNumberLabel) && !IsControlDisplayed(XPathPersonalInfo.Policyholder.Personal.ContactNumberInput) &&
-                                                                !IsControlDisplayed(XPathPersonalInfo.Policyholder.Details.EmailLabel) && !IsControlDisplayed(XPathPersonalInfo.Policyholder.Personal.EmailInput);
-
-                AreIrrelevantLabelsAndFieldsNotDisplayed = AreIrrelevantLabelsAndFieldsNotDisplayed && !IsControlDisplayed(XPathPersonalInfo.Policyholder.Details.TitleLabel) && !IsControlDisplayed(XPathPersonalInfo.Policyholder.Details.TitleButtonGroup);
-
-                Reporting.IsTrue(AreRelevantLabelsAndFieldsDisplayed && AreIrrelevantLabelsAndFieldsNotDisplayed, "Tell us more about you page displays only the labels and fields applicable only for single match users");
+                Reporting.IsTrue(valid, "Tell us more about you page displays only the labels and fields applicable only for single match users");
             }
             //When member multi matched upfront
             else if (policyHolder.IsMultiMatchRSAMember && !policyHolder.SkipDeclaringMembership && !retrieveQuote.HasValue)
             {
-                bool AreRelevantLabelsAndFieldsDisplayed = IsControlDisplayed(XPathPersonalInfo.Policyholder.Details.MailingAddressLabel) && IsControlDisplayed(XPathPersonalInfo.Policyholder.Personal.MailingAddress) &&
-                                                            IsControlDisplayed(XPathPersonalInfo.Policyholder.Details.TitleLabel) && IsControlDisplayed(XPathPersonalInfo.Policyholder.Details.TitleButtonGroup) &&
-                                                            IsControlDisplayed(XPathPersonalInfo.Policyholder.Details.LastNameLabel) && IsControlDisplayed(XPathPersonalInfo.Policyholder.Personal.LastNameInput);
-                bool AreIrrelevantLabelsAndFieldsNotDisplayed = !IsControlDisplayed(XPathPersonalInfo.Policyholder.Details.FirstNameLabel) && !IsControlDisplayed(XPathPersonalInfo.Policyholder.Personal.FirstNameInput) &&
-                                                            !IsControlDisplayed(XPathPersonalInfo.Policyholder.Details.ContactNumberLabel) && !IsControlDisplayed(XPathPersonalInfo.Policyholder.Personal.ContactNumberInput) &&
-                                                            !IsControlDisplayed(XPathPersonalInfo.Policyholder.Details.EmailLabel) && !IsControlDisplayed(XPathPersonalInfo.Policyholder.Personal.EmailInput);
+                bool valid = IsMultiMatchFormShown() &&
+                             IsHidden(XPathPersonalInfo.Policyholder.Details.FirstNameLabel, XPathPersonalInfo.Policyholder.Personal.FirstNameInput) &&
+                             IsHidden(XPathPersonalInfo.Policyholder.Details.ContactNumberLabel, XPathPersonalInfo.Policyholder.Personal.ContactNumberInput) &&
+                             IsHidden(XPathPersonalInfo.Policyholder.Details.EmailLabel, XPathPersonalInfo.Policyholder.Personal.EmailInput);
 
-                Reporting.IsTrue(AreRelevantLabelsAndFieldsDisplayed && AreIrrelevantLabelsAndFieldsNotDisplayed, "Tell us more about you page displays only the labels and fields applicable only for multi match users");
+                Reporting.IsTrue(valid, "Tell us more about you page displays only the labels and fields applicable only for multi match users");
             }
             else
             {
-                bool AreRelevantLabelsAndFieldsDisplayed = IsControlDisplayed(XPathPersonalInfo.Policyholder.Details.MailingAddressLabel) && IsControlDisplayed(XPathPersonalInfo.Policyholder.Personal.MailingAddress) &&
-                                                            IsControlDisplayed(XPathPersonalInfo.Policyholder.Details.TitleLabel) && IsControlDisplayed(XPathPersonalInfo.Policyholder.Details.TitleButtonGroup) &&
-                                                            IsControlDisplayed(XPathPersonalInfo.Policyholder.Details.LastNameLabel) && IsControlDisplayed(XPathPersonalInfo.Policyholder.Personal.LastNameInput) &&
-                                                            IsControlDisplayed(XPathPersonalInfo.Policyholder.Details.FirstNameLabel) && IsControlDisplayed(XPathPersonalInfo.Policyholder.Personal.FirstNameInput) &&
-                                                            IsControlDisplayed(XPathPersonalInfo.Policyholder.Details.ContactNumberLabel) && IsControlDisplayed(XPathPersonalInfo.Policyholder.Personal.ContactNumberInput) &&
-                                                            IsControlDisplayed(XPathPersonalInfo.Policyholder.Details.EmailLabel) && IsControlDisplayed(XPathPersonalInfo.Policyholder.Personal.EmailInput);
-                Reporting.IsTrue(AreRelevantLabelsAndFieldsDisplayed, "Tell us more about you page displays all the labels and fields applicable for no match users");
+                bool valid = IsMultiMatchFormShown() &&
+                             IsShown(XPathPersonalInfo.Policyholder.Details.FirstNameLabel, XPathPersonalInfo.Policyholder.Personal.FirstNameInput) &&
+                             IsShown(XPathPersonalInfo.Policyholder.Details.MiddleNameLabel, XPathPersonalInfo.Policyholder.Personal.MiddleNameInput) &&
+                             IsShown(XPathPersonalInfo.Policyholder.Details.ContactNumberLabel, XPathPersonalInfo.Policyholder.Personal.ContactNumberInput) &&
+                             IsShown(XPathPersonalInfo.Policyholder.Details.EmailLabel, XPathPersonalInfo.Policyholder.Personal.EmailInput);
+
+                Reporting.IsTrue(valid, "Tell us more about you page displays all the labels and fields applicable for no match users");
             }
         }
+
+        private bool IsShown(string labelXPath, string inputXPath) =>
+            IsControlDisplayed(labelXPath) && IsControlDisplayed(inputXPath);
+
+        private bool IsHidden(string labelXPath, string inputXPath) =>
+            !IsControlDisplayed(labelXPath) && !IsControlDisplayed(inputXPath);
+
+        private bool IsMultiMatchFormShown() =>
+            IsShown(XPathPersonalInfo.Policyholder.Details.MailingAddressLabel, XPathPersonalInfo.Policyholder.Personal.MailingAddress) &&
+            IsShown(XPathPersonalInfo.Policyholder.Details.TitleLabel, XPathPersonalInfo.Policyholder.Details.TitleButtonGroup) &&
+            IsShown(XPathPersonalInfo.Policyholder.Details.LastNameLabel, XPathPersonalInfo.Policyholder.Personal.LastNameInput);
 
         public void FillPersonalInformation(Contact policyHolder)
         {
@@ -122,6 +129,10 @@ namespace UIDriver.Pages.Spark.CaravanQuote
             {
                 SetTitleWithGender(policyHolder);
                 FirstName = policyHolder.FirstName;
+                if (!string.IsNullOrEmpty(policyHolder.MiddleName))
+                {
+                    MiddleName = policyHolder.MiddleName;
+                }
                 LastName = policyHolder.Surname;
                 ContactNumber = policyHolder.MobilePhoneNumber;
                 Email = policyHolder.PrivateEmail.Address;
